@@ -62,6 +62,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (!u) {
+        unsubscribeDoc();
         setLoading(false);
         setIsPaywall(false);
         setTrialEndsAt(null);
@@ -87,8 +88,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
         }
       };
       
-      await checkDoc();
+      try {
+        await checkDoc();
+      } catch (checkErr) {
+        console.error("Error setting up user doc:", checkErr);
+      }
 
+      // Ensure we clean up any existing listener before starting a new one
+      unsubscribeDoc();
       unsubscribeDoc = onSnapshot(userRef, (snap) => {
         if (snap.exists()) {
           const data = snap.data();

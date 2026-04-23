@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
+import { LOGO_BASE64 } from '@/lib/logoBase64';
 
 import { Paywall } from './Paywall';
 import { LoadingScreen } from './ui/LoadingScreen';
@@ -86,7 +87,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="absolute top-0 left-0 right-0 h-2 bg-[var(--neu-accent)]" />
           
           <div className="neu-panel-inset mx-auto w-16 h-16 md:w-20 md:h-20 rounded-full flex flex-col justify-center items-center text-blue-400 mb-6 overflow-hidden">
-            <img src="/logo.png" alt="IT-Box Logo" className="w-[120%] h-[120%] object-contain" />
+            <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[120%] h-[120%] object-contain" />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-wide mb-3">IT-Box</h1>
           <p className="text-[var(--neu-text-muted)] font-medium mb-8 md:mb-10 leading-relaxed text-sm lg:text-base">
@@ -165,7 +166,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
          <div className={cn("pt-6 pb-2 flex items-center", desktopSidebarOpen ? "px-6 justify-between" : "px-0 justify-center")}>
             <div className="flex items-center gap-2 overflow-hidden px-2 py-0.5">
                <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-10 h-10 flex items-center justify-center shrink-0">
-                  <img src="/logo.png" alt="IT-Box Logo" className="w-[140%] h-[140%] object-contain" />
+                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[140%] h-[140%] object-contain" />
                </div>
                {desktopSidebarOpen && <span className="text-lg font-bold tracking-tight whitespace-nowrap">IT-Box</span>}
             </div>
@@ -228,8 +229,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
              <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0">
                 <Search className="h-4 w-4" />
              </div>
-               <div className={`h-8 px-2 md:px-4 flex items-center justify-center text-[10px] md:text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'ru' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('ru')}>RU</div>
-               <div className={`h-8 px-2 md:px-4 flex items-center justify-center text-[10px] md:text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'en' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('en')}>EN</div>
+               <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')}>
+                  {i18n.language === 'ru' ? 'RU' : 'EN'}
+               </div>
              <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
                 <LogOut className="h-4 w-4" />
              </div>
@@ -274,6 +276,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       </Link>
                     ))}
                     <div className="my-1.5 h-px neu-panel-inset opacity-50" />
+                    
+                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <HelpCircle className="h-4 w-4" />
+                       {t('about')}
+                    </Link>
+                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <HelpCircle className="h-4 w-4" />
+                       {t('faq')}
+                    </Link>
+                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <CreditCard className="h-4 w-4" />
+                       {t('pricing')}
+                    </Link>
                  </nav>
                  <div className="p-5 text-[11px] text-[var(--neu-text-muted)] opacity-80 mt-auto border-t border-[var(--neu-border)]/20 font-medium">
                     <div className="flex flex-col gap-1.5 mb-4">

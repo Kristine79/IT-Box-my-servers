@@ -182,11 +182,11 @@ service cloud.firestore {
     // --- Entity Rules ---
 
     match /users/{userId} {
-      allow get: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId;
+      allow get: if isAuthenticated() && request.auth.uid == userId;
       allow list: if false; // Blanket lists forbidden
-      allow create: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId
+      allow create: if isAuthenticated() && request.auth.uid == userId
                     && isValidUserCreate(incoming());
-      allow update: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId
+      allow update: if isAuthenticated() && request.auth.uid == userId
                     && isValidUserUpdate(incoming())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['notificationsEnabled']);
       allow delete: if false;

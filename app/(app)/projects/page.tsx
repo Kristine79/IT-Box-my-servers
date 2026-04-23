@@ -276,17 +276,16 @@ export default function ProjectsPage() {
                 <div className="neu-panel-inset p-3 rounded-full text-blue-400 shrink-0">
                   <FolderKanban className="w-6 h-6" />
                 </div>
-                <div className="relative h-8 flex items-center justify-end flex-1">
+                <div className="flex flex-col items-end sm:flex-row sm:items-center justify-end gap-2 flex-1">
                   <div className={cn(
-                    "text-xs font-bold px-3 py-1 rounded-full shrink-0 transition-all duration-300 absolute right-0",
-                    p.status === 'active' ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500",
-                    "group-hover:opacity-0 group-hover:scale-95"
+                    "text-[10px] md:text-xs font-bold px-3 py-1 rounded-full shrink-0",
+                    p.status === 'active' ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500"
                   )}>
                     {p.status === 'active' ? t('status_active') : t('status_archive')}
                   </div>
-                  <div className="flex gap-1 absolute right-0 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
-                    <button className="neu-button h-8 w-8 text-blue-500" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
-                    <button onClick={() => handleDelete(p.id)} className="neu-button h-8 w-8 text-red-500" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
+                  <div className="flex gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="neu-button h-8 w-8 text-blue-500 flex items-center justify-center shrink-0" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
+                    <button onClick={() => handleDelete(p.id)} className="neu-button h-8 w-8 text-red-500 flex items-center justify-center shrink-0" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
                   </div>
                 </div>
               </div>
