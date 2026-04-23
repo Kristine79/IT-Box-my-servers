@@ -16,13 +16,19 @@ import { motion, AnimatePresence } from 'motion/react';
 import { NotificationBell } from './NotificationBell';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isPaywall, login, logout } = useAuth();
+  const { user, loading, isPaywall, login, loginWithEmail, logout } = useAuth();
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const pathname = usePathname();
   const [isNavigating, setIsNavigating] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isEmailView, setIsEmailView] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   useEffect(() => {
     setIsNavigating(true);
@@ -67,10 +73,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // If not logged in
   if (!user) {
+    const handleEmailAuth = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setAuthError('');
+      try {
+        await loginWithEmail(email, password, isRegistering);
+      } catch (err: any) {
+        setAuthError(err.message || 'Authentication error');
+      }
+    };
+
     return (
       <div className="flex bg-[var(--neu-bg)] text-[var(--neu-text)] h-screen w-full flex-col items-center justify-center p-6">
         <div className="neu-panel p-10 md:p-14 text-center rounded-3xl max-w-md w-full relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-2 bg-[var(--neu-accent)]" />
+          
           <div className="neu-panel-inset mx-auto w-20 h-20 rounded-full flex flex-col justify-center items-center text-blue-400 mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
@@ -78,9 +95,44 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <p className="text-[var(--neu-text-muted)] font-medium mb-10 leading-relaxed text-sm lg:text-base">
             {t('login_subtitle')}
           </p>
-          <button onClick={login} className="neu-button font-bold text-base w-full py-4 bg-[var(--neu-accent)] text-white shadow-none hover:opacity-90 transition-opacity">
-            {t('login')}
-          </button>
+          
+          {isEmailView ? (
+             <form onSubmit={handleEmailAuth} className="space-y-4 text-left">
+                {authError && <div className="text-sm text-red-500 bg-red-100 dark:bg-red-900/30 p-2 rounded">{authError}</div>}
+                
+                <div>
+                  <label className="text-xs uppercase tracking-wider font-bold text-[var(--neu-text-muted)] ml-1">{t('email_ph', 'Email address')}</label>
+                  <Input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="neu-input w-full mt-1" />
+                </div>
+                <div>
+                  <label className="text-xs uppercase tracking-wider font-bold text-[var(--neu-text-muted)] ml-1">{t('password_ph', 'Password')}</label>
+                  <Input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full mt-1" />
+                </div>
+                
+                <div className="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="register" checked={isRegistering} onChange={e=>setIsRegistering(e.target.checked)} className="rounded" />
+                  <label htmlFor="register" className="text-sm cursor-pointer">{t('register_new_account', 'Register new account')}</label>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-3">
+                   <button type="submit" className="neu-button font-bold py-3 bg-[var(--neu-accent)] text-white shadow-none w-full">
+                     {isRegistering ? t('sign_up', 'Sign Up') : t('sign_in', 'Sign In')}
+                   </button>
+                   <button type="button" onClick={() => {setIsEmailView(false); setAuthError('');}} className="neu-button py-3 text-sm font-medium w-full">
+                     {t('back', 'Back')}
+                   </button>
+                </div>
+             </form>
+          ) : (
+             <div className="flex flex-col gap-3">
+                <button onClick={login} className="neu-button font-bold text-base w-full py-4 bg-[var(--neu-accent)] text-white shadow-none hover:opacity-90 transition-opacity">
+                  {t('login', 'Login with Google')}
+                </button>
+                <button onClick={() => setIsEmailView(true)} className="neu-button font-bold text-base w-full py-4 border border-[var(--neu-border)] hover:opacity-90 transition-opacity text-[var(--neu-text-muted)]">
+                  {t('login_email', 'Login with Email')}
+                </button>
+             </div>
+          )}
         </div>
       </div>
     );

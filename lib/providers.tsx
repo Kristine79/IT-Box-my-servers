@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 import i18n from 'i18next';
@@ -300,6 +300,7 @@ type AuthContextType = {
   notificationsEnabled: boolean;
   login: () => Promise<void>;
   loginWithEmail: (e: string, p: string, isRegister?: boolean) => Promise<void>;
+  loginWithApple: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<{ notificationsEnabled: boolean }>) => Promise<void>;
 };
@@ -313,6 +314,7 @@ const AuthContext = createContext<AuthContextType>({
   notificationsEnabled: true,
   login: async () => {},
   loginWithEmail: async () => {},
+  loginWithApple: async () => {},
   logout: async () => {},
   updateProfile: async () => {}
 });
@@ -397,6 +399,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     await signInWithPopup(auth, provider);
   };
 
+  const loginWithApple = async () => {
+    const provider = new OAuthProvider('apple.com');
+    await signInWithPopup(auth, provider);
+  };
+
   const loginWithEmail = async (email: string, pass: string, isRegister = false) => {
     if (isRegister) {
       await createUserWithEmailAndPassword(auth, email, pass);
@@ -416,7 +423,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, logout, updateProfile }}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>
