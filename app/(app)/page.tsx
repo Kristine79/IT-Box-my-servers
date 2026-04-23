@@ -180,34 +180,34 @@ export default function DashboardPage() {
       </div>
 
       {/* Recents */}
-      <div className="grid lg:grid-cols-2 gap-8">
-        <motion.div variants={item} className="neu-panel p-6 md:p-8">
-           <h3 className="text-xl font-bold mb-6">{t('recent_projects')}</h3>
-          <div className="space-y-4">
+      <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
+        <motion.div variants={item} className="neu-panel p-4 md:p-5">
+           <h3 className="text-lg font-bold mb-4">{t('recent_projects')}</h3>
+          <div className="space-y-2">
              {recentProjects.length === 0 ? <p className="text-sm opacity-50">{t('no_data')}</p> : null}
              {recentProjects.map((p) => (
-               <Link href="/projects" prefetch={true} key={p.id} className="block group p-4 -mx-4 rounded-2xl hover:bg-[var(--neu-accent)]/5 transition-all">
+               <Link href="/projects" prefetch={true} key={p.id} className="block group p-3 -mx-3 rounded-xl hover:bg-[var(--neu-accent)]/5 transition-all">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium group-hover:text-[var(--neu-accent)] transition-colors">{p.name}</span>
+                    <span className="text-base font-medium group-hover:text-[var(--neu-accent)] transition-colors">{p.name}</span>
                     <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                   </div>
-                  <p className="text-[var(--neu-text-muted)] text-sm mt-1 truncate">{p.description || t('no_description')}</p>
+                  <p className="text-[var(--neu-text-muted)] text-xs mt-0.5 truncate">{p.description || t('no_description')}</p>
                </Link>
              ))}
           </div>
         </motion.div>
 
-        <motion.div variants={item} className="neu-panel p-6 md:p-8">
-           <h3 className="text-xl font-bold mb-6">{t('recent_servers')}</h3>
-          <div className="space-y-4">
+        <motion.div variants={item} className="neu-panel p-4 md:p-5">
+           <h3 className="text-lg font-bold mb-4">{t('recent_servers')}</h3>
+          <div className="space-y-2">
              {recentServers.length === 0 ? <p className="text-sm opacity-50">{t('no_data')}</p> : null}
              {recentServers.map((s) => (
-               <Link href="/servers" prefetch={true} key={s.id} className="block group p-4 -mx-4 rounded-2xl hover:bg-[var(--neu-accent)]/5 transition-all">
+               <Link href="/servers" prefetch={true} key={s.id} className="block group p-3 -mx-3 rounded-xl hover:bg-[var(--neu-accent)]/5 transition-all">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium group-hover:text-[var(--neu-accent)] transition-colors">{s.name}</span>
+                    <span className="text-base font-medium group-hover:text-[var(--neu-accent)] transition-colors">{s.name}</span>
                     <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                   </div>
-                  <p className="text-[var(--neu-text-muted)] font-mono text-sm mt-1">{s.ipAddress}</p>
+                  <p className="text-[var(--neu-text-muted)] font-mono text-xs mt-0.5">{s.ipAddress}</p>
                </Link>
              ))}
           </div>

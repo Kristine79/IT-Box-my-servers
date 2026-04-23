@@ -272,12 +272,22 @@ export default function ProjectsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map(p => (
             <div key={p.id} className="neu-panel p-6 flex flex-col h-full group relative transition-all duration-300 hover:scale-[1.02]">
-              <div className="flex justify-between items-start mb-6 gap-4 relative">
+              <div className="flex justify-between items-start mb-6 gap-4">
                 <div className="neu-panel-inset p-3 rounded-full text-blue-400 shrink-0">
                   <FolderKanban className="w-6 h-6" />
                 </div>
-                <div className={p.status === 'active' ? "text-xs font-bold px-3 py-1 bg-green-500/10 text-green-500 rounded-full shrink-0" : "text-xs font-bold px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full shrink-0"}>
-                  {p.status === 'active' ? t('status_active') : t('status_archive')}
+                <div className="relative h-8 flex items-center justify-end flex-1">
+                  <div className={cn(
+                    "text-xs font-bold px-3 py-1 rounded-full shrink-0 transition-all duration-300 absolute right-0",
+                    p.status === 'active' ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500",
+                    "group-hover:opacity-0 group-hover:scale-95"
+                  )}>
+                    {p.status === 'active' ? t('status_active') : t('status_archive')}
+                  </div>
+                  <div className="flex gap-1 absolute right-0 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
+                    <button className="neu-button h-8 w-8 text-blue-500" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
+                    <button onClick={() => handleDelete(p.id)} className="neu-button h-8 w-8 text-red-500" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
+                  </div>
                 </div>
               </div>
               
@@ -316,10 +326,6 @@ export default function ProjectsPage() {
               </Dialog>
             </div>
 
-              <div className="absolute top-6 right-6 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="neu-button h-8 w-8 text-blue-500" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
-                <button onClick={() => handleDelete(p.id)} className="neu-button h-8 w-8 text-red-500" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
-              </div>
             </div>
           ))}
         </div>

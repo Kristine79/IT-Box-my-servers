@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/providers';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, Search } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -145,7 +145,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: '/servers', icon: Server, label: t('servers') },
     { href: '/services', icon: Network, label: t('services') },
     { href: '/credentials', icon: KeyRound, label: t('credentials') },
-    { href: '/share-links', icon: Share2, label: t('share_links') },
   ];
 
   return (
@@ -162,13 +161,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      <aside className={cn("hidden flex-col neu-panel m-4 mr-0 rounded-3xl md:flex shrink-0 transition-all duration-300", desktopSidebarOpen ? "w-52" : "w-16")}>
-         <div className="px-6 pt-6 pb-2">
-            <div className="flex items-center gap-2">
-               <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-8 h-8 flex items-center justify-center cursor-pointer" onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}>
+      <aside className={cn("hidden flex-col neu-panel m-4 mr-0 rounded-3xl md:flex shrink-0 transition-all duration-300 overflow-hidden", desktopSidebarOpen ? "w-52" : "w-[68px]")}>
+         <div className={cn("pt-6 pb-2 flex items-center", desktopSidebarOpen ? "px-6 justify-between" : "px-0 justify-center")}>
+            <div className="flex items-center gap-2 overflow-hidden px-2 py-0.5">
+               <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-10 h-10 flex items-center justify-center shrink-0">
                   <img src="/logo.png" alt="IT-Box Logo" className="w-[140%] h-[140%] object-contain" />
                </div>
-               <span className={cn("text-base font-bold tracking-tight transition-opacity duration-300", desktopSidebarOpen ? "opacity-100" : "opacity-0")}>IT-Box</span>
+               {desktopSidebarOpen && <span className="text-lg font-bold tracking-tight whitespace-nowrap">IT-Box</span>}
             </div>
          </div>
 
@@ -180,29 +179,31 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                <Link
                  key={item.href}
                  href={item.href}
+                 title={!desktopSidebarOpen ? item.label : undefined}
                  className={cn(
-                   "flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200",
+                   "flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden",
+                   desktopSidebarOpen ? "px-3" : "px-0 justify-center",
                    isActive ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] text-[var(--neu-text)] opacity-80 hover:opacity-100"
                  )}
                >
-                 <item.icon className="h-4 w-4" />
-                 {desktopSidebarOpen && <span className="transition-opacity duration-300">{item.label}</span>}
+                 <item.icon className="h-4 w-4 shrink-0" />
+                 {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{item.label}</span>}
                </Link>
              )})}
              
-             <div className="my-1.5 h-px neu-panel-inset opacity-50" />
+             <div className="my-1.5 h-px neu-panel-inset opacity-50 mx-2" />
              
-             <Link href="/about" className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                <HelpCircle className="h-4 w-4" />
-                {desktopSidebarOpen && <span className="transition-opacity duration-300">{t('about')}</span>}
+             <Link href="/about" title={!desktopSidebarOpen ? t('about') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                <HelpCircle className="h-4 w-4 shrink-0" />
+                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{t('about')}</span>}
              </Link>
-             <Link href="/faq" className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                <HelpCircle className="h-4 w-4" />
-                {desktopSidebarOpen && <span className="transition-opacity duration-300">{t('faq')}</span>}
+             <Link href="/faq" title={!desktopSidebarOpen ? t('faq') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                <HelpCircle className="h-4 w-4 shrink-0" />
+                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{t('faq')}</span>}
              </Link>
-             <Link href="/pricing" className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                <CreditCard className="h-4 w-4" />
-                {desktopSidebarOpen && <span className="transition-opacity duration-300">{t('pricing')}</span>}
+             <Link href="/pricing" title={!desktopSidebarOpen ? t('pricing') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                <CreditCard className="h-4 w-4 shrink-0" />
+                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{t('pricing')}</span>}
              </Link>
            </nav>
          </div>
@@ -210,23 +211,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center justify-between px-4 mt-2">
-          <div className="flex items-center gap-2 md:hidden">
-            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <Menu className="h-5 w-5" />
+            </Button>
+            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 hidden md:flex" onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}>
               <Menu className="h-5 w-5" />
             </Button>
           </div>
           
-          <div className="hidden md:flex gap-2 ml-auto items-center">
-             <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer" onClick={toggleTheme}>
+          <div className="flex gap-1.5 md:gap-2 ml-auto items-center">
+             <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme}>
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
              </div>
              <NotificationBell />
-             <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer">
+             <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0">
                 <Search className="h-4 w-4" />
              </div>
-               <div className={`h-8 px-4 flex items-center justify-center text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'ru' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('ru')}>RU</div>
-               <div className={`h-8 px-4 flex items-center justify-center text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'en' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('en')}>EN</div>
-             <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer ml-3 text-red-500" onClick={logout}>
+               <div className={`h-8 px-2 md:px-4 flex items-center justify-center text-[10px] md:text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'ru' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('ru')}>RU</div>
+               <div className={`h-8 px-2 md:px-4 flex items-center justify-center text-[10px] md:text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'en' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('en')}>EN</div>
+             <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
                 <LogOut className="h-4 w-4" />
              </div>
           </div>
@@ -249,6 +253,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="relative flex w-60 flex-col bg-[var(--neu-bg)] m-0 rounded-r-xl h-full pt-4 border-r border-[var(--neu-text-muted)]/10 shadow-2xl"
               >
+                 <div className="flex justify-end px-4 mb-2">
+                    <button className="p-2 rounded-lg text-[var(--neu-text-muted)] hover:text-[var(--neu-accent)] hover:bg-[var(--neu-accent)]/10 transition-colors" onClick={() => setSidebarOpen(false)}>
+                       <X className="w-5 h-5" />
+                    </button>
+                 </div>
                  <nav className="flex-1 p-3 text-xs font-medium gap-1 overflow-y-auto flex flex-col">
                    {navItems.map((item) => (
                       <Link
@@ -266,6 +275,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     ))}
                     <div className="my-1.5 h-px neu-panel-inset opacity-50" />
                  </nav>
+                 <div className="p-5 text-[11px] text-[var(--neu-text-muted)] opacity-80 mt-auto border-t border-[var(--neu-border)]/20 font-medium">
+                    <div className="flex flex-col gap-1.5 mb-4">
+                      <p>{t('it_asset_manager')} v1.0.0</p>
+                      <p>© 2026 IT-Box</p>
+                    </div>
+                    <div className="flex flex-col gap-1.5 mb-4">
+                      <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a>
+                      <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">Согласие на обработку персональных данных</a>
+                      <a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a>
+                    </div>
+                 </div>
               </motion.aside>
             </div>
           )}
@@ -282,18 +305,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               className="h-full"
             >
               {children}
-              <footer className="mt-10 pt-6 border-t border-[var(--neu-border)] text-[var(--neu-text-muted)] opacity-70 text-[11px] text-center md:text-left flex flex-col md:flex-row md:justify-between items-center md:items-start gap-4">
-                <div>
-                  <p className="font-bold mb-1">{t('it_asset_manager')} v1.0.0</p>
+              <footer className="mt-10 pt-6 pb-8 border-t border-[var(--neu-border)] text-[var(--neu-text-muted)] opacity-80 text-[12px] font-medium text-center md:text-left flex flex-col md:flex-row md:justify-between items-center md:items-start gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <p>{t('it_asset_manager')} v1.0.0</p>
                   <p>© 2026 IT-Box</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors font-medium">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a>
-                  <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors font-medium">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a>
+                  <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a>
+                  <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors font-medium">Согласие на обработку персональных данных</a>
-                  <a href="#" className="hover:text-[var(--neu-accent)] transition-colors font-medium">{t('privacy_policy')}</a>
+                  <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">Согласие на обработку персональных данных</a>
+                  <a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a>
                 </div>
               </footer>
             </motion.div>
