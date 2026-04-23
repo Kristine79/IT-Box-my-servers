@@ -351,7 +351,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         const snap = await getDoc(userRef);
         if (!snap.exists()) {
           // New User: 14 days free trial
-          const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+          const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
           await setDoc(userRef, {
             email: u.email,
             trialEndsAt: trialEnd,
@@ -367,8 +367,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       unsubscribeDoc = onSnapshot(userRef, (snap) => {
         if (snap.exists()) {
           const data = snap.data();
-          const tEnd = data.trialEndsAt ? new Date(data.trialEndsAt) : null;
-          const sEnd = data.subscriptionEndsAt ? new Date(data.subscriptionEndsAt) : null;
+          const tEnd = data.trialEndsAt ? (data.trialEndsAt.toDate ? data.trialEndsAt.toDate() : new Date(data.trialEndsAt)) : null;
+          const sEnd = data.subscriptionEndsAt ? (data.subscriptionEndsAt.toDate ? data.subscriptionEndsAt.toDate() : new Date(data.subscriptionEndsAt)) : null;
           
           setTrialEndsAt(tEnd);
           setSubscriptionEndsAt(sEnd);

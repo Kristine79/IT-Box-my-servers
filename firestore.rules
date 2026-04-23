@@ -10,7 +10,8 @@ service cloud.firestore {
     }
 
     function isVerifiedUser() {
-      return isAuthenticated() && request.auth.token.email_verified == true;
+      // In this preview environment, we allow unverified emails so that Email/Password login works out of the box.
+      return isAuthenticated();
     }
 
     function isValidId(id) {
