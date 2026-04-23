@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Providers } from '@/lib/providers';
 import { NotificationProvider } from '@/lib/notifications';
 import { Toaster } from '@/components/ui/sonner';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -82,6 +83,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             <Toaster />
           </NotificationProvider>
         </Providers>
+        <GoogleAnalytics gaId="G-YD1230Y7R5" />
       </body>
     </html>
   );

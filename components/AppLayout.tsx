@@ -88,8 +88,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="neu-panel p-10 md:p-14 text-center rounded-3xl max-w-lg w-full relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-2 bg-[var(--neu-accent)]" />
           
-          <div className="neu-panel-inset mx-auto w-16 h-16 md:w-20 md:h-20 rounded-full flex flex-col justify-center items-center text-blue-400 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div className="neu-panel-inset mx-auto w-16 h-16 md:w-20 md:h-20 rounded-full flex flex-col justify-center items-center text-blue-400 mb-6 overflow-hidden">
+            <img src="/logo.png" alt="IT-Box Logo" className="w-[120%] h-[120%] object-contain" />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-wide mb-3">IT-Box</h1>
           <p className="text-[var(--neu-text-muted)] font-medium mb-8 md:mb-10 leading-relaxed text-sm lg:text-base">
