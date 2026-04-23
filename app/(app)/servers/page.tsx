@@ -70,13 +70,13 @@ export default function ServersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if(!confirm("Are you sure?")) return;
+    if(!confirm("Вы уверены?")) return;
     try {
       await deleteDoc(doc(db, "servers", id));
-      toast.success("Server deleted");
+      toast.success("Сервер удален");
       loadData();
     } catch (error) {
-      toast.error("Failed to delete server");
+      toast.error("Не удалось удалить сервер");
     }
   };
 

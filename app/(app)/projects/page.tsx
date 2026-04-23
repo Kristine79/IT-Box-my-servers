@@ -242,27 +242,27 @@ export default function ProjectsPage() {
              <Plus className="w-4 h-4 mr-2"/> {t('create_project')}
           </DialogTrigger>
           <DialogContent className="border-0 sm:rounded-3xl p-8" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
-            <DialogHeader><DialogTitle className="text-2xl font-bold">{t('create_project')}</DialogTitle></DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-6 pt-4 pb-12 sm:pb-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder={t('placeholder_name')} />
+            <DialogHeader><DialogTitle className="text-xl font-bold">{t('create_project')}</DialogTitle></DialogHeader>
+            <form onSubmit={handleCreate} className="space-y-4 pt-2">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_name')} />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
-                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_desc')} />
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
+                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[70px] p-2 resize-none" placeholder={t('placeholder_desc')} />
               </div>
               
-              <div className="space-y-2">
-                 <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
-                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full" placeholder="https://" />
+              <div className="space-y-1">
+                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
+                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full p-2" placeholder="https://" />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
-                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full" placeholder={t('placeholder_stack')} />
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
+                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_stack')} />
               </div>
-              <div className="flex justify-end pt-4"><button type="submit" className="neu-button neu-button-accent px-8 py-3">{t('btn_save')}</button></div>
+              <div className="flex justify-end pt-2"><button type="submit" className="neu-button neu-button-accent px-6 py-2">{t('btn_save')}</button></div>
             </form>
           </DialogContent>
         </Dialog>
@@ -272,24 +272,24 @@ export default function ProjectsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map(p => (
             <div key={p.id} className="neu-panel p-6 flex flex-col h-full group relative transition-all duration-300 hover:scale-[1.02]">
-              <div className="flex justify-between items-start mb-6">
-                <div className="neu-panel-inset p-3 rounded-full text-blue-400">
+              <div className="flex justify-between items-start mb-6 gap-4 relative">
+                <div className="neu-panel-inset p-3 rounded-full text-blue-400 shrink-0">
                   <FolderKanban className="w-6 h-6" />
                 </div>
-                <div className={p.status === 'active' ? "text-xs font-bold px-3 py-1 bg-green-500/10 text-green-500 rounded-full" : "text-xs font-bold px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full"}>
+                <div className={p.status === 'active' ? "text-xs font-bold px-3 py-1 bg-green-500/10 text-green-500 rounded-full shrink-0" : "text-xs font-bold px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full shrink-0"}>
                   {p.status === 'active' ? t('status_active') : t('status_archive')}
                 </div>
               </div>
               
-            <h3 className="text-xl font-bold mb-2 pr-8">{p.name}</h3>
-            <p className="text-[var(--neu-text-muted)] text-sm mb-4 line-clamp-3">
+            <h3 className="text-xl font-bold mb-2 pr-16 line-clamp-1">{p.name}</h3>
+            <p className="text-[var(--neu-text-muted)] text-sm mb-4 line-clamp-2">
               {p.description || t('no_description')}
             </p>
             
             {p.url && (
-              <div className="flex items-center gap-2 text-sm text-blue-400 mb-4 opacity-80 hover:opacity-100">
-                <Globe className="w-4 h-4" />
-                <a href={p.url.startsWith('http') ? p.url : `https://${p.url}`} target="_blank" rel="noreferrer" className="truncate">{p.url}</a>
+              <div className="flex items-center gap-2 text-sm text-blue-400 mb-4 opacity-80 hover:opacity-100 min-w-0">
+                <Globe className="w-4 h-4 shrink-0" />
+                <a href={p.url.startsWith('http') ? p.url : `https://${p.url}`} target="_blank" rel="noreferrer" className="truncate block">{p.url}</a>
               </div>
             )}
             
@@ -301,7 +301,7 @@ export default function ProjectsPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {p.techStack.split(',').map((t: string) => t.trim()).filter(Boolean).map((tech: string, i: number) => (
-                    <span key={i} className="text-xs px-2.5 py-1 neu-panel-inset rounded-full opacity-80">{tech}</span>
+                    <span key={i} className="text-xs px-2.5 py-1 neu-panel-inset rounded-full opacity-80 break-all">{tech}</span>
                   ))}
                 </div>
               </div>
@@ -316,7 +316,8 @@ export default function ProjectsPage() {
               </Dialog>
             </div>
 
-              <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-6 right-6 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="neu-button h-8 w-8 text-blue-500" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
                 <button onClick={() => handleDelete(p.id)} className="neu-button h-8 w-8 text-red-500" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
               </div>
             </div>

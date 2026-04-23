@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/providers';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, Languages, Search, Moon, Sun, CreditCard, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isPaywall, login, loginWithEmail, logout } = useAuth();
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const pathname = usePathname();
@@ -64,14 +65,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return <LoadingScreen />;
   }
 
-  // If public route like /share/:token, we don't force login or show sidebar.
-  // We'll let the individual page handle it, but wait, usually we apply AppLayout in an (app) group.
-  // Actually, we can just check if pathname starts with /share/
   if (pathname.startsWith('/share/')) {
     return <main className="min-h-screen bg-[var(--neu-bg)]">{children}</main>;
   }
 
-  // If not logged in
   if (!user) {
     const handleEmailAuth = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -151,13 +148,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: '/share-links', icon: Share2, label: t('share_links') },
   ];
 
-  const toggleLang = () => {
-    i18n.changeLanguage(i18n.language === 'en' ? 'ru' : 'en');
-  };
-
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--neu-bg)] text-[var(--neu-text)]">
-      {/* Top progress bar for navigation feedback */}
       <AnimatePresence>
         {isNavigating && (
           <motion.div 
@@ -170,117 +162,76 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar Desktop */}
-      <aside className="hidden w-72 flex-col neu-panel m-4 mr-0 rounded-3xl md:flex shrink-0">
-        <div className="px-8 pt-8 pb-4">
-           <div className="flex items-center gap-3">
-              <div className="neu-panel-inset p-2 rounded-xl text-[var(--neu-accent)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <span className="text-xl font-bold tracking-tight">IT-Box</span>
-           </div>
-        </div>
+      <aside className={cn("hidden flex-col neu-panel m-4 mr-0 rounded-3xl md:flex shrink-0 transition-all duration-300", desktopSidebarOpen ? "w-52" : "w-16")}>
+         <div className="px-6 pt-6 pb-2">
+            <div className="flex items-center gap-2">
+               <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-8 h-8 flex items-center justify-center cursor-pointer" onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}>
+                  <img src="/logo.png" alt="IT-Box Logo" className="w-[140%] h-[140%] object-contain" />
+               </div>
+               <span className={cn("text-base font-bold tracking-tight transition-opacity duration-300", desktopSidebarOpen ? "opacity-100" : "opacity-0")}>IT-Box</span>
+            </div>
+         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide">
-          <nav className="grid gap-2 items-start font-medium text-[15px]">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-4 rounded-xl px-4 py-2 transition-all duration-200",
-                  isActive ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] text-[var(--neu-text)] opacity-80 hover:opacity-100"
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-                {item.label}
-              </Link>
-            )})}
-            
-            <div className="my-4 h-px neu-panel-inset opacity-50" />
-            
-            <Link href="/about" className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all duration-200", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-2.5z"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-               {t('about')}
-            </Link>
-            <Link href="/faq" className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all duration-200", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <HelpCircle className="h-5 w-5" />
-               {t('faq')}
-            </Link>
-            <Link href="/pricing" className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all duration-200", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <CreditCard className="h-5 w-5" />
-               {t('pricing')}
-            </Link>
-          </nav>
-        </div>
-        
-        <div className="p-6 text-xs text-[var(--neu-text-muted)] opacity-70">
-           <p className="font-semibold text-[13px] mb-1">{t('it_asset_manager')}</p>
-           <p>v1.0.0</p>
-           <p className="mt-4 mb-2">© 2026 IT-Box<br/>
-           <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a><br/>
-           <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium mt-1">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a></p>
-           <p className="mt-2"><a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a></p>
-        </div>
-      </aside>
+         <div className="flex-1 overflow-y-auto px-2 py-1 scrollbar-hide">
+           <nav className="grid gap-0.5 items-start font-medium text-[13px]">
+             {navItems.map((item) => {
+               const isActive = pathname === item.href;
+               return (
+               <Link
+                 key={item.href}
+                 href={item.href}
+                 className={cn(
+                   "flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200",
+                   isActive ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] text-[var(--neu-text)] opacity-80 hover:opacity-100"
+                 )}
+               >
+                 <item.icon className="h-4 w-4" />
+                 {desktopSidebarOpen && <span className="transition-opacity duration-300">{item.label}</span>}
+               </Link>
+             )})}
+             
+             <div className="my-1.5 h-px neu-panel-inset opacity-50" />
+             
+             <Link href="/about" className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                <HelpCircle className="h-4 w-4" />
+                {desktopSidebarOpen && <span className="transition-opacity duration-300">{t('about')}</span>}
+             </Link>
+             <Link href="/faq" className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                <HelpCircle className="h-4 w-4" />
+                {desktopSidebarOpen && <span className="transition-opacity duration-300">{t('faq')}</span>}
+             </Link>
+             <Link href="/pricing" className={cn("flex items-center gap-2 rounded-md px-3 py-1.5 transition-all duration-200", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                <CreditCard className="h-4 w-4" />
+                {desktopSidebarOpen && <span className="transition-opacity duration-300">{t('pricing')}</span>}
+             </Link>
+           </nav>
+         </div>
+       </aside>
 
-      {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 lg:h-20 items-center justify-between px-6 lg:px-12 mt-2 lg:mt-4">
-          <div className="flex items-center gap-4 md:hidden">
-            <Button variant="outline" size="icon" className="neu-button h-10 w-10 border-0 bg-transparent shrink-0" onClick={() => setSidebarOpen(!sidebarOpen)}>
+        <header className="flex h-14 items-center justify-between px-4 mt-2">
+          <div className="flex items-center gap-2 md:hidden">
+            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0" onClick={() => setSidebarOpen(!sidebarOpen)}>
               <Menu className="h-5 w-5" />
             </Button>
           </div>
           
-          <div className="flex-1 md:hidden"></div>
-          
-          <div className="flex md:hidden gap-2 ml-auto items-center">
-             <div className="neu-panel-inset flex items-center p-0.5 rounded-full">
-                <div className={cn(
-                  "h-8 px-3 flex items-center justify-center text-[10px] cursor-pointer rounded-full font-bold transition-all",
-                  i18n.language === 'ru' ? "neu-button bg-[var(--neu-accent)] text-white shadow-none" : "opacity-60"
-                )} onClick={() => i18n.changeLanguage('ru')}>RU</div>
-                <div className={cn(
-                  "h-8 px-3 flex items-center justify-center text-[10px] cursor-pointer rounded-full font-bold transition-all",
-                  i18n.language === 'en' ? "neu-button bg-[var(--neu-accent)] text-white shadow-none" : "opacity-60"
-                )} onClick={() => i18n.changeLanguage('en')}>EN</div>
-             </div>
+          <div className="hidden md:flex gap-2 ml-auto items-center">
              <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer" onClick={toggleTheme}>
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
              </div>
              <NotificationBell />
-             <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer text-red-500" onClick={logout}>
+             <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer">
+                <Search className="h-4 w-4" />
+             </div>
+               <div className={`h-8 px-4 flex items-center justify-center text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'ru' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('ru')}>RU</div>
+               <div className={`h-8 px-4 flex items-center justify-center text-xs cursor-pointer rounded-full font-bold ${i18n.language === 'en' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('en')}>EN</div>
+             <div className="neu-button h-10 w-10 flex items-center justify-center cursor-pointer ml-3 text-red-500" onClick={logout}>
                 <LogOut className="h-4 w-4" />
-             </div>
-          </div>
-
-          <div className="hidden md:flex gap-4 ml-auto items-center">
-             <div className="neu-button h-12 w-12 flex items-center justify-center cursor-pointer" onClick={toggleTheme}>
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-             </div>
-             <NotificationBell />
-             <div className="neu-button h-12 w-12 flex items-center justify-center cursor-pointer">
-                <Search className="h-5 w-5" />
-             </div>
-             <div className="neu-button h-12 w-12 flex items-center justify-center cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-             </div>
-             
-             <div className="neu-panel-inset flex items-center p-1 rounded-full ml-4">
-               <div className={`h-10 px-5 flex items-center justify-center text-sm cursor-pointer rounded-full font-bold ${i18n.language === 'ru' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('ru')}>RU</div>
-               <div className={`h-10 px-5 flex items-center justify-center text-sm cursor-pointer rounded-full font-bold ${i18n.language === 'en' ? 'neu-button bg-[var(--neu-accent)] text-white shadow-none' : 'opacity-60 hover:opacity-100'}`} onClick={() => i18n.changeLanguage('en')}>EN</div>
-             </div>
-             
-             <div className="neu-button h-12 w-12 flex items-center justify-center cursor-pointer ml-4 text-red-500" onClick={logout}>
-                <LogOut className="h-5 w-5" />
              </div>
           </div>
         </header>
 
-        {/* Mobile Navigation overlay */}
         <AnimatePresence>
           {sidebarOpen && (
             <div className="fixed inset-0 z-50 flex md:hidden">
@@ -296,54 +247,31 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="relative flex w-72 flex-col bg-[var(--neu-bg)] m-0 rounded-r-xl h-full pt-6 border-r border-[var(--neu-text-muted)]/10 shadow-2xl"
+                className="relative flex w-60 flex-col bg-[var(--neu-bg)] m-0 rounded-r-xl h-full pt-4 border-r border-[var(--neu-text-muted)]/10 shadow-2xl"
               >
-                 <nav className="flex-1 p-4 text-sm font-medium gap-2 overflow-y-auto flex flex-col">
+                 <nav className="flex-1 p-3 text-xs font-medium gap-1 overflow-y-auto flex flex-col">
                    {navItems.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[15px]",
-                          pathname === item.href ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80"
+                          "flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all",
+                          pathname === item.href ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80"
                         )}
                       >
-                        <item.icon className="h-5 w-5" />
+                        <item.icon className="h-4 w-4" />
                         {item.label}
                       </Link>
                     ))}
-                    
-                    <div className="my-2 h-px neu-panel-inset opacity-50" />
-                    
-                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[15px]", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80")}>
-                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-2.5z"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                       {t('about')}
-                    </Link>
-                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[15px]", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80")}>
-                       <HelpCircle className="h-5 w-5" />
-                       {t('faq')}
-                    </Link>
-                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[15px]", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80")}>
-                       <CreditCard className="h-5 w-5" />
-                       {t('pricing')}
-                    </Link>
+                    <div className="my-1.5 h-px neu-panel-inset opacity-50" />
                  </nav>
-                 <div className="p-6 text-xs text-[var(--neu-text-muted)] opacity-70 border-t border-[var(--neu-border)]/5">
-                   <p className="font-semibold text-[13px] mb-1">{t('it_asset_manager')}</p>
-                   <p>v1.0.0</p>
-                   <p className="mt-4 mb-2">© 2026 IT-Box<br/>
-                   <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a><br/>
-                   <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium mt-1">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a></p>
-                   <p className="mt-2"><a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a></p>
-                </div>
               </motion.aside>
             </div>
           )}
         </AnimatePresence>
 
-        {/* Main scrollable area */}
-        <main className="flex-1 overflow-y-auto p-4 pt-4 md:p-8 lg:p-12 pb-24">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           <AnimatePresence initial={false}>
             <motion.div
               key={pathname}
@@ -354,6 +282,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               className="h-full"
             >
               {children}
+              <footer className="mt-10 pt-4 border-t border-[var(--neu-border)] text-[var(--neu-text-muted)] opacity-70 text-[10px] text-center md:text-left">
+                <p className="font-semibold text-[11px] mb-0.5">{t('it_asset_manager')}</p>
+                <p>v1.0.0</p>
+                <p className="mt-2 mb-1">© 2026 IT-Box<br/>
+                <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a><br/>
+                <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium mt-0.5">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a></p>
+                <p className="mt-1.5"><a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">Согласие на обработку персональных данных</a></p>
+                <p className="mt-1.5"><a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a></p>
+              </footer>
             </motion.div>
           </AnimatePresence>
         </main>
