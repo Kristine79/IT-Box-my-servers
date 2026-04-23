@@ -282,14 +282,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               className="h-full"
             >
               {children}
-              <footer className="mt-10 pt-4 border-t border-[var(--neu-border)] text-[var(--neu-text-muted)] opacity-70 text-[10px] text-center md:text-left">
-                <p className="font-semibold text-[11px] mb-0.5">{t('it_asset_manager')}</p>
-                <p>v1.0.0</p>
-                <p className="mt-2 mb-1">© 2026 IT-Box<br/>
-                <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a><br/>
-                <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors inline-block font-medium mt-0.5">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a></p>
-                <p className="mt-1.5"><a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">Согласие на обработку персональных данных</a></p>
-                <p className="mt-1.5"><a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a></p>
+              <footer className="mt-10 pt-6 border-t border-[var(--neu-border)] text-[var(--neu-text-muted)] opacity-70 text-[11px] text-center md:text-left flex flex-col md:flex-row md:justify-between items-center md:items-start gap-4">
+                <div>
+                  <p className="font-bold mb-1">{t('it_asset_manager')} v1.0.0</p>
+                  <p>© 2026 IT-Box</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors font-medium">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a>
+                  <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors font-medium">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors font-medium">Согласие на обработку персональных данных</a>
+                  <a href="#" className="hover:text-[var(--neu-accent)] transition-colors font-medium">{t('privacy_policy')}</a>
+                </div>
               </footer>
             </motion.div>
           </AnimatePresence>
