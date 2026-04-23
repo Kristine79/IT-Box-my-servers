@@ -1,0 +1,6 @@
+{
+  "name": "IT-Box Мои серверы",
+  "description": "Unified vault for your infrastructure. Servers, services, credentials AES-256-GCM.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

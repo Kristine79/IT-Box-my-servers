@@ -1,0 +1,218 @@
+'use client';
+
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import { collection, query, where, getCountFromServer, getDocs, orderBy, limit } from "firebase/firestore";
+import { db, useAuth } from "@/lib/providers";
+import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "motion/react";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
+
+export default function DashboardPage() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  
+  const [stats, setStats] = useState({ projects: 0, servers: 0, services: 0, credentials: 0 });
+  const [recentProjects, setRecentProjects] = useState<any[]>([]);
+  const [recentServers, setRecentServers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    async function loadDashboard() {
+      try {
+        const pQuery = query(collection(db, "projects"), where("ownerId", "==", user!.uid), where("status", "==", "active"));
+        const srvQuery = query(collection(db, "servers"), where("ownerId", "==", user!.uid));
+        const svcQuery = query(collection(db, "services"), where("ownerId", "==", user!.uid));
+        const cQuery = query(collection(db, "credentials"), where("ownerId", "==", user!.uid));
+
+        const [pSnap, srvSnap, svcSnap, cSnap] = await Promise.all([
+          getCountFromServer(pQuery),
+          getCountFromServer(srvQuery),
+          getCountFromServer(svcQuery),
+          getCountFromServer(cQuery)
+        ]);
+
+        setStats({
+          projects: pSnap.data().count,
+          servers: srvSnap.data().count,
+          services: svcSnap.data().count,
+          credentials: cSnap.data().count
+        });
+
+        const pRecentQ = query(collection(db, "projects"), where("ownerId", "==", user!.uid), orderBy("createdAt", "desc"), limit(5));
+        const sRecentQ = query(collection(db, "servers"), where("ownerId", "==", user!.uid), orderBy("createdAt", "desc"), limit(5));
+
+        const [pRec, sRec] = await Promise.all([getDocs(pRecentQ), getDocs(sRecentQ)]);
+        
+        setRecentProjects(pRec.docs.map(d => ({ id: d.id, ...d.data() })));
+        setRecentServers(sRec.docs.map(d => ({ id: d.id, ...d.data() })));
+      } catch(err) {
+        console.error("Failed to load dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboard();
+  }, [user]);
+
+  if (loading) return <div className="p-4 opacity-50">{t('loading')}</div>;
+
+  return (
+    <motion.div 
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-6 md:space-y-8 max-w-7xl mx-auto"
+    >
+      <motion.div variants={item}>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1 md:mb-2">{t('dashboard')}</h1>
+        <p className="text-sm md:text-base text-[var(--neu-text-muted)]">{t('system_overview')}</p>
+      </motion.div>
+
+      {/* Hero Banner */}
+      <motion.div variants={item} className="neu-panel relative overflow-hidden px-5 py-6 md:pl-6 md:pr-8 md:py-8 lg:p-10">
+        <div className="absolute left-0 top-6 bottom-6 w-1 rounded-r-full bg-[var(--neu-accent)]"></div>
+        <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 md:mb-6 leading-snug">
+          {t('hero_title')}
+        </h2>
+        <div className="space-y-5">
+          <div className="flex items-start gap-4">
+            <div className="neu-panel-inset p-2 rounded-full text-[var(--neu-accent)] shrink-0">
+               <Lock className="w-5 h-5" />
+            </div>
+            <p className="text-[var(--neu-text-muted)] pt-1 lg:text-lg">{t('hero_sub1')}</p>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="neu-panel-inset p-2 rounded-full text-[var(--neu-accent)] shrink-0">
+               <MousePointer2 className="w-5 h-5" />
+            </div>
+            <p className="text-[var(--neu-text-muted)] pt-1 lg:text-lg">{t('hero_sub2')}</p>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="neu-panel-inset p-2 rounded-full text-[var(--neu-accent)] shrink-0">
+               <Users className="w-5 h-5" />
+            </div>
+            <p className="text-[var(--neu-text-muted)] pt-1 lg:text-lg">{t('hero_sub3')}</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+        <motion.div variants={item}>
+          <Link href="/projects" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start">
+               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase w-2/3">{t('active_projects')}</span>
+               <div className="neu-panel-inset p-2.5 rounded-full text-blue-400 group-hover:bg-blue-400/10 transition-colors">
+                 <FolderKanban className="w-5 h-5" />
+               </div>
+             </div>
+             <div>
+               <div className="text-5xl font-bold mb-4">{stats.projects}</div>
+               <div className="text-blue-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
+             </div>
+          </Link>
+        </motion.div>
+
+        <motion.div variants={item}>
+          <Link href="/servers" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start">
+               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase">{t('servers')}</span>
+               <div className="neu-panel-inset p-2.5 rounded-full text-purple-400 group-hover:bg-purple-400/10 transition-colors">
+                 <Server className="w-5 h-5" />
+               </div>
+             </div>
+             <div>
+               <div className="text-5xl font-bold mb-4">{stats.servers}</div>
+               <div className="text-purple-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
+             </div>
+          </Link>
+        </motion.div>
+
+        <motion.div variants={item}>
+          <Link href="/services" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start">
+               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase">{t('services')}</span>
+               <div className="neu-panel-inset p-2.5 rounded-full text-amber-500 group-hover:bg-amber-500/10 transition-colors">
+                 <Network className="w-5 h-5" />
+               </div>
+             </div>
+             <div>
+               <div className="text-5xl font-bold mb-4">{stats.services}</div>
+               <div className="text-amber-500 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
+             </div>
+          </Link>
+        </motion.div>
+
+        <motion.div variants={item}>
+          <Link href="/credentials" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start">
+               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase">{t('credentials')}</span>
+               <div className="neu-panel-inset p-2.5 rounded-full text-rose-500 group-hover:bg-rose-500/10 transition-colors">
+                 <KeyRound className="w-5 h-5" />
+               </div>
+             </div>
+             <div>
+               <div className="text-5xl font-bold mb-4">{stats.credentials}</div>
+               <div className="text-rose-500 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
+             </div>
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Recents */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        <motion.div variants={item} className="neu-panel p-6 md:p-8">
+           <h3 className="text-xl font-bold mb-6">{t('recent_projects')}</h3>
+          <div className="space-y-4">
+             {recentProjects.length === 0 ? <p className="text-sm opacity-50">{t('no_data')}</p> : null}
+             {recentProjects.map((p) => (
+               <Link href="/projects" prefetch={true} key={p.id} className="block group p-4 -mx-4 rounded-2xl hover:bg-[var(--neu-accent)]/5 transition-all">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium group-hover:text-[var(--neu-accent)] transition-colors">{p.name}</span>
+                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                  </div>
+                  <p className="text-[var(--neu-text-muted)] text-sm mt-1 truncate">{p.description || t('no_description')}</p>
+               </Link>
+             ))}
+          </div>
+        </motion.div>
+
+        <motion.div variants={item} className="neu-panel p-6 md:p-8">
+           <h3 className="text-xl font-bold mb-6">{t('recent_servers')}</h3>
+          <div className="space-y-4">
+             {recentServers.length === 0 ? <p className="text-sm opacity-50">{t('no_data')}</p> : null}
+             {recentServers.map((s) => (
+               <Link href="/servers" prefetch={true} key={s.id} className="block group p-4 -mx-4 rounded-2xl hover:bg-[var(--neu-accent)]/5 transition-all">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium group-hover:text-[var(--neu-accent)] transition-colors">{s.name}</span>
+                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                  </div>
+                  <p className="text-[var(--neu-text-muted)] font-mono text-sm mt-1">{s.ipAddress}</p>
+               </Link>
+             ))}
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}

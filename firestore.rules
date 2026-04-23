@@ -1,0 +1,283 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Validation Helpers ---
+
+    function isValidUser(data) {
+      let isEmailValid = data.email is string && data.email.size() <= 256;
+      let isTrialAtValid = !('trialEndsAt' in data) || data.trialEndsAt is timestamp || data.trialEndsAt == null;
+      let isSubAtValid = !('subscriptionEndsAt' in data) || data.subscriptionEndsAt is timestamp || data.subscriptionEndsAt == null;
+      let isNotifValid = !('notificationsEnabled' in data) || data.notificationsEnabled is bool;
+      return isEmailValid && isTrialAtValid && isSubAtValid && isNotifValid;
+    }
+
+    function isValidUserCreate(data) {
+      return isValidUser(data) && data.createdAt == request.time && data.keys().size() >= 2 && data.keys().size() <= 5 && data.keys().hasAll(["email", "createdAt"]);
+    }
+
+    function isValidUserUpdate(data) {
+      return isValidUser(data) && data.createdAt == existing().createdAt && (data.email == existing().email);
+    }
+
+    function isValidProject(data) {
+      let isNameValid = data.name is string && data.name.size() > 0 && data.name.size() <= 100;
+      let isDescValid = !('description' in data) || (data.description is string && data.description.size() <= 1000);
+      let isStatusValid = data.status in ["active", "inactive", "archived"];
+      let isUrlValid = !('url' in data) || (data.url is string && data.url.size() <= 500);
+      let isTechStackValid = !('techStack' in data) || (data.techStack is string && data.techStack.size() <= 500);
+      let isOwnerIdValid = data.ownerId == request.auth.uid;
+
+      return isNameValid && isDescValid && isStatusValid && isUrlValid && isTechStackValid && isOwnerIdValid;
+    }
+
+    function isValidProjectCreate(data) {
+      return isValidProject(data) && data.createdAt == request.time && data.updatedAt == request.time && data.keys().size() >= 5 && data.keys().size() <= 8 && data.keys().hasAll(["name", "status", "ownerId", "createdAt", "updatedAt"]);
+    }
+
+    function isValidProjectUpdate(data) {
+      return isValidProject(data) && data.updatedAt == request.time && data.createdAt == existing().createdAt && data.ownerId == existing().ownerId;
+    }
+
+    function isValidTask(data) {
+      let isContentValid = data.content is string && data.content.size() > 0 && data.content.size() <= 500;
+      let isPriorityValid = data.priority in ["critical", "urgent", "normal", "low"];
+      let isStatusValid = data.status in ["todo", "in_progress", "done"];
+      let isOwnerValid = data.ownerId == request.auth.uid;
+      let isCompletedAtValid = !('completedAt' in data) || data.completedAt is timestamp || data.completedAt == null;
+      return isContentValid && isPriorityValid && isStatusValid && isOwnerValid && isCompletedAtValid;
+    }
+
+    function isValidTaskCreate(data) {
+      return isValidTask(data) && data.createdAt == request.time && data.updatedAt == request.time && data.keys().size() >= 6 && data.keys().size() <= 7 && data.keys().hasAll(["content", "priority", "status", "ownerId", "createdAt", "updatedAt"]);
+    }
+
+    function isValidTaskUpdate(data) {
+      return isValidTask(data) && data.updatedAt == request.time && data.createdAt == existing().createdAt && data.ownerId == existing().ownerId;
+    }
+
+    function isValidServer(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+             && (!('ipAddress' in data) || (data.ipAddress is string && data.ipAddress.size() <= 100))
+             && (!('provider' in data) || (data.provider is string && data.provider.size() <= 100))
+             && (!('os' in data) || (data.os is string && data.os.size() <= 100))
+             && (!('projectId' in data) || (data.projectId is string && data.projectId.size() <= 128))
+             && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
+             && data.ownerId == request.auth.uid;
+    }
+
+    function isValidServerCreate(data) {
+      return isValidServer(data) && data.createdAt == request.time && data.updatedAt == request.time && data.keys().hasAll(["name", "ownerId", "createdAt", "updatedAt"]);
+    }
+
+    function isValidServerUpdate(data) {
+      return isValidServer(data) && data.updatedAt == request.time && data.createdAt == existing().createdAt && data.ownerId == existing().ownerId;
+    }
+
+    function isValidService(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+             && (!('url' in data) || (data.url is string && data.url.size() <= 500))
+             && (!('port' in data) || (data.port is string && data.port.size() <= 20))
+             && (!('serverId' in data) || (data.serverId is string && data.serverId.size() <= 128))
+             && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
+             && data.ownerId == request.auth.uid;
+    }
+
+    function isValidServiceCreate(data) {
+      return isValidService(data) && data.createdAt == request.time && data.updatedAt == request.time && data.keys().hasAll(["name", "ownerId", "createdAt", "updatedAt"]);
+    }
+
+    function isValidServiceUpdate(data) {
+      return isValidService(data) && data.updatedAt == request.time && data.createdAt == existing().createdAt && data.ownerId == existing().ownerId;
+    }
+
+    function isValidCredential(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+             && data.type in ["SSH", "FTP", "DB", "WEB_PANEL", "API_KEY", "OTHER"]
+             && (!('username' in data) || (data.username is string && data.username.size() <= 256))
+             && data.passwordEncrypted is string && data.passwordEncrypted.size() <= 5000
+             && data.iv is string && data.iv.size() <= 100
+             && data.authTag is string && data.authTag.size() <= 100
+             && (!('resourceType' in data) || (data.resourceType in ["project", "server", "service", "none"]))
+             && (!('resourceId' in data) || (data.resourceId is string && data.resourceId.size() <= 128))
+             && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
+             && data.ownerId == request.auth.uid;
+    }
+
+    function isValidCredentialCreate(data) {
+      return isValidCredential(data) && data.createdAt == request.time && data.updatedAt == request.time && data.keys().hasAll(["name", "type", "passwordEncrypted", "iv", "authTag", "ownerId", "createdAt", "updatedAt"]);
+    }
+
+    function isValidCredentialUpdate(data) {
+      return isValidCredential(data) && data.updatedAt == request.time && data.createdAt == existing().createdAt && data.ownerId == existing().ownerId;
+    }
+
+    function isValidShareLink(data) {
+       return data.resourceType in ["project", "server", "service"]
+              && data.resourceId is string && data.resourceId.size() <= 128
+              && (!('expiresAt' in data) || data.expiresAt is timestamp || data.expiresAt == null)
+              && (!('revokedAt' in data) || data.revokedAt is timestamp || data.revokedAt == null)
+              && (!('snapshot' in data) || data.snapshot is map)
+              && data.ownerId == request.auth.uid;
+    }
+
+    function isValidShareLinkCreate(data) {
+      return isValidShareLink(data) && data.createdAt == request.time && data.keys().hasAll(["resourceType", "resourceId", "ownerId", "createdAt"]);
+    }
+
+    function isValidShareLinkUpdate(data) {
+      return isValidShareLink(data) && data.createdAt == existing().createdAt && data.ownerId == existing().ownerId;
+    }
+
+    function isValidAccessLog(data) {
+      return data.ip is string && data.ip.size() <= 64
+             && data.userAgent is string && data.userAgent.size() <= 500;
+    }
+
+    function isValidAccessLogCreate(data) {
+      return isValidAccessLog(data) && data.accessedAt == request.time && data.keys().size() == 3 && data.keys().hasAll(["ip", "userAgent", "accessedAt"]);
+    }
+
+    function isValidNotification(data) {
+      return data.userId == request.auth.uid
+             && data.title is string && data.title.size() <= 200
+             && data.message is string && data.message.size() <= 1000
+             && data.type in ["info", "success", "warning", "error"]
+             && data.isRead is bool
+             && (!('link' in data) || (data.link is string && data.link.size() <= 500));
+    }
+
+    function isValidNotificationCreate(data) {
+      return isValidNotification(data) && data.createdAt == request.time && data.keys().hasAll(["userId", "title", "message", "type", "isRead", "createdAt"]);
+    }
+
+    function isValidNotificationUpdate(data) {
+      return isValidNotification(data) && data.createdAt == existing().createdAt && data.userId == existing().userId;
+    }
+
+    // --- Entity Rules ---
+
+    match /users/{userId} {
+      allow get: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false; // Blanket lists forbidden
+      allow create: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId
+                    && isValidUserCreate(incoming());
+      allow update: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId
+                    && isValidUserUpdate(incoming())
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['notificationsEnabled']);
+      allow delete: if false;
+    }
+
+    match /projects/{projectId} {
+      allow get: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(projectId) && isValidProjectCreate(incoming());
+      allow update: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid
+                    && isValidProjectUpdate(incoming())
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'description', 'url', 'techStack', 'status', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid;
+
+      match /tasks/{taskId} {
+        allow get: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == request.auth.uid;
+        allow list: if isVerifiedUser() && isValidId(projectId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId)
+                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid
+                      && isValidTaskCreate(incoming());
+        allow update: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == request.auth.uid
+                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid
+                      && isValidTaskUpdate(incoming())
+                      && incoming().diff(existing()).affectedKeys().hasOnly(['content', 'priority', 'status', 'updatedAt', 'completedAt']);
+        allow delete: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == request.auth.uid
+                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
+      }
+    }
+
+    match /servers/{serverId} {
+      allow get: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(serverId) && isValidServerCreate(incoming())
+                    && (!('projectId' in incoming()) || incoming().projectId == "" || get(/databases/$(database)/documents/projects/$(incoming().projectId)).data.ownerId == request.auth.uid);
+      allow update: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == request.auth.uid
+                    && isValidServerUpdate(incoming())
+                    && (!('projectId' in incoming()) || incoming().projectId == "" || incoming().projectId == existing().projectId || get(/databases/$(database)/documents/projects/$(incoming().projectId)).data.ownerId == request.auth.uid)
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'ipAddress', 'provider', 'os', 'projectId', 'notes', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == request.auth.uid;
+    }
+
+    match /services/{serviceId} {
+      allow get: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(serviceId) && isValidServiceCreate(incoming())
+                    && (!('serverId' in incoming()) || incoming().serverId == "" || get(/databases/$(database)/documents/servers/$(incoming().serverId)).data.ownerId == request.auth.uid);
+      allow update: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == request.auth.uid
+                    && isValidServiceUpdate(incoming())
+                    && (!('serverId' in incoming()) || incoming().serverId == "" || incoming().serverId == existing().serverId || get(/databases/$(database)/documents/servers/$(incoming().serverId)).data.ownerId == request.auth.uid)
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'url', 'port', 'serverId', 'notes', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == request.auth.uid;
+    }
+
+    match /credentials/{credentialId} {
+      allow get: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(credentialId) && isValidCredentialCreate(incoming());
+      allow update: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == request.auth.uid
+                    && isValidCredentialUpdate(incoming())
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'username', 'passwordEncrypted', 'iv', 'authTag', 'resourceType', 'resourceId', 'notes', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == request.auth.uid;
+    }
+
+    match /shareLinks/{tokenId} {
+      allow get: if isValidId(tokenId)
+                 && (!('expiresAt' in existing()) || existing().expiresAt == null || existing().expiresAt > request.time)
+                 && (!('revokedAt' in existing()) || existing().revokedAt == null);
+      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(tokenId) && isValidShareLinkCreate(incoming());
+      allow update: if isVerifiedUser() && isValidId(tokenId) && existing().ownerId == request.auth.uid
+                    && isValidShareLinkUpdate(incoming())
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['revokedAt']);
+      allow delete: if isVerifiedUser() && isValidId(tokenId) && existing().ownerId == request.auth.uid;
+
+      match /logs/{logId} {
+        allow get: if false; // Only allow lists, no gets
+        allow list: if isVerifiedUser() && isValidId(tokenId) && get(/databases/$(database)/documents/shareLinks/$(tokenId)).data.ownerId == request.auth.uid;
+        allow create: if isValidId(tokenId) && isValidId(logId)
+                      && exists(/databases/$(database)/documents/shareLinks/$(tokenId))
+                      && isValidAccessLogCreate(incoming());
+        allow update, delete: if false;
+      }
+    }
+
+    match /notifications/{notificationId} {
+      allow get: if isVerifiedUser() && isValidId(notificationId) && existing().userId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.userId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(notificationId) && isValidNotificationCreate(incoming());
+      allow update: if isVerifiedUser() && isValidId(notificationId) && existing().userId == request.auth.uid
+                    && isValidNotificationUpdate(incoming())
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['isRead']);
+      allow delete: if isVerifiedUser() && isValidId(notificationId) && existing().userId == request.auth.uid;
+    }
+  }
+}
