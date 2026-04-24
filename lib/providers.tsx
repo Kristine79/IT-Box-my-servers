@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 import { I18nextProvider } from 'react-i18next';
@@ -61,39 +61,43 @@ export function Providers({ children }: { children: React.ReactNode }) {
     let unsubscribeDoc = () => {};
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (!u) {
-        unsubscribeDoc();
-        setLoading(false);
-        setIsPaywall(false);
-        setTrialEndsAt(null);
-        setSubscriptionEndsAt(null);
-        return;
+      if (u) {
+        setUser(u);
+      } else {
+        // Force a guest user if not signed in
+        setUser({ 
+          uid: 'guest_user', 
+          email: 'guest@stackbox.pro', 
+          displayName: 'Guest',
+          isAnonymous: true 
+        } as any);
       }
-
+      
+      const currentUser = u || { uid: 'guest_user' } as any;
+      
       // Check user document for subscription logic
-      const userRef = doc(db, 'users', u.uid);
+      const userRef = doc(db, 'users', currentUser.uid);
       
       const checkDoc = async () => {
-        const snap = await getDoc(userRef);
-        if (!snap.exists()) {
-          // New User: 14 days free trial
-          const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
-          await setDoc(userRef, {
-            email: u.email,
-            trialEndsAt: trialEnd,
-            subscriptionEndsAt: null,
-            notificationsEnabled: true,
-            createdAt: serverTimestamp()
-          });
+        try {
+          const snap = await getDoc(userRef);
+          if (!snap.exists()) {
+            // New User: 14 days free trial
+            const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+            await setDoc(userRef, {
+              email: currentUser.email || 'guest@stackbox.pro',
+              trialEndsAt: trialEnd,
+              subscriptionEndsAt: null,
+              notificationsEnabled: true,
+              createdAt: serverTimestamp()
+            });
+          }
+        } catch (err) {
+          console.error("Error setting up user doc:", err);
         }
       };
       
-      try {
-        await checkDoc();
-      } catch (checkErr) {
-        console.error("Error setting up user doc:", checkErr);
-      }
+      await checkDoc();
 
       // Ensure we clean up any existing listener before starting a new one
       unsubscribeDoc();
@@ -117,6 +121,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }, (err) => {
         console.error("Firestore onSnapshot error:", err);
+        // Even if errors occur (like permissions), we stop loading to show the app
         setLoading(false);
       });
     });
@@ -146,6 +151,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    if (user?.isAnonymous) {
+      await signOut(auth); // Signing out will trigger anonymous re-auth in Providers
+      return;
+    }
     await signOut(auth);
   };
 

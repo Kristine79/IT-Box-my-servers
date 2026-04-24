@@ -74,75 +74,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return <main className="min-h-screen bg-[var(--neu-bg)]">{children}</main>;
   }
 
-  if (false) {
-    const handleEmailAuth = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setAuthError('');
-
-      try {
-        await loginWithEmail(email, password, isRegistering);
-      } catch (err: any) {
-        setAuthError(err.message || 'Authentication error');
-      }
-    };
-
-    return (
-      <div className="flex bg-[var(--neu-bg)] text-[var(--neu-text)] h-screen w-full flex-col items-center justify-center p-6">
-        <div className="neu-panel p-8 md:p-10 text-center rounded-3xl max-w-md w-full relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-2 bg-[var(--neu-accent)]" />
-          
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="neu-panel-inset w-14 h-14 rounded-full flex flex-col justify-center items-center text-blue-400 overflow-hidden shrink-0">
-              <img src={LOGO_BASE64} alt="StackBox Logo" className="w-[220%] h-[220%] object-contain" />
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-wide">StackBox</h1>
-          </div>
-          <p className="text-[var(--neu-text-muted)] font-medium mb-6 leading-relaxed text-sm">
-            {t('login_subtitle')}
-          </p>
-          
-          {isEmailView ? (
-             <form onSubmit={handleEmailAuth} className="space-y-3 text-left">
-                {authError && <div className="text-sm text-red-500 bg-red-100 dark:bg-red-900/30 p-2 rounded">{authError}</div>}
-                
-                <div>
-                  <label className="text-xs uppercase tracking-wider font-bold text-[var(--neu-text-muted)] ml-1">{t('email_ph', 'Email address')}</label>
-                  <Input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="neu-input w-full mt-1 h-10" />
-                </div>
-                <div>
-                  <label className="text-xs uppercase tracking-wider font-bold text-[var(--neu-text-muted)] ml-1">{t('password_ph', 'Password')}</label>
-                  <Input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full mt-1 h-10" />
-                </div>
-                
-                <div className="flex items-center gap-2 mt-1">
-                  <input type="checkbox" id="register" checked={isRegistering} onChange={e=>setIsRegistering(e.target.checked)} className="rounded" />
-                  <label htmlFor="register" className="text-sm cursor-pointer">{t('register_new_account', 'Зарегистрировать новый аккаунт')}</label>
-                </div>
-
-                <div className="pt-1 flex flex-col gap-2">
-                   <button type="submit" className="neu-button font-bold py-2.5 bg-[var(--neu-accent)] text-white shadow-none w-full">
-                     {isRegistering ? t('sign_up', 'Sign Up') : t('sign_in', 'Sign In')}
-                   </button>
-                   <button type="button" onClick={() => {setIsEmailView(false); setAuthError('');}} className="neu-button py-2.5 text-sm font-medium w-full">
-                     {t('back', 'Back')}
-                   </button>
-                </div>
-             </form>
-          ) : (
-             <div className="flex flex-col gap-3">
-                <button onClick={login} className="neu-button font-bold text-sm md:text-base w-full py-3 md:py-3.5 bg-[var(--neu-accent)] text-white shadow-none hover:opacity-90 transition-opacity">
-                  {t('login', 'Login with Google')}
-                </button>
-                <button onClick={() => setIsEmailView(true)} className="neu-button font-bold text-sm md:text-base w-full py-3 md:py-3.5 border border-[var(--neu-border)] hover:opacity-90 transition-opacity text-[var(--neu-text-muted)]">
-                  {t('login_email', 'Login with Email')}
-                </button>
-             </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   if (isPaywall) {
     return <Paywall />;
   }
@@ -238,9 +169,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')}>
                   {i18n.language === 'ru' ? 'RU' : 'EN'}
                </div>
-             <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
-                <LogOut className="h-4 w-4" />
-             </div>
+              {user && !user.isAnonymous && (
+                <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
+                  <LogOut className="h-4 w-4" />
+                </div>
+              )}
           </div>
         </header>
 
@@ -310,10 +243,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
                        {t('change_language', 'Сменить язык')}
                     </button>
-                    <button onClick={logout} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
-                       <LogOut className="h-4 w-4 shrink-0" />
-                       {t('logout', 'Выйти')}
-                    </button>
+                    {user && !user.isAnonymous && (
+                      <button onClick={logout} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
+                        <LogOut className="h-4 w-4 shrink-0" />
+                        {t('logout', 'Выйти')}
+                      </button>
+                    )}
                  </nav>
               </motion.aside>
             </div>

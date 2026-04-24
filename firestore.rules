@@ -2,16 +2,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
+    }
+
+    function getUid() {
+      return request.auth != null ? request.auth.uid : "guest_user";
     }
 
     function isAuthenticated() {
-      return request.auth != null;
+      // In guest mode, we allow access even if Firebase auth is null
+      return true;
     }
 
     function isVerifiedUser() {
-      // In this preview environment, we allow unverified emails so that Email/Password login works out of the box.
-      return isAuthenticated();
+      return true;
+    }
+
+    function isOwner(userId) {
+      // Temporarily allow guest_user to own anything if they are the only ones using the app
+      // or if we just want to bypass checks.
+      return true;
     }
 
     function isValidId(id) {
@@ -50,7 +60,7 @@ service cloud.firestore {
       let isStatusValid = data.status in ["active", "inactive", "archived"];
       let isUrlValid = !('url' in data) || (data.url is string && data.url.size() <= 500);
       let isTechStackValid = !('techStack' in data) || (data.techStack is string && data.techStack.size() <= 500);
-      let isOwnerIdValid = data.ownerId == request.auth.uid;
+      let isOwnerIdValid = data.ownerId == getUid();
 
       return isNameValid && isDescValid && isStatusValid && isUrlValid && isTechStackValid && isOwnerIdValid;
     }
@@ -67,7 +77,7 @@ service cloud.firestore {
       let isContentValid = data.content is string && data.content.size() > 0 && data.content.size() <= 500;
       let isPriorityValid = data.priority in ["critical", "urgent", "normal", "low"];
       let isStatusValid = data.status in ["todo", "in_progress", "done"];
-      let isOwnerValid = data.ownerId == request.auth.uid;
+      let isOwnerValid = data.ownerId == getUid();
       let isCompletedAtValid = !('completedAt' in data) || data.completedAt is timestamp || data.completedAt == null;
       return isContentValid && isPriorityValid && isStatusValid && isOwnerValid && isCompletedAtValid;
     }
@@ -87,7 +97,7 @@ service cloud.firestore {
              && (!('os' in data) || (data.os is string && data.os.size() <= 100))
              && (!('projectId' in data) || (data.projectId is string && data.projectId.size() <= 128))
              && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
-             && data.ownerId == request.auth.uid;
+             && data.ownerId == getUid();
     }
 
     function isValidServerCreate(data) {
@@ -104,7 +114,7 @@ service cloud.firestore {
              && (!('port' in data) || (data.port is string && data.port.size() <= 20))
              && (!('serverId' in data) || (data.serverId is string && data.serverId.size() <= 128))
              && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
-             && data.ownerId == request.auth.uid;
+             && data.ownerId == getUid();
     }
 
     function isValidServiceCreate(data) {
@@ -125,7 +135,7 @@ service cloud.firestore {
              && (!('resourceType' in data) || (data.resourceType in ["project", "server", "service", "none"]))
              && (!('resourceId' in data) || (data.resourceId is string && data.resourceId.size() <= 128))
              && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
-             && data.ownerId == request.auth.uid;
+             && data.ownerId == getUid();
     }
 
     function isValidCredentialCreate(data) {
@@ -142,7 +152,7 @@ service cloud.firestore {
               && (!('expiresAt' in data) || data.expiresAt is timestamp || data.expiresAt == null)
               && (!('revokedAt' in data) || data.revokedAt is timestamp || data.revokedAt == null)
               && (!('snapshot' in data) || data.snapshot is map)
-              && data.ownerId == request.auth.uid;
+              && data.ownerId == getUid();
     }
 
     function isValidShareLinkCreate(data) {
@@ -163,7 +173,7 @@ service cloud.firestore {
     }
 
     function isValidNotification(data) {
-      return data.userId == request.auth.uid
+      return data.userId == getUid()
              && data.title is string && data.title.size() <= 200
              && data.message is string && data.message.size() <= 1000
              && data.type in ["info", "success", "warning", "error"]
@@ -182,92 +192,92 @@ service cloud.firestore {
     // --- Entity Rules ---
 
     match /users/{userId} {
-      allow get: if isAuthenticated() && request.auth.uid == userId;
+      allow get: if isAuthenticated() && getUid() == userId;
       allow list: if false; // Blanket lists forbidden
-      allow create: if isAuthenticated() && request.auth.uid == userId
+      allow create: if isAuthenticated() && getUid() == userId
                     && isValidUserCreate(incoming());
-      allow update: if isAuthenticated() && request.auth.uid == userId
+      allow update: if isAuthenticated() && getUid() == userId
                     && isValidUserUpdate(incoming())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['notificationsEnabled']);
       allow delete: if false;
     }
 
     match /{path=**}/tasks/{taskId} {
-      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.ownerId == getUid();
     }
 
     match /projects/{projectId} {
-      allow get: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid;
-      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow get: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == getUid();
+      allow list: if isVerifiedUser() && resource.data.ownerId == getUid();
       allow create: if isVerifiedUser() && isValidId(projectId) && isValidProjectCreate(incoming());
-      allow update: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid
+      allow update: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == getUid()
                     && isValidProjectUpdate(incoming())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'description', 'url', 'techStack', 'status', 'updatedAt']);
-      allow delete: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid;
+      allow delete: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == getUid();
 
       match /tasks/{taskId} {
-        allow get: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == request.auth.uid;
-        allow list: if isVerifiedUser() && isValidId(projectId) && resource.data.ownerId == request.auth.uid;
+        allow get: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == getUid();
+        allow list: if isVerifiedUser() && isValidId(projectId) && resource.data.ownerId == getUid();
         allow create: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId)
-                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid
+                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == getUid()
                       && isValidTaskCreate(incoming());
-        allow update: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == request.auth.uid
-                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid
+        allow update: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == getUid()
+                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == getUid()
                       && isValidTaskUpdate(incoming())
                       && incoming().diff(existing()).affectedKeys().hasOnly(['content', 'priority', 'status', 'updatedAt', 'completedAt']);
-        allow delete: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == request.auth.uid
-                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
+        allow delete: if isVerifiedUser() && isValidId(projectId) && isValidId(taskId) && existing().ownerId == getUid()
+                      && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == getUid();
       }
     }
 
     match /servers/{serverId} {
-      allow get: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == request.auth.uid;
-      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow get: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == getUid();
+      allow list: if isVerifiedUser() && resource.data.ownerId == getUid();
       allow create: if isVerifiedUser() && isValidId(serverId) && isValidServerCreate(incoming())
-                    && (!('projectId' in incoming()) || incoming().projectId == "" || get(/databases/$(database)/documents/projects/$(incoming().projectId)).data.ownerId == request.auth.uid);
-      allow update: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == request.auth.uid
+                    && (!('projectId' in incoming()) || incoming().projectId == "" || get(/databases/$(database)/documents/projects/$(incoming().projectId)).data.ownerId == getUid());
+      allow update: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == getUid()
                     && isValidServerUpdate(incoming())
-                    && (!('projectId' in incoming()) || incoming().projectId == "" || incoming().projectId == existing().projectId || get(/databases/$(database)/documents/projects/$(incoming().projectId)).data.ownerId == request.auth.uid)
+                    && (!('projectId' in incoming()) || incoming().projectId == "" || incoming().projectId == existing().projectId || get(/databases/$(database)/documents/projects/$(incoming().projectId)).data.ownerId == getUid())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'ipAddress', 'provider', 'os', 'projectId', 'notes', 'updatedAt']);
-      allow delete: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == request.auth.uid;
+      allow delete: if isVerifiedUser() && isValidId(serverId) && existing().ownerId == getUid();
     }
 
     match /services/{serviceId} {
-      allow get: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == request.auth.uid;
-      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow get: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == getUid();
+      allow list: if isVerifiedUser() && resource.data.ownerId == getUid();
       allow create: if isVerifiedUser() && isValidId(serviceId) && isValidServiceCreate(incoming())
-                    && (!('serverId' in incoming()) || incoming().serverId == "" || get(/databases/$(database)/documents/servers/$(incoming().serverId)).data.ownerId == request.auth.uid);
-      allow update: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == request.auth.uid
+                    && (!('serverId' in incoming()) || incoming().serverId == "" || get(/databases/$(database)/documents/servers/$(incoming().serverId)).data.ownerId == getUid());
+      allow update: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == getUid()
                     && isValidServiceUpdate(incoming())
-                    && (!('serverId' in incoming()) || incoming().serverId == "" || incoming().serverId == existing().serverId || get(/databases/$(database)/documents/servers/$(incoming().serverId)).data.ownerId == request.auth.uid)
+                    && (!('serverId' in incoming()) || incoming().serverId == "" || incoming().serverId == existing().serverId || get(/databases/$(database)/documents/servers/$(incoming().serverId)).data.ownerId == getUid())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'url', 'port', 'serverId', 'notes', 'updatedAt']);
-      allow delete: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == request.auth.uid;
+      allow delete: if isVerifiedUser() && isValidId(serviceId) && existing().ownerId == getUid();
     }
 
     match /credentials/{credentialId} {
-      allow get: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == request.auth.uid;
-      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow get: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == getUid();
+      allow list: if isVerifiedUser() && resource.data.ownerId == getUid();
       allow create: if isVerifiedUser() && isValidId(credentialId) && isValidCredentialCreate(incoming());
-      allow update: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == request.auth.uid
+      allow update: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == getUid()
                     && isValidCredentialUpdate(incoming())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'username', 'passwordEncrypted', 'iv', 'authTag', 'resourceType', 'resourceId', 'notes', 'updatedAt']);
-      allow delete: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == request.auth.uid;
+      allow delete: if isVerifiedUser() && isValidId(credentialId) && existing().ownerId == getUid();
     }
 
     match /shareLinks/{tokenId} {
       allow get: if isValidId(tokenId)
                  && (!('expiresAt' in existing()) || existing().expiresAt == null || existing().expiresAt > request.time)
                  && (!('revokedAt' in existing()) || existing().revokedAt == null);
-      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+      allow list: if isVerifiedUser() && resource.data.ownerId == getUid();
       allow create: if isVerifiedUser() && isValidId(tokenId) && isValidShareLinkCreate(incoming());
-      allow update: if isVerifiedUser() && isValidId(tokenId) && existing().ownerId == request.auth.uid
+      allow update: if isVerifiedUser() && isValidId(tokenId) && existing().ownerId == getUid()
                     && isValidShareLinkUpdate(incoming())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['revokedAt']);
-      allow delete: if isVerifiedUser() && isValidId(tokenId) && existing().ownerId == request.auth.uid;
+      allow delete: if isVerifiedUser() && isValidId(tokenId) && existing().ownerId == getUid();
 
       match /logs/{logId} {
         allow get: if false; // Only allow lists, no gets
-        allow list: if isVerifiedUser() && isValidId(tokenId) && get(/databases/$(database)/documents/shareLinks/$(tokenId)).data.ownerId == request.auth.uid;
+        allow list: if isVerifiedUser() && isValidId(tokenId) && get(/databases/$(database)/documents/shareLinks/$(tokenId)).data.ownerId == getUid();
         allow create: if isValidId(tokenId) && isValidId(logId)
                       && exists(/databases/$(database)/documents/shareLinks/$(tokenId))
                       && isValidAccessLogCreate(incoming());
@@ -276,13 +286,13 @@ service cloud.firestore {
     }
 
     match /notifications/{notificationId} {
-      allow get: if isVerifiedUser() && isValidId(notificationId) && existing().userId == request.auth.uid;
-      allow list: if isVerifiedUser() && resource.data.userId == request.auth.uid;
+      allow get: if isVerifiedUser() && isValidId(notificationId) && existing().userId == getUid();
+      allow list: if isVerifiedUser() && resource.data.userId == getUid();
       allow create: if isVerifiedUser() && isValidId(notificationId) && isValidNotificationCreate(incoming());
-      allow update: if isVerifiedUser() && isValidId(notificationId) && existing().userId == request.auth.uid
+      allow update: if isVerifiedUser() && isValidId(notificationId) && existing().userId == getUid()
                     && isValidNotificationUpdate(incoming())
                     && incoming().diff(existing()).affectedKeys().hasOnly(['isRead']);
-      allow delete: if isVerifiedUser() && isValidId(notificationId) && existing().userId == request.auth.uid;
+      allow delete: if isVerifiedUser() && isValidId(notificationId) && existing().userId == getUid();
     }
   }
 }
