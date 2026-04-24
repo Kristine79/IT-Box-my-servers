@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description: 'Secure vault for your infrastructure. Manage servers, services, and credentials with enterprise-grade AES-256-GCM encryption.',
   keywords: ['IT Asset Management', 'Infrastructure Security', 'Server Management', 'Credential Vault', 'AES-256-GCM'],
   authors: [{ name: 'IT-Box Team' }],
+  icons: {
+    icon: '/favicon.ico',
+  },
   openGraph: {
     title: 'IT-Box | Unified Asset Manager',
     description: 'Secure vault for your infrastructure tools.',
@@ -43,6 +46,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
