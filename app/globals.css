@@ -158,14 +158,19 @@
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow);
     border-radius: 1.5rem;
-    transition: box-shadow 0.3s ease, background 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+  }
+  
+  .neu-panel:hover {
+    box-shadow: 8px 8px 20px var(--neu-dark), -8px -8px 20px var(--neu-light);
+    transform: translateY(-2px);
   }
   
   .neu-panel-inset {
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow-inset);
     border-radius: 1.5rem;
-    transition: box-shadow 0.3s ease, background 0.3s ease;
+    transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
   }
   
   .neu-panel-sidebar {
@@ -179,7 +184,7 @@
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow);
     border-radius: 9999px;
-    transition: all 0.2s ease-in-out;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, background 0.2s ease;
     color: var(--neu-text);
     display: inline-flex;
     align-items: center;
@@ -188,12 +193,12 @@
   }
 
   .neu-button:hover {
-    box-shadow: var(--neu-shadow-hover);
-    transform: translateY(1px);
+    box-shadow: 8px 8px 16px var(--neu-dark), -8px -8px 16px var(--neu-light);
+    transform: translateY(-2px);
   }
 
   .neu-button:active {
-    box-shadow: var(--neu-shadow-active);
+    box-shadow: var(--neu-shadow-inset);
     transform: translateY(2px);
   }
 
@@ -201,6 +206,17 @@
     background: var(--neu-accent);
     color: white;
     box-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.39);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+  }
+  
+  .neu-button-accent:hover {
+    box-shadow: 0 6px 20px 0 rgba(14, 165, 233, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .neu-button-accent:active {
+    box-shadow: 0 2px 5px 0 rgba(14, 165, 233, 0.39);
+    transform: translateY(2px);
   }
 
   .neu-input {
@@ -209,12 +225,13 @@
     border-radius: 1rem;
     color: var(--neu-text);
     padding: 0.75rem 1rem;
-    transition: all 0.2s ease;
+    transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
     border: 2px solid transparent;
   }
   
   .neu-input:focus {
     outline: none;
     border-color: var(--neu-accent);
+    box-shadow: inset 8px 8px 16px var(--neu-dark), inset -8px -8px 16px var(--neu-light);
   }
 }

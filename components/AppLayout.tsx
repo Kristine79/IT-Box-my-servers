@@ -200,7 +200,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
          </div>
 
         <div className="flex-1 overflow-y-auto px-2 py-1 scrollbar-hide">
-          <nav className={cn("flex flex-col gap-0.5 font-medium text-[13px]", desktopSidebarOpen ? "items-start" : "items-center")}>
+          <nav className={cn("flex flex-col gap-0.5 font-normal text-[13px]", desktopSidebarOpen ? "items-start" : "items-center")}>
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -283,24 +283,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className="relative flex w-fit min-w-[200px] max-w-[90vw] flex-col neu-panel-sidebar rounded-r-2xl h-full pt-4 pr-6"
               >
                  <div className="flex justify-between items-center px-4 mb-2">
-                    <div className="flex items-center gap-2">
-                       <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-8 h-8 flex items-center justify-center shrink-0">
+                    <div className="flex items-center gap-3">
+                       <div className="neu-panel-inset p-0.5 rounded-2xl text-[var(--neu-accent)] overflow-hidden w-12 h-12 flex items-center justify-center shrink-0">
                           <img src={LOGO_BASE64} alt="StackBox Logo" className="w-[450%] h-[450%] object-contain scale-[1.5]" />
                        </div>
-                       <span className="text-xl font-bold tracking-tight">StackBox</span>
+                       <span className="text-2xl font-bold tracking-tight">StackBox</span>
                     </div>
                     <button className="p-2 rounded-lg text-[var(--neu-text-muted)] hover:text-[var(--neu-accent)] hover:bg-[var(--neu-accent)]/10 transition-colors" onClick={() => setSidebarOpen(false)}>
                        <X className="w-6 h-6" />
                     </button>
                  </div>
-                 <nav className="flex-1 p-4 text-lg font-semibold gap-2 overflow-y-auto flex flex-col items-start w-full">
+                 <nav className="flex-1 p-4 text-lg font-normal gap-1 overflow-y-auto flex flex-col items-start w-full">
                    {navItems.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex items-center gap-4 rounded-xl px-4 py-3 transition-all w-full",
+                          "flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full",
                           pathname === item.href ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80"
                         )}
                       >
@@ -310,28 +310,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     ))}
                     <div className="my-2 h-px neu-panel-inset opacity-50 w-full" />
                     
-                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-3 transition-all w-full", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                        <HelpCircle className="h-6 w-6" />
                        {t('about')}
                     </Link>
-                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-3 transition-all w-full", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                        <HelpCircle className="h-6 w-6" />
                        {t('faq')}
                     </Link>
-                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-3 transition-all w-full", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                        <CreditCard className="h-6 w-6" />
                        {t('pricing')}
                     </Link>
-                    <div className="my-4 h-px neu-panel-inset opacity-50 w-full" />
-                    <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-4 rounded-xl px-4 py-3 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
+                    <div className="my-2 h-px neu-panel-inset opacity-50 w-full" />
+                    <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        {isDark ? <Sun className="h-6 w-6 shrink-0" /> : <Moon className="h-6 w-6 shrink-0" />}
                        {isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}
                     </button>
-                    <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-4 rounded-xl px-4 py-3 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
+                    <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        <div className="w-6 h-6 flex items-center justify-center font-bold text-sm shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
                        {t('change_language', 'Сменить язык')}
                     </button>
-                    <button onClick={logout} className="flex items-center gap-4 rounded-xl px-4 py-3 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
+                    <button onClick={logout} className="flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
                        <LogOut className="h-6 w-6 shrink-0" />
                        {t('logout', 'Выйти')}
                     </button>

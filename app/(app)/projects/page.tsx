@@ -5,12 +5,12 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, Edit, FolderKanban, Globe, Code2, ClipboardList, CheckCircle2, Circle, Clock } from "lucide-react";
+import { Plus, Trash2, Edit, FolderKanban, Globe, Code2, ClipboardList, CheckCircle2, Circle, Clock, ArrowUp, ArrowDown, ArrowDownAZ, ArrowUpAZ, CalendarDays, BarChart2, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/lib/notifications";
 
-function TaskModal({ projectId, projectName }: { projectId: string; projectName: string }) {
+function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string; projectName: string; onTaskChange?: () => void }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { sendNotification } = useNotifications();
@@ -50,6 +50,7 @@ function TaskModal({ projectId, projectName }: { projectId: string; projectName:
       setContent("");
       setPriority("normal");
       toast.success(t('task_add'));
+      onTaskChange?.();
     } catch (err) {
       toast.error("Failed to add task");
     }
@@ -79,6 +80,7 @@ function TaskModal({ projectId, projectName }: { projectId: string; projectName:
   const deleteTask = async (id: string) => {
     try {
       await deleteDoc(doc(db, "projects", projectId, "tasks", id));
+      onTaskChange?.();
     } catch (err) {
       toast.error("Delete failed");
     }
@@ -86,6 +88,7 @@ function TaskModal({ projectId, projectName }: { projectId: string; projectName:
 
   return (
     <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-2xl max-h-[85vh] overflow-y-auto scrollbar-hide" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+      <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold flex items-center gap-3">
           <ClipboardList className="w-6 h-6 text-[var(--neu-accent)]" />
@@ -157,6 +160,8 @@ function TaskModal({ projectId, projectName }: { projectId: string; projectName:
   );
 }
 
+const POPULAR_STACKS = ["React", "Next.js", "Vue", "Angular", "Node.js", "Express", "Firebase", "Supabase", "TailwindCSS", "PostgreSQL", "MongoDB", "TypeScript", "Python", "Go"];
+
 export default function ProjectsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -164,6 +169,15 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Sorting & Filtering State
+  const [sortBy, setSortBy] = useState<'date' | 'name' | 'status'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [filterStack, setFilterStack] = useState<string>('all');
+  const [filterTasks, setFilterTasks] = useState<'all' | 'with-tasks' | 'no-tasks'>('all');
 
   // Form State
   const [name, setName] = useState("");
@@ -172,12 +186,70 @@ export default function ProjectsPage() {
   const [stack, setStack] = useState("");
   const [status, setStatus] = useState("active");
 
+  const handleToggleStack = (tech: string) => {
+    const currentStacks = stack.split(',').map(s => s.trim()).filter(Boolean);
+    if (currentStacks.includes(tech)) {
+      setStack(currentStacks.filter(s => s !== tech).join(', '));
+    } else {
+      currentStacks.push(tech);
+      setStack(currentStacks.join(', '));
+    }
+  };
+
+  const sortedProjects = useMemo(() => {
+    let filtered = [...projects];
+    
+    // Apply Filters
+    if (filterStack !== 'all') {
+      filtered = filtered.filter(p => {
+        const projStacks = p.techStack ? p.techStack.split(',').map((s: string) => s.trim().toLowerCase()) : [];
+        return projStacks.includes(filterStack.toLowerCase());
+      });
+    }
+
+    if (filterTasks === 'with-tasks') {
+      filtered = filtered.filter(p => p.tasksCount > 0);
+    } else if (filterTasks === 'no-tasks') {
+      filtered = filtered.filter(p => !p.tasksCount || p.tasksCount === 0);
+    }
+
+    // Apply Sorting
+    return filtered.sort((a, b) => {
+      let valA, valB;
+      if (sortBy === 'name') {
+        valA = a.name?.toLowerCase() || '';
+        valB = b.name?.toLowerCase() || '';
+      } else if (sortBy === 'status') {
+        valA = a.status || '';
+        valB = b.status || '';
+      } else { // date
+        valA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        valB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      }
+      
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [projects, sortBy, sortOrder, filterStack, filterTasks]);
+
   const loadProjects = useCallback(async () => {
     if(!user) return;
     try {
       const q = query(collection(db, "projects"), where("ownerId", "==", user.uid));
       const snap = await getDocs(q);
-      setProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const projData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      const fullData = await Promise.all(projData.map(async (p) => {
+        try {
+          const tq = query(collection(db, "projects", p.id, "tasks"));
+          const tsnap = await getDocs(tq);
+          return { ...p, tasksCount: tsnap.size };
+        } catch {
+          return { ...p, tasksCount: 0 };
+        }
+      }));
+      setProjects(fullData);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load projects");
@@ -213,11 +285,44 @@ export default function ProjectsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if(!confirm("Are you sure?")) return;
+  const openEdit = (p: any) => {
+    setName(p.name || "");
+    setDesc(p.description || "");
+    setUrl(p.url || "");
+    setStack(p.techStack || "");
+    setStatus(p.status || "active");
+    setEditId(p.id);
+    setEditOpen(true);
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editId) return;
     try {
-      await deleteDoc(doc(db, "projects", id));
+      await updateDoc(doc(db, "projects", editId), {
+        name,
+        description: desc,
+        url,
+        techStack: stack,
+        status,
+        updatedAt: serverTimestamp()
+      });
+      toast.success("Project updated");
+      setEditOpen(false);
+      setName(""); setDesc(""); setUrl(""); setStack(""); setStatus("active"); setEditId(null);
+      loadProjects();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update project");
+    }
+  };
+
+  const handleDelete = async () => {
+    if(!deleteId) return;
+    try {
+      await deleteDoc(doc(db, "projects", deleteId));
       toast.success("Project deleted");
+      setDeleteId(null);
       loadProjects();
     } catch (error) {
       toast.error("Failed to delete project");
@@ -236,6 +341,7 @@ export default function ProjectsPage() {
              <Plus className="w-4 h-4 mr-2"/> {t('create_project')}
           </DialogTrigger>
           <DialogContent className="border-0 sm:rounded-3xl p-8" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+            <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
             <DialogHeader><DialogTitle className="text-xl font-bold">{t('create_project')}</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4 pt-2">
               <div className="space-y-1">
@@ -255,16 +361,141 @@ export default function ProjectsPage() {
               <div className="space-y-1">
                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
                 <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_stack')} />
+                <div className="flex flex-wrap gap-2 mt-3 px-1">
+                  {POPULAR_STACKS.map(tech => {
+                    const isSelected = stack.split(',').map(s=>s.trim()).includes(tech);
+                    return (
+                      <button
+                        key={tech}
+                        type="button"
+                        onClick={() => handleToggleStack(tech)}
+                        className={cn(
+                          "text-[10px] px-2.5 py-1 rounded-full transition-all cursor-pointer font-medium",
+                          isSelected ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "neu-panel-inset text-[var(--neu-text-muted)] hover:text-[var(--neu-text)]"
+                        )}
+                      >
+                        {tech}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="flex justify-end pt-2"><button type="submit" className="neu-button neu-button-accent px-6 py-2">{t('btn_save')}</button></div>
             </form>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent className="border-0 sm:rounded-3xl p-8" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+            <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
+            <DialogHeader><DialogTitle className="text-xl font-bold">Редактировать проект</DialogTitle></DialogHeader>
+            <form onSubmit={handleUpdate} className="space-y-4 pt-2">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_name')} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
+                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[70px] p-2 resize-none" placeholder={t('placeholder_desc')} />
+              </div>
+              
+              <div className="space-y-1">
+                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
+                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full p-2" placeholder="https://" />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
+                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_stack')} />
+                <div className="flex flex-wrap gap-2 mt-3 px-1">
+                  {POPULAR_STACKS.map(tech => {
+                    const isSelected = stack.split(',').map(s=>s.trim()).includes(tech);
+                    return (
+                      <button
+                        key={tech}
+                        type="button"
+                        onClick={() => handleToggleStack(tech)}
+                        className={cn(
+                          "text-[10px] px-2.5 py-1 rounded-full transition-all cursor-pointer font-medium",
+                          isSelected ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "neu-panel-inset text-[var(--neu-text-muted)] hover:text-[var(--neu-text)]"
+                        )}
+                      >
+                        {tech}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              <div className="space-y-1">
+                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">Cтатус</label>
+                 <select value={status} onChange={e=>setStatus(e.target.value)} className="neu-input w-full p-2 appearance-none cursor-pointer">
+                   <option value="active" className="bg-[var(--neu-bg)] text-[var(--neu-text)]">{t('status_active')}</option>
+                   <option value="archived" className="bg-[var(--neu-bg)] text-[var(--neu-text)]">{t('status_archive')}</option>
+                 </select>
+              </div>
+              <div className="flex justify-end pt-2"><button type="submit" className="neu-button neu-button-accent px-6 py-2">{t('btn_save')}</button></div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!deleteId} onOpenChange={(val) => !val && setDeleteId(null)}>
+          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-sm text-center" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+            <DialogHeader><DialogTitle className="text-xl font-bold flex flex-col items-center gap-4"><Trash2 className="w-12 h-12 text-red-500"/> Удалить проект?</DialogTitle></DialogHeader>
+            <p className="opacity-80 py-4">Это действие нельзя отменить.</p>
+            <div className="flex w-full gap-3 mt-4">
+               <button onClick={() => setDeleteId(null)} className="neu-button flex-1 py-2 font-medium">Отмена</button>
+               <button onClick={handleDelete} className="neu-button flex-1 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 font-bold">Удалить</button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex flex-col xl:flex-row gap-4 bg-[var(--neu-bg)] px-4 py-3 rounded-lg w-full items-start xl:items-center" style={{ boxShadow: 'var(--neu-shadow-inset)' }}>
+        <div className="flex flex-wrap items-center gap-2 flex-1">
+          <span className="text-sm font-bold text-[var(--neu-text-muted)] uppercase tracking-widest pl-2 pr-2">Сортировать</span>
+          <button onClick={() => setSortBy('date')} className={cn("neu-button py-2 px-4 text-sm flex items-center gap-2", sortBy === 'date' && 'neu-button-accent')}>
+            <CalendarDays className="w-4 h-4" /> Дата
+          </button>
+          <button onClick={() => setSortBy('name')} className={cn("neu-button py-2 px-4 text-sm flex items-center gap-2", sortBy === 'name' && 'neu-button-accent')}>
+            <ArrowDownAZ className="w-4 h-4" /> Название
+          </button>
+          <button onClick={() => setSortBy('status')} className={cn("neu-button py-2 px-4 text-sm flex items-center gap-2", sortBy === 'status' && 'neu-button-accent')}>
+            <BarChart2 className="w-4 h-4" /> Статус
+          </button>
+          <button onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} className="neu-button p-2 text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] ml-1">
+            {sortOrder === 'asc' ? <ArrowUp className="w-5 h-5" /> : <ArrowDown className="w-5 h-5" />}
+          </button>
+        </div>
+
+        <div className="w-full xl:w-px h-px xl:h-10 bg-[var(--neu-text-muted)] opacity-20"></div>
+
+        <div className="flex flex-wrap items-center gap-2">
+           <span className="text-sm font-bold text-[var(--neu-text-muted)] uppercase tracking-widest pl-2 pr-2 flex items-center gap-1"><Filter className="w-4 h-4" /> Фильтр</span>
+           <select 
+             value={filterStack} 
+             onChange={(e) => setFilterStack(e.target.value)} 
+             className="neu-input py-2 px-3 text-sm min-w-[140px] cursor-pointer"
+           >
+             <option value="all">Любой стэк</option>
+             {POPULAR_STACKS.map(s => <option key={s} value={s}>{s}</option>)}
+           </select>
+
+           <select 
+             value={filterTasks} 
+             onChange={(e) => setFilterTasks(e.target.value as any)} 
+             className="neu-input py-2 px-3 text-sm min-w-[140px] cursor-pointer"
+           >
+             <option value="all">Все задачи</option>
+             <option value="with-tasks">С задачами</option>
+             <option value="no-tasks">Без задач</option>
+           </select>
+        </div>
       </div>
 
       {loading ? <p className="opacity-50">{t('loading')}</p> : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map(p => (
+          {sortedProjects.map(p => (
             <div key={p.id} className="neu-panel p-6 flex flex-col h-full group relative transition-all duration-300 hover:scale-[1.02]">
               <div className="flex justify-between items-start mb-6 gap-4">
                 <div className="neu-panel-inset p-3 rounded-full text-blue-400 shrink-0">
@@ -277,9 +508,9 @@ export default function ProjectsPage() {
                   )}>
                     {p.status === 'active' ? t('status_active') : t('status_archive')}
                   </div>
-                  <div className="flex gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="neu-button h-8 w-8 text-blue-500 flex items-center justify-center shrink-0" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
-                    <button onClick={() => handleDelete(p.id)} className="neu-button h-8 w-8 text-red-500 flex items-center justify-center shrink-0" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
+                  <div className="flex gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity relative z-10">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEdit(p); }} className="neu-button h-8 w-8 text-blue-500 flex items-center justify-center shrink-0" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteId(p.id); }} className="neu-button h-8 w-8 text-red-500 flex items-center justify-center shrink-0" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
                   </div>
                 </div>
               </div>
@@ -313,9 +544,9 @@ export default function ProjectsPage() {
             <div className="mt-auto">
               <Dialog>
                 <DialogTrigger className="neu-button w-full flex items-center justify-center gap-2 py-3 text-sm font-bold neu-button-accent">
-                  <ClipboardList className="w-4 h-4" /> {t('tasks')}
+                  <ClipboardList className="w-4 h-4" /> {t('tasks')} {p.tasksCount !== undefined && `(${p.tasksCount})`}
                 </DialogTrigger>
-                <TaskModal projectId={p.id} projectName={p.name} />
+                <TaskModal projectId={p.id} projectName={p.name} onTaskChange={loadProjects} />
               </Dialog>
             </div>
 
