@@ -1,6 +1,6 @@
 {
-  "name": "IT-Box Unified Asset Manager",
-  "short_name": "IT-Box",
+  "name": "StackBox Unified Asset Manager",
+  "short_name": "StackBox",
   "description": "Secure vault for your infrastructure: servers, services, and credentials.",
   "start_url": "/",
   "display": "standalone",

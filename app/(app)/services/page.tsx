@@ -54,12 +54,6 @@ export default function ServicesPage() {
         updatedAt: serverTimestamp()
       });
       toast.success("Service created");
-      sendNotification({
-        title: t('notif_service_added'),
-        message: name,
-        type: 'info',
-        link: '/services'
-      });
       setOpen(false);
       setName(""); setUrl(""); setPort(""); setServerId(""); setNotes("");
       loadData();

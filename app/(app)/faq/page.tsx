@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 
 const faqs_ru = [
   {
-    q: "Что такое IT-Box?",
-    a: "IT-Box — это централизованный сейф для хранения информации о ваших серверах, проектах, микросервисах и аутентификационных данных."
+    q: "Что такое StackBox?",
+    a: "StackBox — это централизованный сейф для хранения информации о ваших серверах, проектах, микросервисах и аутентификационных данных."
   },
   {
     q: "Где хранятся мои пароли?",
@@ -29,8 +29,8 @@ const faqs_ru = [
 
 const faqs_en = [
   {
-    q: "What is IT-Box?",
-    a: "IT-Box is a centralized vault for storing information about your servers, projects, microservices, and authentication data."
+    q: "What is StackBox?",
+    a: "StackBox is a centralized vault for storing information about your servers, projects, microservices, and authentication data."
   },
   {
     q: "Where are my passwords stored?",
@@ -92,8 +92,8 @@ export default function FAQPage() {
         </div>
         <p className="text-[var(--neu-text-muted)] leading-relaxed text-base md:text-lg">
           {i18n.language === 'en' 
-            ? "Here are answers to the most common questions about the features, security, and architecture of the IT-Box platform." 
-            : "Здесь собраны ответы на самые частые вопросы о возможностях, безопасности и устройстве платформы IT-Box."}
+            ? "Here are answers to the most common questions about the features, security, and architecture of the StackBox platform." 
+            : "Здесь собраны ответы на самые частые вопросы о возможностях, безопасности и устройстве платформы StackBox."}
         </p>
       </motion.div>
 

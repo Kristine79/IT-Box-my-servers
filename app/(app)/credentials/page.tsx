@@ -77,12 +77,6 @@ export default function CredentialsPage() {
         updatedAt: serverTimestamp()
       });
       toast.success("Credential created and securely encrypted");
-      sendNotification({
-        title: t('notif_credential_added'),
-        message: name,
-        type: 'success',
-        link: '/credentials'
-      });
       setOpen(false);
       setName(""); setType("OTHER"); setUsername(""); setPassword(""); setResourceType("none"); setResourceId(""); setNotes("");
       loadData();

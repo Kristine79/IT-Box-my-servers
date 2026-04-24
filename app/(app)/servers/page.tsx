@@ -55,12 +55,6 @@ export default function ServersPage() {
         updatedAt: serverTimestamp()
       });
       toast.success("Server created");
-      sendNotification({
-        title: t('notif_server_added'),
-        message: `${name} (${ipAddress})`,
-        type: 'info',
-        link: '/servers'
-      });
       setOpen(false);
       setName(""); setIp(""); setProvider(""); setOs(""); setProjectId(""); setNotes("");
       loadData();

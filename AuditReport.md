@@ -1,9 +1,14 @@
-# IT-Box SEO Audit Report (Standards 2026)
+# StackBox SEO Audit Report (Standards 2026)
 
-**Status**: Optimized 🟢
+**Status**: Optimized & Rebranded 🟢
+
+## 0. Brand Evolution (Q2 2026)
+- **Identity Upgrade**: Successfully migrated all branding from "IT-Box" to **StackBox**.
+- **Namespace Clean-up**: Verified 100% replacement across UI, Metadata, Schema, and Documentation.
+- **URL Synchronization**: All canonicals and sitemap links now point to `stackbox.app`.
 
 ## 1. Technical Infrastructure
-- **Crawler Optimization**: Added `robots.txt` with explicit instructions for AI crawlers (Gemini, ChatGPT) and standard search engines.
+- **AI Crawler Optimization**: Added `robots.txt` with explicit instructions for AI agents (`GPTBot`, `Google-Extended`, `anthropic-ai`) and standard search engines.
 - **Dynamic Indexing**: Implemented `app/sitemap.ts` to ensure automated, fresh indexing of all core marketing pages.
 - **PWA Integration**: Deployed `manifest.json` and linked it in root layout. Mobile-first ranking signals are now fully satisfied.
 - **Theme Awareness**: Added `theme-color` meta tag for browser/system integration.
@@ -18,8 +23,8 @@
 - **Language Detection**: i18n logic (`lib/i18n.ts`) is optimized for browser detection, reducing bounce rates for localized users.
 
 ## 4. Performance (Core Web Vitals 2026)
-- **INP (Interaction to Next Paint)**: Client components are wrapped in `framer-motion` with staggered execution to prevent main-thread blocking during initial interactions.
-- **LCP (Largest Contentful Paint)**: System fonts (`Geist`) and local asset priority are set in `layout.tsx`.
+- **INP (Interaction to Next Paint)**: Client components are wrapped in `motion` with staggered execution to prevent main-thread blocking during initial interactions.
+- **LCP (Largest Contentful Paint)**: System fonts and local asset priority are set in `layout.tsx`.
 
 ## 5. Security Context
 - **Secure Origin**: Application is configured for HTTPS-only environments.
@@ -28,5 +33,5 @@
 ---
 ### Recommendations for Next Step:
 1. **Dynamic Hreflang**: Implement Next.js Internationalized Routing (Middleware) for physical `/ru` or `/en` paths to maximize regional crawl depth.
-2. **Social Assets**: Generate a high-resolution `opengraph-image.png` for branded social sharing.
+2. **Social Assets**: Deploy a 1200x630 `public/opengraph-image.png` for branded social sharing.
 3. **Internal Linking**: Increase cross-linking between FAQ and About page to improve "Topical Authority."

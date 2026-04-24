@@ -53,7 +53,7 @@ export const LoadingScreen = () => {
         animate={{ opacity: 1, y: 0 }}
         className="mt-8 text-center"
       >
-        <h2 className="text-xl font-bold tracking-widest text-[var(--neu-text)] uppercase mb-2">IT-Box</h2>
+        <h2 className="text-xl font-bold tracking-widest text-[var(--neu-text)] uppercase mb-2">StackBox</h2>
         <p className="text-[var(--neu-text-muted)] font-medium text-sm animate-pulse">
           {mounted ? t('loading') : 'Loading...'}
         </p>

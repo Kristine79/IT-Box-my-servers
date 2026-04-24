@@ -126,7 +126,6 @@ export default function DashboardPage() {
              </div>
              <div>
                <div className="text-5xl font-bold mb-4">{stats.projects}</div>
-               <div className="text-blue-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
              </div>
           </Link>
         </motion.div>
@@ -141,7 +140,6 @@ export default function DashboardPage() {
              </div>
              <div>
                <div className="text-5xl font-bold mb-4">{stats.servers}</div>
-               <div className="text-purple-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
              </div>
           </Link>
         </motion.div>
@@ -156,7 +154,6 @@ export default function DashboardPage() {
              </div>
              <div>
                <div className="text-5xl font-bold mb-4">{stats.services}</div>
-               <div className="text-amber-500 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
              </div>
           </Link>
         </motion.div>
@@ -171,7 +168,6 @@ export default function DashboardPage() {
              </div>
              <div>
                <div className="text-5xl font-bold mb-4">{stats.credentials}</div>
-               <div className="text-rose-500 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">{t('view_all')} <ArrowRight className="w-4 h-4" /></div>
              </div>
           </Link>
         </motion.div>
@@ -187,7 +183,6 @@ export default function DashboardPage() {
                <Link href="/projects" prefetch={true} key={p.id} className="block group p-3 -mx-3 rounded-xl hover:bg-[var(--neu-accent)]/5 transition-all">
                   <div className="flex justify-between items-center">
                     <span className="text-base font-medium group-hover:text-[var(--neu-accent)] transition-colors">{p.name}</span>
-                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                   </div>
                   <p className="text-[var(--neu-text-muted)] text-xs mt-0.5 truncate">{p.description || t('no_description')}</p>
                </Link>
@@ -203,7 +198,6 @@ export default function DashboardPage() {
                <Link href="/servers" prefetch={true} key={s.id} className="block group p-3 -mx-3 rounded-xl hover:bg-[var(--neu-accent)]/5 transition-all">
                   <div className="flex justify-between items-center">
                     <span className="text-base font-medium group-hover:text-[var(--neu-accent)] transition-colors">{s.name}</span>
-                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                   </div>
                   <p className="text-[var(--neu-text-muted)] font-mono text-xs mt-0.5">{s.ipAddress}</p>
                </Link>

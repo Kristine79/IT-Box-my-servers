@@ -23,14 +23,14 @@ export default function AboutPage() {
              <Shield className="h-6 w-6 md:h-8 md:w-8" />
           </div>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold tracking-wide text-[var(--neu-text)]">IT-Box</h1>
+            <h1 className="text-xl md:text-2xl font-bold tracking-wide text-[var(--neu-text)]">StackBox</h1>
             <p className="text-[var(--neu-text-muted)] text-[10px] uppercase tracking-widest mt-0.5">{t('about')}</p>
           </div>
         </div>
         <p className="text-[var(--neu-text-muted)] leading-relaxed text-sm md:text-base mt-4">
           {isEn 
-            ? "IT-Box is a centralized vault for IT infrastructure: servers, projects, services, access, and secure configuration sharing." 
-            : "IT-Box — централизованный сейф для IT-инфраструктуры: серверы, проекты, сервисы, доступы и безопасный шеринг конфигураций."}
+            ? "StackBox is a centralized vault for IT infrastructure: servers, projects, services, access, and secure configuration sharing." 
+            : "StackBox — централизованный сейф для IT-инфраструктуры: серверы, проекты, сервисы, доступы и безопасный шеринг конфигураций."}
         </p>
       </motion.div>
 
@@ -41,11 +41,11 @@ export default function AboutPage() {
         transition={{ delay: 0.1 }}
         className="neu-panel p-6 md:p-8 rounded-2xl"
       >
-        <h2 className="text-lg md:text-xl font-bold tracking-tight text-[var(--neu-text)] mb-3">{isEn ? "What is IT-Box?" : "Что такое IT-Box?"}</h2>
+        <h2 className="text-lg md:text-xl font-bold tracking-tight text-[var(--neu-text)] mb-3">{isEn ? "What is StackBox?" : "Что такое StackBox?"}</h2>
         <p className="text-[var(--neu-text-muted)] leading-relaxed text-sm md:text-base">
           {isEn 
-            ? "IT-Box is a web application for system administrators, DevOps engineers, and webmasters. It allows you to keep all your infrastructure at your fingertips: servers, projects, services, and credentials — in one secure place."
-            : "IT-Box — это веб-приложение для системных администраторов, DevOps-инженеров и веб-мастеров. Оно позволяет держать всю инфраструктуру под рукой: серверы, проекты, сервисы и учётные данные — в одном защищённом месте."}
+            ? "StackBox is a web application for system administrators, DevOps engineers, and webmasters. It allows you to keep all your infrastructure at your fingertips: servers, projects, services, and credentials — in one secure place."
+            : "StackBox — это веб-приложение для системных администраторов, DevOps-инженеров и веб-мастеров. Оно позволяет держать всю инфраструктуру под рукой: серверы, проекты, сервисы и учётные данные — в одном защищённом месте."}
         </p>
       </motion.div>
 

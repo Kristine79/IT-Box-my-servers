@@ -1,6 +1,6 @@
-# Product Requirements Document (PRD): IT-Box
+# Product Requirements Document (PRD): StackBox
 
-**Product Name:** IT-Box (IT-Vault)  
+**Product Name:** StackBox (Stack-Vault)  
 **Version:** 1.1.0  
 **Status:** In Development / MVP  
 **Date:** April 2026
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Vision
 
-**IT-Box** is a specialized B2B/B2C SaaS solution designed for IT leaders, DevOps engineers, system administrators, and freelancers. The product aims to unify fragmented infrastructure data—often scattered across spreadsheets, notes, and chat apps—into a single, aesthetic, and cryptographically secure vault.
+**StackBox** is a specialized B2B/B2C SaaS solution designed for IT leaders, DevOps engineers, system administrators, and freelancers. The product aims to unify fragmented infrastructure data—often scattered across spreadsheets, notes, and chat apps—into a single, aesthetic, and cryptographically secure vault.
 
 ### Core Value Propositions:
 - **Security First:** "Bullet-proof" encryption for sensitive credentials.
@@ -34,7 +34,8 @@
 
 ### 3.2 Global Dashboard
 - **Aggregated Metrics:** Real-time counters for Projects, Servers, and Services.
-- **Quick Links:** Access recently added or modified infrastructure entities.
+- **Clean Aesthetic:** Optimized for monitoring with a simplified UI that removes distracting action buttons from dashboard summary cards.
+- **Quick Navigation:** Direct links to detailed module views via card interaction.
 
 ### 3.3 Infrastructure Modules
 - **Projects:** 

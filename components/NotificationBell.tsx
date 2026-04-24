@@ -92,11 +92,11 @@ export function NotificationBell() {
                   <Settings className="w-4 h-4" />
                 </button>
                 {unreadCount > 0 && notificationsEnabled && !showSettings && (
-                  <button 
+                    <button 
                     onClick={markAllAsRead}
-                    className="text-[11px] uppercase tracking-wider text-[var(--neu-accent)] hover:opacity-80 font-bold ml-2 bg-[var(--neu-accent)]/10 px-3 py-1.5 rounded-full transition-all"
+                    className="text-[11px] uppercase tracking-wider text-white hover:opacity-90 font-bold ml-2 bg-[var(--neu-accent)] px-3 py-1.5 rounded-full transition-all shadow-sm"
                   >
-                    {t('mark_all_read')}
+                    {t('read')}
                   </button>
                 )}
               </div>

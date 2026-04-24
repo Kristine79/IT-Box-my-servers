@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         type: 'redirect',
         return_url: returnUrl
       },
-      description: 'IT-Box 1-month subscription',
+      description: 'StackBox 1-month subscription',
       metadata: { uid }
     };
 

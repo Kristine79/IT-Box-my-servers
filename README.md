@@ -1,8 +1,8 @@
-# IT-Box 🗄️
+# StackBox 🗄️
 
 **A unified, secure vault for your entire IT infrastructure.**
 
-IT-Box is a modern, web-based platform designed for system administrators, DevOps engineers, and IT teams to centralize and secure their infrastructure data. It eliminates fragmented spreadsheets and insecure password sharing by providing a single, encrypted source of truth for projects, servers, services, and credentials.
+StackBox is a modern, web-based platform designed for system administrators, DevOps engineers, and IT teams to centralize and secure their infrastructure data. It eliminates fragmented spreadsheets and insecure password sharing by providing a single, encrypted source of truth for projects, servers, services, and credentials.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15+-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -13,7 +13,7 @@ IT-Box is a modern, web-based platform designed for system administrators, DevOp
 
 ## ✨ Key Features
 
-- 📊 **Intelligent Dashboard:** A centralized overview of your infrastructure health, active projects, and recently modified assets.
+- 📊 **Intelligent Dashboard:** A streamlined, centralized overview of your infrastructure health, active projects, and recently modified assets with a focus on quick status reading.
 - 📁 **Project Management:** Track IT projects with status tagging (Active/Archived), tech stack documentation, and cross-linking to servers.
 - 🖥️ **Server Inventory:** Maintain a detailed registry of machines with IP tracking, OS versions, provider details, and quick-copy functionality.
 - 🌐 **Service Directory:** Map applications and microservices to their respective servers, ports, and public URLs.
@@ -21,9 +21,9 @@ IT-Box is a modern, web-based platform designed for system administrators, DevOp
   - **AES-256-GCM Encryption:** All secrets are encrypted client-side or at the API level before reaching the database.
   - **Zero-Knowledge Feel:** Passwords are masked by default and require explicit user action (and server-side decryption) to view.
 - 🔗 **Secure Sharing (Ephemeral Links):** Generate temporary, time-limited landing pages to share configuration details with external contractors without revealing actual database records.
-- 🌓 **Neumorphic UI/UX:** A unique, tactile interface design that reduces eye strain and provides a premium, modern feel. Supports **Light** and **Dark** modes.
+- 🌓 **Tactile Neumorphic UI:** A unique, minimalist interface design that reduces eye strain and provides a premium, modern feel. The dashboard is optimized for at-a-glance monitoring by removing redundant action buttons.
 - 🌍 **Internationalization:** Full support for English and Russian languages out of the box.
-- 📱 **PWA Ready:** Install IT-Box as a native-like app on your desktop or mobile device.
+- 📱 **PWA Ready:** Install StackBox as a native-like app on your desktop or mobile device.
 
 ---
 
@@ -42,7 +42,7 @@ IT-Box is a modern, web-based platform designed for system administrators, DevOp
 
 ## 🔐 Security Architecture
 
-IT-Box takes security seriously. We implement the "Eight Pillars of Hardened Rules" in our Firestore configuration and utilize high-grade encryption for all secrets:
+StackBox takes security seriously. We implement the "Eight Pillars of Hardened Rules" in our Firestore configuration and utilize high-grade encryption for all secrets:
 
 1. **Payload Encryption:** Secrets are encrypted via `AES-256-GCM`.
 2. **Key Isolation:** Encryption keys are managed via server-side environment variables, never exposed to the client bundle.
@@ -62,8 +62,8 @@ IT-Box takes security seriously. We implement the "Eight Pillars of Hardened Rul
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/it-box.git
-   cd it-box
+   git clone https://github.com/your-username/stackbox.git
+   cd stackbox
    ```
 
 2. **Install dependencies:**
@@ -128,4 +128,4 @@ Contributions are what make the open-source community such an amazing place to l
 
 ---
 
-Developed with ❤️ by the IT-Box Team.
+Developed with ❤️ by the StackBox Team.

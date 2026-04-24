@@ -204,12 +204,6 @@ export default function ProjectsPage() {
         updatedAt: serverTimestamp()
       });
       toast.success("Project created");
-      sendNotification({
-        title: t('notif_project_created'),
-        message: name,
-        type: 'info',
-        link: '/projects'
-      });
       setOpen(false);
       setName(""); setDesc(""); setUrl(""); setStack(""); setStatus("active");
       loadProjects();

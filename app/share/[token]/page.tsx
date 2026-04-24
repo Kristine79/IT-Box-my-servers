@@ -109,7 +109,7 @@ export default function PublicSharePage() {
            
            <div className="mt-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
               <FileJson className="w-4 h-4" />
-              Powered by IT-Vault Secure Sharing
+              Powered by StackBox Secure Sharing
            </div>
         </div>
       </div>

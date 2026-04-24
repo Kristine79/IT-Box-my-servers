@@ -7,6 +7,7 @@ import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from '
 import firebaseConfig from '../firebase-applet-config.json';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/lib/i18n';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -154,10 +155,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
-        {children}
-      </AuthContext.Provider>
-    </I18nextProvider>
+    <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}>
+      <I18nextProvider i18n={i18n}>
+        <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
+          {children}
+        </AuthContext.Provider>
+      </I18nextProvider>
+    </GoogleReCaptchaProvider>
   );
 }

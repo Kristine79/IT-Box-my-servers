@@ -10,30 +10,30 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: 'IT-Box | Unified Asset Manager',
+  title: 'StackBox | Unified Asset Manager',
   description: 'Secure vault for your infrastructure. Manage servers, services, and credentials with enterprise-grade AES-256-GCM encryption.',
   keywords: ['IT Asset Management', 'Infrastructure Security', 'Server Management', 'Credential Vault', 'AES-256-GCM'],
-  authors: [{ name: 'IT-Box Team' }],
+  authors: [{ name: 'StackBox Team' }],
   icons: {
     icon: '/favicon.ico',
   },
   openGraph: {
-    title: 'IT-Box | Unified Asset Manager',
+    title: 'StackBox | Unified Asset Manager',
     description: 'Secure vault for your infrastructure tools.',
     type: 'website',
-    url: 'https://it-box.app',
-    siteName: 'IT-Box',
+    url: 'https://stackbox.app',
+    siteName: 'StackBox',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IT-Box | Unified Asset Manager',
+    title: 'StackBox | Unified Asset Manager',
     description: 'Secure vault for your infrastructure tools.',
   },
   alternates: {
-    canonical: 'https://it-box.app',
+    canonical: 'https://stackbox.app',
     languages: {
-      'en-US': 'https://it-box.app',
-      'ru-RU': 'https://it-box.app/ru', // Assuming middleware or segment is planned, but adding it for crawler awareness
+      'en-US': 'https://stackbox.app',
+      'ru-RU': 'https://stackbox.app/ru', // Assuming middleware or segment is planned, but adding it for crawler awareness
     },
   },
   manifest: '/manifest.json',
@@ -60,14 +60,14 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "IT-Box",
-              "url": "https://it-box.app",
+              "name": "StackBox",
+              "url": "https://stackbox.app",
               "applicationCategory": "BusinessApplication",
               "operatingSystem": "Web, Windows, macOS, Linux, iOS, Android",
               "description": "Unified secure vault for IT infrastructure: servers, projects, services, and credentials with enterprise-grade encryption.",
               "author": {
                 "@type": "Organization",
-                "name": "IT-Box Team"
+                "name": "StackBox Team"
               },
               "offers": {
                 "@type": "AggregateOffer",

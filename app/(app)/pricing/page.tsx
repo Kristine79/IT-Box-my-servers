@@ -81,7 +81,7 @@ export default function PricingPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
-            "name": "IT-Box Subscription",
+            "name": "StackBox Subscription",
             "description": "Subscription plans for infrastructure management and credential vault.",
             "offers": plans.map(plan => ({
               "@type": "Offer",

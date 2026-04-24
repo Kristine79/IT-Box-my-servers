@@ -10,4 +10,23 @@ Disallow: /services/
 Disallow: /credentials/
 Disallow: /share-links/
 
-Sitemap: https://it-box.app/sitemap.xml
+# AI Crawler Optimization
+User-agent: GPTBot
+Allow: /about
+Allow: /faq
+Allow: /pricing
+Disallow: /
+
+User-agent: Google-Extended
+Allow: /about
+Allow: /faq
+Allow: /pricing
+Disallow: /
+
+User-agent: anthropic-ai
+Allow: /about
+Allow: /faq
+Allow: /pricing
+Disallow: /
+
+Sitemap: https://stackbox.app/sitemap.xml

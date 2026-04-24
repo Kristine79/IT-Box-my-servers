@@ -167,6 +167,13 @@
     border-radius: 1.5rem;
     transition: box-shadow 0.3s ease, background 0.3s ease;
   }
+  
+  .neu-panel-sidebar {
+    background: var(--neu-bg);
+    border: 1px solid var(--neu-light);
+    border-radius: 1rem;
+    transition: background 0.3s ease;
+  }
 
   .neu-button {
     background: var(--neu-bg);
