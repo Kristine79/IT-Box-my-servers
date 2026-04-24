@@ -48,9 +48,9 @@ export function Paywall() {
         </p>
 
         <div className="neu-panel-inset p-6 mb-8 text-left rounded-2xl">
-          <div className="flex justify-between items-center mb-6">
-             <span className="font-bold text-lg">{t('full_access_label')}</span>
-             <span className="text-2xl font-bold break-words text-[var(--neu-accent)]">300 ₽</span>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-6">
+             <span className="font-bold text-lg leading-tight">{t('full_access_label')}</span>
+             <span className="text-2xl font-bold text-[var(--neu-accent)] whitespace-nowrap">300 ₽</span>
           </div>
           <ul className="space-y-3">
              <li className="flex items-center gap-3 text-sm font-medium">

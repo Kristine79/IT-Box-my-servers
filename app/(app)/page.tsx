@@ -4,10 +4,12 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { collection, query, where, getCountFromServer, getDocs, orderBy, limit } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
-import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, ArrowRight } from "lucide-react";
+import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, ArrowRight, Info } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const container = {
   hidden: { opacity: 0 },
@@ -85,35 +87,31 @@ export default function DashboardPage() {
     >
       <motion.div variants={item}>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1 md:mb-2">{t('dashboard')}</h1>
-        <p className="text-sm md:text-base text-[var(--neu-text-muted)]">{t('system_overview')}</p>
-      </motion.div>
-
-      {/* Hero Banner */}
-      <motion.div variants={item} className="neu-panel relative overflow-hidden px-5 py-6 md:pl-6 md:pr-8 md:py-8 lg:p-10">
-        <div className="absolute left-0 top-6 bottom-6 w-1 rounded-r-full bg-[var(--neu-accent)]"></div>
-        <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 md:mb-6 leading-snug">
-          {t('hero_title')}
-        </h2>
-        <div className="space-y-5">
-          <div className="flex items-start gap-4">
-            <div className="neu-panel-inset p-2 rounded-full text-[var(--neu-accent)] shrink-0">
-               <Lock className="w-5 h-5" />
+        <HoverCard openDelay={0} closeDelay={150}>
+          <HoverCardTrigger render={<span className="text-sm md:text-base text-[var(--neu-text-muted)] inline-flex items-center gap-1.5 cursor-pointer hover:text-[var(--neu-accent)] transition-colors group" tabIndex={0} />}>
+              {t('system_overview')}
+              <Info className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
+          </HoverCardTrigger>
+          <HoverCardContent align="start" sideOffset={8} className="w-[340px] px-5 py-4 neu-panel border border-[var(--neu-border)]/20 shadow-2xl">
+            <h3 className="font-bold text-sm md:text-base text-[var(--neu-accent)] leading-tight mb-3">
+              {t('hero_title')}
+            </h3>
+            <div className="grid gap-2.5 text-xs md:text-sm text-[var(--neu-text-muted)]">
+              <div className="flex items-start gap-2.5">
+                <Lock className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
+                <span className="leading-snug">{t('hero_sub1')}</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <MousePointer2 className="w-4 h-4 shrink-0 mt-0.5 text-green-400" />
+                <span className="leading-snug">{t('hero_sub2')}</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Users className="w-4 h-4 shrink-0 mt-0.5 text-purple-400" />
+                <span className="leading-snug">{t('hero_sub3')}</span>
+              </div>
             </div>
-            <p className="text-[var(--neu-text-muted)] pt-1 lg:text-lg">{t('hero_sub1')}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="neu-panel-inset p-2 rounded-full text-[var(--neu-accent)] shrink-0">
-               <MousePointer2 className="w-5 h-5" />
-            </div>
-            <p className="text-[var(--neu-text-muted)] pt-1 lg:text-lg">{t('hero_sub2')}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="neu-panel-inset p-2 rounded-full text-[var(--neu-accent)] shrink-0">
-               <Users className="w-5 h-5" />
-            </div>
-            <p className="text-[var(--neu-text-muted)] pt-1 lg:text-lg">{t('hero_sub3')}</p>
-          </div>
-        </div>
+          </HoverCardContent>
+        </HoverCard>
       </motion.div>
 
       {/* Stats Grid */}

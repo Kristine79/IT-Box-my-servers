@@ -87,7 +87,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="absolute top-0 left-0 right-0 h-2 bg-[var(--neu-accent)]" />
           
           <div className="neu-panel-inset mx-auto w-16 h-16 md:w-20 md:h-20 rounded-full flex flex-col justify-center items-center text-blue-400 mb-6 overflow-hidden">
-            <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[120%] h-[120%] object-contain" />
+            <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[180%] h-[180%] object-contain" />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-wide mb-3">IT-Box</h1>
           <p className="text-[var(--neu-text-muted)] font-medium mb-8 md:mb-10 leading-relaxed text-sm lg:text-base">
@@ -166,7 +166,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
          <div className={cn("pt-6 pb-2 flex items-center", desktopSidebarOpen ? "px-6 justify-between" : "px-0 justify-center")}>
             <div className="flex items-center gap-2 overflow-hidden px-2 py-0.5">
                <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-10 h-10 flex items-center justify-center shrink-0">
-                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[140%] h-[140%] object-contain" />
+                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[200%] h-[200%] object-contain" />
                </div>
                {desktopSidebarOpen && <span className="text-lg font-bold tracking-tight whitespace-nowrap">IT-Box</span>}
             </div>
@@ -229,10 +229,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
              <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0">
                 <Search className="h-4 w-4" />
              </div>
-               <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')}>
+               <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')}>
                   {i18n.language === 'ru' ? 'RU' : 'EN'}
                </div>
-             <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
+             <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
                 <LogOut className="h-4 w-4" />
              </div>
           </div>
@@ -255,7 +255,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="relative flex w-60 flex-col bg-[var(--neu-bg)] m-0 rounded-r-xl h-full pt-4 border-r border-[var(--neu-text-muted)]/10 shadow-2xl"
               >
-                 <div className="flex justify-end px-4 mb-2">
+                 <div className="flex justify-between items-center px-4 mb-2">
+                    <div className="flex items-center gap-2">
+                       <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-8 h-8 flex items-center justify-center shrink-0">
+                          <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[200%] h-[200%] object-contain" />
+                       </div>
+                       <span className="text-base font-bold tracking-tight">IT-Box</span>
+                    </div>
                     <button className="p-2 rounded-lg text-[var(--neu-text-muted)] hover:text-[var(--neu-accent)] hover:bg-[var(--neu-accent)]/10 transition-colors" onClick={() => setSidebarOpen(false)}>
                        <X className="w-5 h-5" />
                     </button>
@@ -289,6 +295,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        <CreditCard className="h-4 w-4" />
                        {t('pricing')}
                     </Link>
+                    <div className="my-1.5 h-px neu-panel-inset opacity-50" />
+                    <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left">
+                       <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px]">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
+                       {t('change_language', 'Сменить язык')}
+                    </button>
+                    <button onClick={logout} className="flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all text-red-500 opacity-60 hover:opacity-100 text-left">
+                       <LogOut className="h-4 w-4" />
+                       {t('logout', 'Выйти')}
+                    </button>
                  </nav>
                  <div className="p-5 text-[11px] text-[var(--neu-text-muted)] opacity-80 mt-auto border-t border-[var(--neu-border)]/20 font-medium">
                     <div className="flex flex-col gap-1.5 mb-4">
