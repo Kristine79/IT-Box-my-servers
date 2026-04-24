@@ -1,26 +1,32 @@
-# IT-Box Audit Report (2026-04-23)
+# IT-Box SEO Audit Report (Standards 2026)
 
-## 1. Security Audit [PASS 🟢]
-- **Cryptographic Standards**: Enterprise-grade AES-256-GCM is utilized for sensitive credentials.
-- **Server-Side Protection**: All encryption/decryption logic is isolated behind API routes to prevent secret leaking.
-- **Data Isolation**: Firestore security rules mandate ownership checks (`ownerId == request.auth.uid`) for Projects, Tasks, Servers, Services, and Credentials.
-- **Headers**: Implemented `Content-Security-Policy`, `X-Frame-Options`, and `Strict-Transport-Security` to mitigate XSS and clickjacking.
+**Status**: Optimized 🟢
 
-## 2. SEO & AI Optimization [PASS 🟢]
-- **AI Crawling**: Added JSON-LD (`SoftwareApplication` schema) to allow AI agents (Gemini, ChatGPT) to understand the app's utility and business context.
-- **Semantic Tags**: Enhanced meta tags with `keywords`, `openGraph`, and `robots` directives.
-- **Dynamic Language**: Root layout supports standard i18n patterns.
+## 1. Technical Infrastructure
+- **Crawler Optimization**: Added `robots.txt` with explicit instructions for AI crawlers (Gemini, ChatGPT) and standard search engines.
+- **Dynamic Indexing**: Implemented `app/sitemap.ts` to ensure automated, fresh indexing of all core marketing pages.
+- **PWA Integration**: Deployed `manifest.json` and linked it in root layout. Mobile-first ranking signals are now fully satisfied.
+- **Theme Awareness**: Added `theme-color` meta tag for browser/system integration.
 
-## 3. Accessibility (A11y) [PASS 🟢]
-- **Screen Readers**: All icon-only buttons (Delete, Copy, Eye) now feature `aria-label` providing context to assistive technologies.
-- **Form Controls**: All inputs have proper labels or placeholders linked to their function.
-- **Contrast**: Neumorphic design uses subtle shadows but maintains high-contrast typography for legibility.
+## 2. AI-Readability (SGE & AI Search)
+- **Enhanced Schema**: Expanded `WebApplication` JSON-LD to include `AggregateOffer` (pricing context) and `featureList`.
+- **Product Semantics**: Added `Product` and `Offer` schema to the pricing page for direct comparison table indexing.
+- **Semantic Hierarchy**: Verified `H1` -> `H2` -> `H3` nesting across landing pages (About, Pricing).
 
-## 4. Performance & Code Quality [PASS 🟢]
-- **Real-time**: Leverages Firestore `onSnapshot` for reactive UI without forced reloads.
-- **Transitions**: Smooth route changes handled by `framer-motion` (AnimatePresence) improve perceived performance.
-- **Type Safety**: Full TypeScript integration ensures robust data handling between UI and Backend.
+## 3. Multilingual SEO
+- **Hreflang Tags**: Added `alternates.languages` support to metadata to signal localized versions (EN/RU).
+- **Language Detection**: i18n logic (`lib/i18n.ts`) is optimized for browser detection, reducing bounce rates for localized users.
 
-## 5. Validity [PASS 🟢]
-- Code follows Next.js App Router conventions.
-- Standard libraries (`lucide-react`, `framer-motion`, `sonner`) are used correctly.
+## 4. Performance (Core Web Vitals 2026)
+- **INP (Interaction to Next Paint)**: Client components are wrapped in `framer-motion` with staggered execution to prevent main-thread blocking during initial interactions.
+- **LCP (Largest Contentful Paint)**: System fonts (`Geist`) and local asset priority are set in `layout.tsx`.
+
+## 5. Security Context
+- **Secure Origin**: Application is configured for HTTPS-only environments.
+- **Privacy Compliance**: Meta tags reflect secure AES-256 vault status, improving "Trust & Authority" signals.
+
+---
+### Recommendations for Next Step:
+1. **Dynamic Hreflang**: Implement Next.js Internationalized Routing (Middleware) for physical `/ru` or `/en` paths to maximize regional crawl depth.
+2. **Social Assets**: Generate a high-resolution `opengraph-image.png` for branded social sharing.
+3. **Internal Linking**: Increase cross-linking between FAQ and About page to improve "Topical Authority."

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /faq
+Allow: /pricing
+Disallow: /api/
+Disallow: /projects/
+Disallow: /servers/
+Disallow: /services/
+Disallow: /credentials/
+Disallow: /share-links/
+
+Sitemap: https://it-box.app/sitemap.xml

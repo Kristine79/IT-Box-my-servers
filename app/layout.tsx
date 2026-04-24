@@ -31,7 +31,12 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://it-box.app',
+    languages: {
+      'en-US': 'https://it-box.app',
+      'ru-RU': 'https://it-box.app/ru', // Assuming middleware or segment is planned, but adding it for crawler awareness
+    },
   },
+  manifest: '/manifest.json',
   robots: {
     index: true,
     follow: true,
@@ -46,7 +51,9 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
       <head>
+        <meta name="theme-color" content="#3b82f6" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="manifest" href="/manifest.json" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

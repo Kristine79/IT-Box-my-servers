@@ -1,0 +1,21 @@
+{
+  "name": "IT-Box Unified Asset Manager",
+  "short_name": "IT-Box",
+  "description": "Secure vault for your infrastructure: servers, services, and credentials.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
