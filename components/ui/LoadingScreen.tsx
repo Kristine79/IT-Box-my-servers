@@ -7,54 +7,60 @@ import { useTranslation } from 'react-i18next';
 export const LoadingScreen = () => {
   const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+    const interval = setInterval(() => {
+      setKey(k => k + 1);
+    }, 3500); // Wait for all letters to fall + some hold time, then repeat
+    return () => clearInterval(interval);
   }, []);
+
+  const text = "Stack Box";
+  const letters = text.split("");
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[var(--neu-bg)]">
-      <div className="relative w-24 h-24 flex items-center justify-center">
-        {/* Neumorphic outer ring animating */}
-        <motion.div 
-          className="absolute inset-0 rounded-full neu-panel"
-          animate={{
-            scale: [1, 1.1, 1],
-            boxShadow: [
-              'var(--neu-shadow)',
-              '10px 10px 20px rgba(0,0,0,0.2), -10px -10px 20px rgba(255,255,255,0.1)',
-              'var(--neu-shadow)'
-            ]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        
-        {/* Glowing center */}
-        <motion.div 
-          className="w-12 h-12 rounded-full bg-[var(--neu-accent)] shadow-[0_0_20px_var(--neu-accent)]"
-          animate={{
-            opacity: [0.5, 1, 0.5],
-            scale: [0.8, 1, 0.8]
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
+      
+      {/* Box container */}
+      <div 
+        className="relative w-[300px] h-[100px] border-b-[6px] border-x-[6px] border-[var(--neu-accent)] rounded-b-2xl overflow-hidden flex items-end justify-center pb-4"
+        style={{
+          boxShadow: 'inset 0 -10px 20px rgba(0,0,0,0.05), var(--neu-shadow)',
+          backgroundColor: 'var(--neu-bg)'
+        }}
+      >
+        {/* Letters container */}
+        <div className="flex" key={key}>
+          {letters.map((char, index) => (
+            <motion.span
+              key={index}
+              initial={{ y: -120, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{
+                duration: 0.6,
+                delay: index * 0.15,
+                ease: "easeOut",
+                type: "spring",
+                stiffness: 150,
+                damping: 10
+              }}
+              className="text-[24px] font-bold text-[var(--neu-accent)] uppercase px-[1px]"
+            >
+              {char === " " ? "\u00A0" : char}
+            </motion.span>
+          ))}
+        </div>
       </div>
       
       <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
         className="mt-8 text-center"
       >
-        <h2 className="text-xl font-bold tracking-widest text-[var(--neu-text)] uppercase mb-2">StackBox</h2>
-        <p className="text-[var(--neu-text-muted)] font-medium text-sm animate-pulse">
+        <p className="text-[var(--neu-text-muted)] font-bold tracking-widest text-sm uppercase animate-pulse">
           {mounted ? t('loading') : 'Loading...'}
         </p>
       </motion.div>

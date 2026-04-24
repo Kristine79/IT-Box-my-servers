@@ -192,6 +192,10 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /{path=**}/tasks/{taskId} {
+      allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;
+    }
+
     match /projects/{projectId} {
       allow get: if isVerifiedUser() && isValidId(projectId) && existing().ownerId == request.auth.uid;
       allow list: if isVerifiedUser() && resource.data.ownerId == request.auth.uid;

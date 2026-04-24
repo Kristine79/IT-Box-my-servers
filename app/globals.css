@@ -141,16 +141,20 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
     background-color: var(--neu-bg);
     color: var(--neu-text);
     transition: background-color 0.3s ease, color 0.3s ease;
-    }
+  }
   html {
     @apply font-sans;
-    }
+    font-size: 18px; /* Increased baseline font size for better readability */
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply uppercase tracking-wider;
+  }
 }
 
 @layer components {

@@ -190,17 +190,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       <aside className={cn("hidden flex-col neu-panel-sidebar m-4 mr-0 rounded-2xl md:flex shrink-0 transition-all duration-300 overflow-hidden", desktopSidebarOpen ? "w-52" : "w-[68px]")}>
-         <div className={cn("pt-6 pb-2 flex items-center", desktopSidebarOpen ? "px-6 justify-between" : "px-0 justify-center")}>
-            <div className="flex items-center gap-2 overflow-hidden px-2 py-0.5">
-               <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-10 h-10 flex items-center justify-center shrink-0">
-                  <img src={LOGO_BASE64} alt="StackBox Logo" className="w-[450%] h-[450%] object-contain scale-[1.5]" />
-               </div>
-               {desktopSidebarOpen && <span className="text-xl font-bold tracking-tight whitespace-nowrap">StackBox</span>}
-            </div>
-         </div>
-
-        <div className="flex-1 overflow-y-auto px-2 py-1 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto px-2 py-6 scrollbar-hide">
           <nav className={cn("flex flex-col gap-0.5 font-normal text-[13px]", desktopSidebarOpen ? "items-start" : "items-center")}>
+
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -239,13 +231,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center justify-between px-4 mt-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
               <Menu className="h-5 w-5" />
             </Button>
             <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 hidden md:flex" onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}>
               <Menu className="h-5 w-5" />
             </Button>
+            
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity ml-1">
+               <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-9 h-9 flex items-center justify-center shrink-0">
+                  <img src={LOGO_BASE64} alt="StackBox Logo" className="w-[450%] h-[450%] object-contain scale-[1.5]" />
+               </div>
+               <span className="text-lg font-bold tracking-tight hidden sm:block">StackBox</span>
+            </Link>
           </div>
           
           <div className="flex gap-1.5 md:gap-2 ml-auto items-center">

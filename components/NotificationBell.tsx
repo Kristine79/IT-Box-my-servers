@@ -75,9 +75,9 @@ export function NotificationBell() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
-            className="fixed md:absolute top-16 md:top-auto inset-x-4 md:inset-auto md:right-0 mt-4 md:w-[400px] neu-panel rounded-[2rem] overflow-hidden z-[100] shadow-2xl border border-white/5"
+            className="fixed md:absolute top-16 md:top-auto inset-x-4 md:inset-auto md:right-0 mt-4 md:w-[400px] neu-panel rounded-xl overflow-hidden z-[100] shadow-2xl border border-black/5 dark:border-white/5"
           >
-            <div className="p-5 md:p-6 border-b border-white/5 flex items-center justify-between bg-[var(--neu-bg)] relative z-10">
+            <div className="p-4 md:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[var(--neu-bg)] relative z-10">
               <div className="flex items-center gap-3">
                 <h3 className="font-bold text-lg">{t('notifications')}</h3>
               </div>
@@ -137,7 +137,7 @@ export function NotificationBell() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="max-h-[60vh] overflow-y-auto bg-[var(--neu-bg)] scrollbar-hide text-white"
+                    className="max-h-[60vh] overflow-y-auto bg-[var(--neu-bg)] scrollbar-hide text-[var(--neu-text)]"
                   >
                     {!notificationsEnabled ? (
                       <div className="p-16 text-center flex flex-col items-center gap-4">
@@ -168,7 +168,7 @@ export function NotificationBell() {
                          <p className="opacity-40 text-sm font-medium">{t('no_notifications')}</p>
                       </div>
                     ) : (
-                      <div className="divide-y divide-white/[0.03]">
+                      <div className="divide-y divide-black/5 dark:divide-white/[0.03]">
                         {notifications.map((n) => (
                           <div 
                             key={n.id}
@@ -177,18 +177,18 @@ export function NotificationBell() {
                               if (n.link) window.location.href = n.link;
                             }}
                             className={cn(
-                              "p-5 md:p-6 transition-all cursor-pointer flex gap-5 group items-start text-white",
-                              !n.isRead ? "bg-[var(--neu-accent)]/[0.03] hover:bg-[var(--neu-accent)]/[0.06]" : "hover:bg-white/[0.02]"
+                              "p-4 md:p-4 transition-all cursor-pointer flex gap-4 group items-start text-[var(--neu-text)]",
+                              !n.isRead ? "bg-[var(--neu-accent)]/[0.03] hover:bg-[var(--neu-accent)]/[0.06]" : "hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
                             )}
                           >
-                            <div className="shrink-0">
+                            <div className="shrink-0 mt-1">
                               {getIcon(n.type)}
                             </div>
-                            <div className="flex-1 min-w-0 text-white">
-                              <div className="flex justify-between items-start mb-1.5 overflow-hidden">
-                                <h4 className={cn("text-[13px] md:text-sm font-bold truncate transition-colors", !n.isRead ? "text-[var(--neu-accent)]" : "opacity-80")}>{n.title}</h4>
+                            <div className="flex-1 min-w-0 text-[var(--neu-text)]">
+                              <div className="flex justify-between items-start mb-1 overflow-hidden">
+                                <h4 className={cn("text-base font-bold truncate transition-colors", !n.isRead ? "text-[var(--neu-accent)]" : "opacity-80")}>{n.title}</h4>
                                 <span className={cn(
-                                  "text-[10px] opacity-40 whitespace-nowrap ml-3 font-medium",
+                                  "text-xs opacity-50 whitespace-nowrap ml-3 font-medium",
                                   !n.isRead && "opacity-100 text-[var(--neu-accent)]"
                                 )}>
                                    {n.createdAt && formatDistanceToNow(n.createdAt.toDate ? n.createdAt.toDate() : new Date(), { 
@@ -198,15 +198,15 @@ export function NotificationBell() {
                                 </span>
                               </div>
                               <p className={cn(
-                                "text-xs leading-relaxed line-clamp-2 transition-opacity",
-                                !n.isRead ? "text-[var(--neu-text-muted)] opacity-100" : "text-[var(--neu-text-muted)] opacity-60"
+                                "text-[15px] leading-snug line-clamp-2 transition-opacity",
+                                !n.isRead ? "text-[var(--neu-text-muted)] opacity-100" : "text-[var(--neu-text-muted)] opacity-70"
                               )}>
                                 {n.message}
                               </p>
                             </div>
                             {!n.isRead && (
                               <div className="shrink-0 self-center">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--neu-accent)] shadow-[0_0_8px_rgba(var(--neu-accent-rgb),0.5)]" />
+                                <div className="w-2 h-2 rounded-full bg-[var(--neu-accent)] shadow-[0_0_8px_rgba(var(--neu-accent-rgb),0.5)]" />
                               </div>
                             )}
                           </div>

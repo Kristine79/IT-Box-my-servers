@@ -17,7 +17,13 @@ function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string
   const [tasks, setTasks] = useState<any[]>([]);
   const [content, setContent] = useState("");
   const [priority, setPriority] = useState("normal");
+  const [filterPriority, setFilterPriority] = useState("all");
   const [loading, setLoading] = useState(true);
+
+  const filteredTasks = useMemo(() => {
+    if (filterPriority === "all") return tasks;
+    return tasks.filter(t => t.priority === filterPriority);
+  }, [tasks, filterPriority]);
 
   useEffect(() => {
     if (!user || !projectId) return;
@@ -92,7 +98,7 @@ function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold flex items-center gap-3">
           <ClipboardList className="w-6 h-6 text-[var(--neu-accent)]" />
-          {t('tasks')}: {projectName}
+          {projectName}
         </DialogTitle>
       </DialogHeader>
 
@@ -122,10 +128,25 @@ function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string
       </form>
 
       <div className="mt-8 space-y-4">
+        <div className="flex items-center gap-2 mb-4 bg-[var(--neu-bg)] px-3 py-2 rounded-lg shell shadow-[var(--neu-shadow-inset)] w-full">
+          <Filter className="w-4 h-4 text-[var(--neu-text-muted)]" />
+          <select 
+            value={filterPriority} 
+            onChange={e => setFilterPriority(e.target.value)}
+            className="neu-input flex-1 appearance-none cursor-pointer py-1.5 text-sm"
+          >
+            <option value="all" className="bg-[var(--neu-bg)]">Все приоритеты</option>
+            <option value="low" className="bg-[var(--neu-bg)]">{t('priority_low')}</option>
+            <option value="normal" className="bg-[var(--neu-bg)]">{t('priority_normal')}</option>
+            <option value="urgent" className="bg-[var(--neu-bg)]">{t('priority_urgent')}</option>
+            <option value="critical" className="bg-[var(--neu-bg)]">{t('priority_critical')}</option>
+          </select>
+        </div>
+
         {loading ? <p className="opacity-50 text-center">{t('loading')}</p> : null}
-        {!loading && tasks.length === 0 ? <p className="opacity-50 text-center py-8">{t('task_no_tasks')}</p> : null}
+        {!loading && filteredTasks.length === 0 ? <p className="opacity-50 text-center py-8">{t('task_no_tasks')}</p> : null}
         
-        {tasks.map(task => (
+        {filteredTasks.map(task => (
           <div key={task.id} className="neu-panel p-4 flex items-center justify-between gap-4 group">
             <div className="flex items-center gap-4 flex-1">
               <button onClick={() => toggleTask(task)} className={cn("shrink-0 transition-colors", task.status === "done" ? "text-green-500" : "text-[var(--neu-text-muted)]")}>
@@ -451,31 +472,31 @@ export default function ProjectsPage() {
         </Dialog>
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 bg-[var(--neu-bg)] px-4 py-3 rounded-lg w-full items-start xl:items-center" style={{ boxShadow: 'var(--neu-shadow-inset)' }}>
-        <div className="flex flex-wrap items-center gap-2 flex-1">
-          <span className="text-sm font-bold text-[var(--neu-text-muted)] uppercase tracking-widest pl-2 pr-2">Сортировать</span>
-          <button onClick={() => setSortBy('date')} className={cn("neu-button py-2 px-4 text-sm flex items-center gap-2", sortBy === 'date' && 'neu-button-accent')}>
-            <CalendarDays className="w-4 h-4" /> Дата
+      <div className="flex flex-col xl:flex-row gap-2 bg-[var(--neu-bg)] px-3 py-2.5 rounded-xl w-full items-start xl:items-center" style={{ boxShadow: 'var(--neu-shadow-inset)' }}>
+        <div className="flex flex-wrap items-center gap-1.5 flex-1 w-full xl:w-auto">
+          <span className="text-[10px] md:text-xs font-bold text-[var(--neu-text-muted)] uppercase tracking-wider pl-1.5 pr-1.5">Сортировка</span>
+          <button onClick={() => setSortBy('date')} className={cn("neu-button py-2 px-2 flex items-center justify-center min-w-[36px]", sortBy === 'date' && 'neu-button-accent')} title="Дата">
+            <CalendarDays className="w-4 h-4" />
           </button>
-          <button onClick={() => setSortBy('name')} className={cn("neu-button py-2 px-4 text-sm flex items-center gap-2", sortBy === 'name' && 'neu-button-accent')}>
-            <ArrowDownAZ className="w-4 h-4" /> Название
+          <button onClick={() => setSortBy('name')} className={cn("neu-button py-2 px-2 flex items-center justify-center min-w-[36px]", sortBy === 'name' && 'neu-button-accent')} title="Название">
+            <ArrowDownAZ className="w-4 h-4" />
           </button>
-          <button onClick={() => setSortBy('status')} className={cn("neu-button py-2 px-4 text-sm flex items-center gap-2", sortBy === 'status' && 'neu-button-accent')}>
-            <BarChart2 className="w-4 h-4" /> Статус
+          <button onClick={() => setSortBy('status')} className={cn("neu-button py-2 px-2 flex items-center justify-center min-w-[36px]", sortBy === 'status' && 'neu-button-accent')} title="Статус">
+            <BarChart2 className="w-4 h-4" />
           </button>
-          <button onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} className="neu-button p-2 text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] ml-1">
-            {sortOrder === 'asc' ? <ArrowUp className="w-5 h-5" /> : <ArrowDown className="w-5 h-5" />}
+          <button onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')} className="neu-button p-2 text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] ml-auto xl:ml-1">
+            {sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
           </button>
         </div>
 
-        <div className="w-full xl:w-px h-px xl:h-10 bg-[var(--neu-text-muted)] opacity-20"></div>
+        <div className="hidden xl:block w-px h-6 bg-[var(--neu-text-muted)] opacity-20"></div>
 
-        <div className="flex flex-wrap items-center gap-2">
-           <span className="text-sm font-bold text-[var(--neu-text-muted)] uppercase tracking-widest pl-2 pr-2 flex items-center gap-1"><Filter className="w-4 h-4" /> Фильтр</span>
+        <div className="flex items-center gap-2 w-full xl:w-auto border-t xl:border-0 border-[var(--neu-text-muted)]/10 pt-2 xl:pt-0">
+           <span className="text-[10px] md:text-xs font-bold text-[var(--neu-text-muted)] uppercase tracking-wider pl-1.5 flex items-center gap-1"><Filter className="w-3.5 h-3.5" /> Фильтр</span>
            <select 
              value={filterStack} 
              onChange={(e) => setFilterStack(e.target.value)} 
-             className="neu-input py-2 px-3 text-sm min-w-[140px] cursor-pointer"
+             className="neu-input py-1.5 px-2 text-sm min-w-[120px] max-w-[200px] flex-1 xl:flex-none cursor-pointer"
            >
              <option value="all">Любой стэк</option>
              {POPULAR_STACKS.map(s => <option key={s} value={s}>{s}</option>)}

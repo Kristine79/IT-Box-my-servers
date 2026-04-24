@@ -2,14 +2,18 @@
 
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { collection, query, where, getCountFromServer, getDocs, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, getCountFromServer, getDocs, orderBy, limit, collectionGroup, doc, getDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
-import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, ArrowRight, Info } from "lucide-react";
+import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, ArrowRight, Info, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 
 const container = {
   hidden: { opacity: 0 },
@@ -33,7 +37,10 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({ projects: 0, servers: 0, services: 0, credentials: 0 });
   const [recentProjects, setRecentProjects] = useState<any[]>([]);
   const [recentServers, setRecentServers] = useState<any[]>([]);
+  const [urgentTasks, setUrgentTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -62,10 +69,46 @@ export default function DashboardPage() {
         const pRecentQ = query(collection(db, "projects"), where("ownerId", "==", user!.uid), orderBy("createdAt", "desc"), limit(5));
         const sRecentQ = query(collection(db, "servers"), where("ownerId", "==", user!.uid), orderBy("createdAt", "desc"), limit(5));
 
-        const [pRec, sRec] = await Promise.all([getDocs(pRecentQ), getDocs(sRecentQ)]);
+        // Fetch urgent tasks without composite index
+        const tQuery = query(collectionGroup(db, "tasks"), where("ownerId", "==", user!.uid));
+
+        const [pRec, sRec, tRec] = await Promise.all([getDocs(pRecentQ), getDocs(sRecentQ), getDocs(tQuery)]);
         
         setRecentProjects(pRec.docs.map(d => ({ id: d.id, ...d.data() })));
         setRecentServers(sRec.docs.map(d => ({ id: d.id, ...d.data() })));
+
+        // Filter and sort urgent tasks
+        const tasks = tRec.docs
+           .map(d => {
+             const pathParts = d.ref.path.split('/');
+             const projectId = pathParts.length > 2 ? pathParts[1] : null;
+             return { id: d.id, projectId, ...d.data() } as any;
+           })
+           .filter(t => t.status === "todo" && (t.priority === "urgent" || t.priority === "critical"));
+        
+        // Enhance tasks with project names
+        const enrichedTasks = await Promise.all(tasks.map(async (t) => {
+           if (!t.projectId) return t;
+           try {
+             // Cache check theoretically, we can just getDoc
+             const pDoc = await getDoc(doc(db, "projects", t.projectId));
+             if (pDoc.exists()) {
+               return { ...t, projectName: pDoc.data().name };
+             }
+           } catch (e) {
+             console.log(e);
+           }
+           return t;
+        }));
+
+        enrichedTasks.sort((a,b) => {
+           const timeA = a.createdAt?.toMillis?.() || 0;
+           const timeB = b.createdAt?.toMillis?.() || 0;
+           return timeB - timeA; // desc
+        });
+
+        setUrgentTasks(enrichedTasks);
+
       } catch(err) {
         console.error("Failed to load dashboard data:", err);
       } finally {
@@ -76,6 +119,12 @@ export default function DashboardPage() {
     loadDashboard();
   }, [user]);
 
+  const displayedTasks = selectedDate ? urgentTasks.filter((t: any) => {
+    if (!t.createdAt) return true; // if no date, maybe keep it or exclude it. Let's keep it.
+    const d = t.createdAt.toDate ? t.createdAt.toDate() : new Date(t.createdAt);
+    return d.toDateString() === selectedDate.toDateString();
+  }) : urgentTasks;
+
   if (loading) return <div className="p-4 opacity-50">{t('loading')}</div>;
 
   return (
@@ -83,7 +132,7 @@ export default function DashboardPage() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-6 md:space-y-8 max-w-7xl mx-auto"
+      className="flex flex-col gap-8 md:gap-10 max-w-7xl mx-auto"
     >
       <motion.div variants={item}>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1 md:mb-2">{t('dashboard')}</h1>
@@ -115,91 +164,182 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <motion.div variants={item}>
-          <Link href="/projects" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start">
-               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase w-2/3">{t('active_projects')}</span>
-               <div className="neu-panel-inset p-2.5 rounded-full text-blue-400 group-hover:bg-blue-400/10 transition-colors">
-                 <FolderKanban className="w-5 h-5" />
+          <Link href="/projects" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start gap-2 mb-4">
+               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('active_projects')}</h3>
+               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-blue-400 group-hover:bg-blue-400/10 transition-colors">
+                 <FolderKanban className="w-4 h-4 md:w-5 md:h-5" />
                </div>
              </div>
              <div>
-               <div className="text-5xl font-bold mb-4">{stats.projects}</div>
+               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.projects}</div>
              </div>
           </Link>
         </motion.div>
 
         <motion.div variants={item}>
-          <Link href="/servers" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start">
-               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase">{t('servers')}</span>
-               <div className="neu-panel-inset p-2.5 rounded-full text-purple-400 group-hover:bg-purple-400/10 transition-colors">
-                 <Server className="w-5 h-5" />
+          <Link href="/servers" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start gap-2 mb-4">
+               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('servers')}</h3>
+               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-purple-400 group-hover:bg-purple-400/10 transition-colors">
+                 <Server className="w-4 h-4 md:w-5 md:h-5" />
                </div>
              </div>
              <div>
-               <div className="text-5xl font-bold mb-4">{stats.servers}</div>
+               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.servers}</div>
              </div>
           </Link>
         </motion.div>
 
         <motion.div variants={item}>
-          <Link href="/services" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start">
-               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase">{t('services')}</span>
-               <div className="neu-panel-inset p-2.5 rounded-full text-amber-500 group-hover:bg-amber-500/10 transition-colors">
-                 <Network className="w-5 h-5" />
+          <Link href="/services" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start gap-2 mb-4">
+               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('services')}</h3>
+               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-amber-500 group-hover:bg-amber-500/10 transition-colors">
+                 <Network className="w-4 h-4 md:w-5 md:h-5" />
                </div>
              </div>
              <div>
-               <div className="text-5xl font-bold mb-4">{stats.services}</div>
+               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.services}</div>
              </div>
           </Link>
         </motion.div>
 
         <motion.div variants={item}>
-          <Link href="/credentials" prefetch={true} className="neu-panel p-6 flex flex-col justify-between h-full aspect-square md:aspect-auto md:min-h-[192px] group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start">
-               <span className="text-xs md:text-sm font-semibold tracking-wider text-[var(--neu-text-muted)] uppercase">{t('credentials')}</span>
-               <div className="neu-panel-inset p-2.5 rounded-full text-rose-500 group-hover:bg-rose-500/10 transition-colors">
-                 <KeyRound className="w-5 h-5" />
+          <Link href="/credentials" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
+             <div className="flex justify-between items-start gap-2 mb-4">
+               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('credentials')}</h3>
+               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-rose-500 group-hover:bg-rose-500/10 transition-colors">
+                 <KeyRound className="w-4 h-4 md:w-5 md:h-5" />
                </div>
              </div>
              <div>
-               <div className="text-5xl font-bold mb-4">{stats.credentials}</div>
+               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.credentials}</div>
              </div>
           </Link>
         </motion.div>
       </div>
 
+      {/* Urgent Tasks & Calendar Block */}
+      <motion.div variants={item} className="neu-panel overflow-hidden !rounded-xl">
+         <div className="p-5 lg:p-6 bg-[var(--neu-bg)]/50">
+            <div className="flex items-center justify-between gap-2 md:gap-3 mb-5">
+              <div className="flex items-center gap-2 md:gap-3 shrink min-w-0">
+                 <div className="p-1.5 md:p-2 rounded-md bg-orange-500/10 text-orange-500 shrink-0">
+                   <AlertTriangle className="w-4 h-4 md:w-5 md:h-5" />
+                 </div>
+                 <h3 className="text-[13px] sm:text-base md:text-lg font-bold truncate tracking-tight">Срочные задачи</h3>
+                 {displayedTasks.length > 0 && (
+                   <span className="bg-orange-500 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 md:px-2 rounded-full shrink-0">
+                     {displayedTasks.length}
+                   </span>
+                 )}
+              </div>
+              <button 
+                onClick={() => setIsCalendarOpen(!isCalendarOpen)} 
+                className="neu-button p-2 md:px-3 md:py-2 text-xs font-bold uppercase tracking-widest text-[var(--neu-text-muted)] flex items-center justify-center shrink-0"
+                title={isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}
+              >
+                 <span className="text-base leading-none">📅</span>
+                 <span className="hidden md:inline ml-2">{isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}</span>
+              </button>
+            </div>
+
+            {isCalendarOpen && (
+               <motion.div 
+                 initial={{ opacity: 0, height: 0 }} 
+                 animate={{ opacity: 1, height: 'auto' }} 
+                 className="mb-6 flex justify-center border-b border-[var(--neu-border)]/20 pb-6"
+               >
+                  <div ref={(node) => {
+                    if (node) {
+                      node.style.setProperty('--rdp-accent-color', 'var(--neu-accent)');
+                      node.style.setProperty('--rdp-background-color', 'transparent');
+                    }
+                  }}>
+                    <DayPicker
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(newDate) => { setSelectedDate(newDate); setIsCalendarOpen(false); }}
+                      locale={ru}
+                      className="p-3 bg-[var(--neu-bg)] rounded-md"
+                      style={{ boxShadow: 'var(--neu-shadow-inset)' }}
+                      classNames={{
+                        today: 'text-[var(--neu-accent)] font-bold',
+                        selected: 'bg-[var(--neu-accent)] text-white hover:bg-[var(--neu-accent)] hover:text-white',
+                      }}
+                    />
+                  </div>
+               </motion.div>
+            )}
+
+            <div className="space-y-3">
+               {displayedTasks.length === 0 ? (
+                 <div className="text-center py-10 opacity-50 px-4 flex flex-col items-center">
+                   <FolderKanban className="w-8 h-8 mb-2 opacity-50" />
+                   <p className="text-sm font-medium tracking-wide">
+                     {selectedDate ? `Нет задач на ${selectedDate.toLocaleDateString('ru-RU')}.` : 'Нет срочных задач. Отличная работа!'}
+                   </p>
+                   {selectedDate && (
+                     <button onClick={() => setSelectedDate(undefined)} className="mt-4 text-xs font-bold uppercase text-[var(--neu-accent)] hover:underline">
+                       Показать все
+                     </button>
+                   )}
+                 </div>
+               ) : (
+                 displayedTasks.map((task: any) => (
+                   <Link 
+                     key={task.id} 
+                     href={`/projects?project=${task.projectId}`} 
+                     className="block p-4 rounded-md border border-[var(--neu-border)]/10 hover:border-orange-500/30 bg-[var(--neu-bg)] hover:bg-orange-500/5 transition-all group"
+                   >
+                     <div className="flex justify-between items-start gap-4">
+                       <div>
+                          <p className="font-medium text-[15px] group-hover:text-orange-500 transition-colors leading-snug">{task.content}</p>
+                          {task.projectName && (
+                            <p className="text-xs text-[var(--neu-text-muted)] mt-1.5 font-medium">{task.projectName}</p>
+                          )}
+                       </div>
+                       <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-orange-500/10 text-orange-500 whitespace-nowrap">
+                         {task.priority === 'critical' ? 'Критично' : 'Срочно'}
+                       </span>
+                     </div>
+                   </Link>
+                 ))
+               )}
+            </div>
+         </div>
+      </motion.div>
+
       {/* Recents */}
       <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
-        <motion.div variants={item} className="neu-panel p-4 md:p-5">
-           <h3 className="text-lg font-bold mb-4">{t('recent_projects')}</h3>
-          <div className="space-y-2">
-             {recentProjects.length === 0 ? <p className="text-sm opacity-50">{t('no_data')}</p> : null}
+        <motion.div variants={item} className="neu-panel p-3 sm:p-4">
+           <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 px-1">{t('recent_projects')}</h3>
+          <div className="space-y-1">
+             {recentProjects.length === 0 ? <p className="text-sm opacity-50 px-1">{t('no_data')}</p> : null}
              {recentProjects.map((p) => (
-               <Link href="/projects" prefetch={true} key={p.id} className="block group p-3 -mx-3 rounded-xl hover:bg-[var(--neu-accent)]/5 transition-all">
-                  <div className="flex justify-between items-center">
-                    <span className="text-base font-medium group-hover:text-[var(--neu-accent)] transition-colors">{p.name}</span>
+               <Link href="/projects" prefetch={true} key={p.id} className="block group p-2 -mx-2 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden">
+                  <div className="w-full overflow-hidden">
+                    <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate w-full">{p.name}</h4>
                   </div>
-                  <p className="text-[var(--neu-text-muted)] text-xs mt-0.5 truncate">{p.description || t('no_description')}</p>
+                  <p className="text-[var(--neu-text-muted)] text-xs mt-0.5 truncate w-full">{p.description || t('no_description')}</p>
                </Link>
              ))}
           </div>
         </motion.div>
 
-        <motion.div variants={item} className="neu-panel p-4 md:p-5">
-           <h3 className="text-lg font-bold mb-4">{t('recent_servers')}</h3>
-          <div className="space-y-2">
-             {recentServers.length === 0 ? <p className="text-sm opacity-50">{t('no_data')}</p> : null}
+        <motion.div variants={item} className="neu-panel p-3 sm:p-4">
+           <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 px-1">{t('recent_servers')}</h3>
+          <div className="space-y-1">
+             {recentServers.length === 0 ? <p className="text-sm opacity-50 px-1">{t('no_data')}</p> : null}
              {recentServers.map((s) => (
-               <Link href="/servers" prefetch={true} key={s.id} className="block group p-3 -mx-3 rounded-xl hover:bg-[var(--neu-accent)]/5 transition-all">
-                  <div className="flex justify-between items-center">
-                    <span className="text-base font-medium group-hover:text-[var(--neu-accent)] transition-colors">{s.name}</span>
+               <Link href="/servers" prefetch={true} key={s.id} className="block group p-2 -mx-2 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden">
+                  <div className="w-full overflow-hidden">
+                    <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate w-full">{s.name}</h4>
                   </div>
-                  <p className="text-[var(--neu-text-muted)] font-mono text-xs mt-0.5">{s.ipAddress}</p>
+                  <p className="text-[var(--neu-text-muted)] font-mono text-xs mt-0.5 truncate w-full">{s.ipAddress}</p>
                </Link>
              ))}
           </div>
