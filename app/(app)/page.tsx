@@ -87,8 +87,8 @@ export default function DashboardPage() {
     >
       <motion.div variants={item}>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1 md:mb-2">{t('dashboard')}</h1>
-        <HoverCard openDelay={0} closeDelay={150}>
-          <HoverCardTrigger render={<span className="text-sm md:text-base text-[var(--neu-text-muted)] inline-flex items-center gap-1.5 cursor-pointer hover:text-[var(--neu-accent)] transition-colors group" tabIndex={0} />}>
+        <HoverCard>
+          <HoverCardTrigger className="text-sm md:text-base text-[var(--neu-text-muted)] inline-flex items-center gap-1.5 cursor-pointer hover:text-[var(--neu-accent)] transition-colors group" tabIndex={0}>
               {t('system_overview')}
               <Info className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
           </HoverCardTrigger>

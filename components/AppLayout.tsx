@@ -83,50 +83,50 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     return (
       <div className="flex bg-[var(--neu-bg)] text-[var(--neu-text)] h-screen w-full flex-col items-center justify-center p-6">
-        <div className="neu-panel p-10 md:p-14 text-center rounded-3xl max-w-lg w-full relative overflow-hidden">
+        <div className="neu-panel p-8 md:p-10 text-center rounded-3xl max-w-md w-full relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-2 bg-[var(--neu-accent)]" />
           
-          <div className="neu-panel-inset mx-auto w-16 h-16 md:w-20 md:h-20 rounded-full flex flex-col justify-center items-center text-blue-400 mb-6 overflow-hidden">
-            <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[180%] h-[180%] object-contain" />
+          <div className="neu-panel-inset mx-auto w-16 h-16 rounded-full flex flex-col justify-center items-center text-blue-400 mb-4 overflow-hidden">
+            <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[220%] h-[220%] object-contain" />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-wide mb-3">IT-Box</h1>
-          <p className="text-[var(--neu-text-muted)] font-medium mb-8 md:mb-10 leading-relaxed text-sm lg:text-base">
+          <h1 className="text-xl md:text-2xl font-bold tracking-wide mb-2">IT-Box</h1>
+          <p className="text-[var(--neu-text-muted)] font-medium mb-6 leading-relaxed text-sm">
             {t('login_subtitle')}
           </p>
           
           {isEmailView ? (
-             <form onSubmit={handleEmailAuth} className="space-y-4 text-left">
+             <form onSubmit={handleEmailAuth} className="space-y-3 text-left">
                 {authError && <div className="text-sm text-red-500 bg-red-100 dark:bg-red-900/30 p-2 rounded">{authError}</div>}
                 
                 <div>
                   <label className="text-xs uppercase tracking-wider font-bold text-[var(--neu-text-muted)] ml-1">{t('email_ph', 'Email address')}</label>
-                  <Input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="neu-input w-full mt-1" />
+                  <Input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="neu-input w-full mt-1 h-10" />
                 </div>
                 <div>
                   <label className="text-xs uppercase tracking-wider font-bold text-[var(--neu-text-muted)] ml-1">{t('password_ph', 'Password')}</label>
-                  <Input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full mt-1" />
+                  <Input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full mt-1 h-10" />
                 </div>
                 
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-1">
                   <input type="checkbox" id="register" checked={isRegistering} onChange={e=>setIsRegistering(e.target.checked)} className="rounded" />
                   <label htmlFor="register" className="text-sm cursor-pointer">{t('register_new_account', 'Register new account')}</label>
                 </div>
 
-                <div className="pt-2 flex flex-col gap-3">
-                   <button type="submit" className="neu-button font-bold py-3 bg-[var(--neu-accent)] text-white shadow-none w-full">
+                <div className="pt-1 flex flex-col gap-2">
+                   <button type="submit" className="neu-button font-bold py-2.5 bg-[var(--neu-accent)] text-white shadow-none w-full">
                      {isRegistering ? t('sign_up', 'Sign Up') : t('sign_in', 'Sign In')}
                    </button>
-                   <button type="button" onClick={() => {setIsEmailView(false); setAuthError('');}} className="neu-button py-3 text-sm font-medium w-full">
+                   <button type="button" onClick={() => {setIsEmailView(false); setAuthError('');}} className="neu-button py-2.5 text-sm font-medium w-full">
                      {t('back', 'Back')}
                    </button>
                 </div>
              </form>
           ) : (
              <div className="flex flex-col gap-3">
-                <button onClick={login} className="neu-button font-bold text-base w-full py-4 bg-[var(--neu-accent)] text-white shadow-none hover:opacity-90 transition-opacity">
+                <button onClick={login} className="neu-button font-bold text-sm md:text-base w-full py-3 md:py-3.5 bg-[var(--neu-accent)] text-white shadow-none hover:opacity-90 transition-opacity">
                   {t('login', 'Login with Google')}
                 </button>
-                <button onClick={() => setIsEmailView(true)} className="neu-button font-bold text-base w-full py-4 border border-[var(--neu-border)] hover:opacity-90 transition-opacity text-[var(--neu-text-muted)]">
+                <button onClick={() => setIsEmailView(true)} className="neu-button font-bold text-sm md:text-base w-full py-3 md:py-3.5 border border-[var(--neu-border)] hover:opacity-90 transition-opacity text-[var(--neu-text-muted)]">
                   {t('login_email', 'Login with Email')}
                 </button>
              </div>
@@ -166,7 +166,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
          <div className={cn("pt-6 pb-2 flex items-center", desktopSidebarOpen ? "px-6 justify-between" : "px-0 justify-center")}>
             <div className="flex items-center gap-2 overflow-hidden px-2 py-0.5">
                <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-10 h-10 flex items-center justify-center shrink-0">
-                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[200%] h-[200%] object-contain" />
+                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[250%] h-[250%] object-contain" />
                </div>
                {desktopSidebarOpen && <span className="text-lg font-bold tracking-tight whitespace-nowrap">IT-Box</span>}
             </div>
@@ -253,12 +253,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="relative flex w-60 flex-col bg-[var(--neu-bg)] m-0 rounded-r-xl h-full pt-4 border-r border-[var(--neu-text-muted)]/10 shadow-2xl"
+                className="relative flex w-fit max-w-[85vw] flex-col bg-[var(--neu-bg)] m-0 rounded-r-lg h-full pt-4 border-r border-[var(--neu-text-muted)]/10 shadow-2xl"
               >
                  <div className="flex justify-between items-center px-4 mb-2">
                     <div className="flex items-center gap-2">
                        <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-8 h-8 flex items-center justify-center shrink-0">
-                          <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[200%] h-[200%] object-contain" />
+                          <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[250%] h-[250%] object-contain" />
                        </div>
                        <span className="text-base font-bold tracking-tight">IT-Box</span>
                     </div>
