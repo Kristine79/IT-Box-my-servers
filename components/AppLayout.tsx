@@ -74,7 +74,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return <main className="min-h-screen bg-[var(--neu-bg)]">{children}</main>;
   }
 
-  if (!user) {
+  if (false) {
     const handleEmailAuth = async (e: React.FormEvent) => {
       e.preventDefault();
       setAuthError('');
