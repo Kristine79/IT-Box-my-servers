@@ -111,7 +111,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 
                 <div className="flex items-center gap-2 mt-1">
                   <input type="checkbox" id="register" checked={isRegistering} onChange={e=>setIsRegistering(e.target.checked)} className="rounded" />
-                  <label htmlFor="register" className="text-sm cursor-pointer">{t('register_new_account', 'Register new account')}</label>
+                  <label htmlFor="register" className="text-sm cursor-pointer">{t('register_new_account', 'Зарегистрировать новый аккаунт')}</label>
                 </div>
 
                 <div className="pt-1 flex flex-col gap-2">
@@ -168,9 +168,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
          <div className={cn("pt-6 pb-2 flex items-center", desktopSidebarOpen ? "px-6 justify-between" : "px-0 justify-center")}>
             <div className="flex items-center gap-2 overflow-hidden px-2 py-0.5">
                <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-10 h-10 flex items-center justify-center shrink-0">
-                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[250%] h-[250%] object-contain" />
+                  <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[450%] h-[450%] object-contain scale-[1.5]" />
                </div>
-               {desktopSidebarOpen && <span className="text-lg font-bold tracking-tight whitespace-nowrap">IT-Box</span>}
+               {desktopSidebarOpen && <span className="text-xl font-bold tracking-tight whitespace-nowrap">IT-Box</span>}
             </div>
          </div>
 
@@ -224,7 +224,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex gap-1.5 md:gap-2 ml-auto items-center">
-             <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme}>
+             <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme}>
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
              </div>
              <NotificationBell />
@@ -255,14 +255,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="relative flex w-max max-w-[85vw] flex-col bg-[var(--neu-bg)] m-0 rounded-r-3xl h-full pt-4 border-r border-[var(--neu-text-muted)]/10 shadow-[8px_0_16px_-4px_rgba(0,0,0,0.1)]"
+                className="relative flex w-[280px] max-w-[85vw] flex-col neu-panel my-4 ml-4 rounded-3xl h-[calc(100%-2rem)] pt-4"
               >
                  <div className="flex justify-between items-center px-4 mb-2">
                     <div className="flex items-center gap-2">
                        <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-8 h-8 flex items-center justify-center shrink-0">
-                          <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[250%] h-[250%] object-contain" />
+                          <img src={LOGO_BASE64} alt="IT-Box Logo" className="w-[450%] h-[450%] object-contain scale-[1.5]" />
                        </div>
-                       <span className="text-base font-bold tracking-tight">IT-Box</span>
+                       <span className="text-lg font-bold tracking-tight">IT-Box</span>
                     </div>
                     <button className="p-2 rounded-lg text-[var(--neu-text-muted)] hover:text-[var(--neu-accent)] hover:bg-[var(--neu-accent)]/10 transition-colors" onClick={() => setSidebarOpen(false)}>
                        <X className="w-5 h-5" />
@@ -298,6 +298,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        {t('pricing')}
                     </Link>
                     <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
+                    <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left">
+                       {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+                       {isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}
+                    </button>
                     <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-lg px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left">
                        <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
                        {t('change_language', 'Сменить язык')}
