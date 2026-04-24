@@ -295,11 +295,11 @@ export default function DashboardPage() {
                      href={`/projects?project=${task.projectId}`} 
                      className="block p-4 rounded-md border border-[var(--neu-border)]/10 hover:border-orange-500/30 bg-[var(--neu-bg)] hover:bg-orange-500/5 transition-all group"
                    >
-                     <div className="flex justify-between items-start gap-4">
-                       <div>
-                          <p className="font-medium text-[15px] group-hover:text-orange-500 transition-colors leading-snug">{task.content}</p>
+                     <div className="flex justify-between items-start gap-4 overflow-hidden">
+                       <div className="flex-1 min-w-0">
+                          <p className="font-medium text-[15px] group-hover:text-orange-500 transition-colors leading-snug truncate">{task.content}</p>
                           {task.projectName && (
-                            <p className="text-xs text-[var(--neu-text-muted)] mt-1.5 font-medium">{task.projectName}</p>
+                            <p className="text-xs text-[var(--neu-text-muted)] mt-1.5 font-medium truncate">{task.projectName}</p>
                           )}
                        </div>
                        <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-orange-500/10 text-orange-500 whitespace-nowrap">
@@ -314,32 +314,32 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Recents */}
-      <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
-        <motion.div variants={item} className="neu-panel p-3 sm:p-4">
+      <div className="grid lg:grid-cols-2 gap-4 md:gap-6 min-w-0">
+        <motion.div variants={item} className="neu-panel p-3 sm:p-4 min-w-0">
            <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 px-1">{t('recent_projects')}</h3>
           <div className="space-y-1">
              {recentProjects.length === 0 ? <p className="text-sm opacity-50 px-1">{t('no_data')}</p> : null}
              {recentProjects.map((p) => (
-               <Link href="/projects" prefetch={true} key={p.id} className="block group p-2 -mx-2 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden">
+               <Link href="/projects" prefetch={true} key={p.id} className="block group p-2 mx-0 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden min-w-0">
                   <div className="w-full overflow-hidden">
-                    <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate w-full">{p.name}</h4>
+                    <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate">{p.name}</h4>
                   </div>
-                  <p className="text-[var(--neu-text-muted)] text-xs mt-0.5 truncate w-full">{p.description || t('no_description')}</p>
+                  <p className="text-[var(--neu-text-muted)] text-xs mt-0.5 truncate">{p.description || t('no_description')}</p>
                </Link>
              ))}
           </div>
         </motion.div>
 
-        <motion.div variants={item} className="neu-panel p-3 sm:p-4">
+        <motion.div variants={item} className="neu-panel p-3 sm:p-4 min-w-0">
            <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 px-1">{t('recent_servers')}</h3>
           <div className="space-y-1">
              {recentServers.length === 0 ? <p className="text-sm opacity-50 px-1">{t('no_data')}</p> : null}
              {recentServers.map((s) => (
-               <Link href="/servers" prefetch={true} key={s.id} className="block group p-2 -mx-2 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden">
+               <Link href="/servers" prefetch={true} key={s.id} className="block group p-2 mx-0 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden min-w-0">
                   <div className="w-full overflow-hidden">
-                    <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate w-full">{s.name}</h4>
+                    <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate">{s.name}</h4>
                   </div>
-                  <p className="text-[var(--neu-text-muted)] font-mono text-xs mt-0.5 truncate w-full">{s.ipAddress}</p>
+                  <p className="text-[var(--neu-text-muted)] font-mono text-xs mt-0.5 truncate">{s.ipAddress}</p>
                </Link>
              ))}
           </div>
