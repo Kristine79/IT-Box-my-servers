@@ -18,6 +18,8 @@ import { NotificationBell } from './NotificationBell';
 
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
+import { AIConsultant } from './AIConsultant';
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isPaywall, login, loginWithEmail, logout } = useAuth();
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -189,9 +191,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      <aside className={cn("hidden flex-col neu-panel-sidebar m-4 mr-0 rounded-2xl md:flex shrink-0 transition-all duration-300 overflow-hidden", desktopSidebarOpen ? "w-52" : "w-[68px]")}>
+      <aside className={cn("hidden flex-col neu-panel-sidebar m-4 mr-0 rounded-2xl md:flex shrink-0 transition-all duration-300 overflow-hidden", desktopSidebarOpen ? "w-44" : "w-[68px]")}>
         <div className="flex-1 overflow-y-auto px-2 py-6 scrollbar-hide">
-          <nav className={cn("flex flex-col gap-0.5 font-normal text-[13px]", desktopSidebarOpen ? "items-start" : "items-center")}>
+          <nav className={cn("flex flex-col gap-0.5 font-normal text-[13px]", desktopSidebarOpen ? "items-stretch" : "items-center")}>
 
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -207,7 +209,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <item.icon className="h-4 w-4 shrink-0" />
-                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{item.label}</span>}
+                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{item.label}</span>}
               </Link>
             )})}
             
@@ -215,15 +217,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             
             <Link href="/about" title={!desktopSidebarOpen ? t('about') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                <HelpCircle className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{t('about')}</span>}
+               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('about')}</span>}
             </Link>
             <Link href="/faq" title={!desktopSidebarOpen ? t('faq') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                <HelpCircle className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{t('faq')}</span>}
+               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('faq')}</span>}
             </Link>
             <Link href="/pricing" title={!desktopSidebarOpen ? t('pricing') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                <CreditCard className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap">{t('pricing')}</span>}
+               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('pricing')}</span>}
             </Link>
           </nav>
         </div>
@@ -292,46 +294,46 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        <X className="w-6 h-6" />
                     </button>
                  </div>
-                 <nav className="flex-1 p-4 text-lg font-normal gap-1 overflow-y-auto flex flex-col items-start w-full">
+                 <nav className="flex-1 p-4 text-sm font-normal gap-0.5 overflow-y-auto flex flex-col items-start w-full">
                    {navItems.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full",
+                          "flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full",
                           pathname === item.href ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "hover:text-[var(--neu-accent)] opacity-80"
                         )}
                       >
-                        <item.icon className="h-6 w-6" />
+                        <item.icon className="h-4 w-4" />
                         {item.label}
                       </Link>
                     ))}
-                    <div className="my-2 h-px neu-panel-inset opacity-50 w-full" />
+                    <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
                     
-                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <HelpCircle className="h-6 w-6" />
+                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <HelpCircle className="h-4 w-4" />
                        {t('about')}
                     </Link>
-                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <HelpCircle className="h-6 w-6" />
+                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <HelpCircle className="h-4 w-4" />
                        {t('faq')}
                     </Link>
-                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-4 rounded-xl px-4 py-2 transition-all w-full", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <CreditCard className="h-6 w-6" />
+                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <CreditCard className="h-4 w-4" />
                        {t('pricing')}
                     </Link>
-                    <div className="my-2 h-px neu-panel-inset opacity-50 w-full" />
-                    <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
-                       {isDark ? <Sun className="h-6 w-6 shrink-0" /> : <Moon className="h-6 w-6 shrink-0" />}
+                    <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
+                    <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
+                       {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
                        {isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}
                     </button>
-                    <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
-                       <div className="w-6 h-6 flex items-center justify-center font-bold text-sm shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
+                    <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
+                       <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
                        {t('change_language', 'Сменить язык')}
                     </button>
-                    <button onClick={logout} className="flex items-center gap-4 rounded-xl px-4 py-2 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
-                       <LogOut className="h-6 w-6 shrink-0" />
+                    <button onClick={logout} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
+                       <LogOut className="h-4 w-4 shrink-0" />
                        {t('logout', 'Выйти')}
                     </button>
                  </nav>
@@ -369,6 +371,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </AnimatePresence>
         </main>
       </div>
+      <AIConsultant />
     </div>
   );
 }
