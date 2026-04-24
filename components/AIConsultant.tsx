@@ -9,8 +9,18 @@ import ReactMarkdown from 'react-markdown';
 import { db, useAuth } from '@/lib/providers';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
-// Initialize the Gemini API client
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+let _ai: any = null;
+
+const getAiClient = () => {
+  if (!_ai) {
+    if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+      console.warn("NEXT_PUBLIC_GEMINI_API_KEY is not set. AI Consultant will not work.");
+      return null;
+    }
+    _ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+  }
+  return _ai;
+};
 
 interface Message {
   role: 'user' | 'model';
@@ -83,7 +93,12 @@ export function AIConsultant() {
         "User: " + userMessage
       ].join('\n\n');
 
-      const response = await ai.models.generateContent({
+      const client = getAiClient();
+      if (!client) {
+        throw new Error("AI API is not configured");
+      }
+
+      const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
         contents: contents,
       });
@@ -132,10 +147,6 @@ export function AIConsultant() {
               opacity: 1, 
               y: 0, 
               scale: 1,
-              width: isExpanded ? 'calc(100vw - 48px)' : '400px',
-              height: isExpanded ? 'calc(100vh - 48px)' : '550px',
-              bottom: isExpanded ? '24px' : '24px',
-              right: isExpanded ? '24px' : '24px',
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
