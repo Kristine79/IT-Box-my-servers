@@ -158,15 +158,15 @@ export default function CredentialsPage() {
           <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 shadow-rose-500/30 flex items-center font-semibold">
              <Plus className="w-4 h-4 mr-2"/> {t('add_credential')}
           </DialogTrigger>
-          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+          <DialogContent className="border-0 sm:rounded-3xl p-6 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
             <DialogHeader><DialogTitle className="text-2xl font-bold flex items-center gap-2"><Lock className="w-5 h-5"/> {t('add_credential')}</DialogTitle></DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-6 pt-4 pb-12 sm:pb-4">
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 <div className="space-y-2">
+            <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
                    <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="e.g. Prod DB Root" />
                  </div>
-                 <div className="space-y-2">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_type')}</label>
                    <select 
                       value={type} 
@@ -181,17 +181,17 @@ export default function CredentialsPage() {
                       <option value="OTHER" className="bg-[var(--neu-bg)]">Other</option>
                    </select>
                  </div>
-                 <div className="space-y-2">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_username')}</label>
                    <input value={username} onChange={e=>setUsername(e.target.value)} className="neu-input w-full" placeholder="root" />
                  </div>
-                 <div className="space-y-2">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)] flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-green-500"/> {t('field_password')}</label>
                    <input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full" placeholder="••••••••••••" />
                  </div>
                </div>
 
-              <div className="flex justify-end pt-4"><button type="submit" className="neu-button bg-rose-500 text-white shadow-rose-500/20 px-8 py-3 font-bold hover:shadow-rose-500/40">{t('btn_encrypt_save')}</button></div>
+              <div className="flex justify-end pt-2"><button type="submit" className="neu-button bg-rose-500 text-white shadow-rose-500/20 px-8 py-3 font-bold hover:shadow-rose-500/40">{t('btn_encrypt_save')}</button></div>
             </form>
           </DialogContent>
         </Dialog>

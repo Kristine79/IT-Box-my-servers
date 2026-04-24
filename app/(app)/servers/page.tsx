@@ -85,29 +85,29 @@ export default function ServersPage() {
           <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm">
              <Plus className="w-4 h-4 mr-2"/> {t('create_server')}
           </DialogTrigger>
-          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+          <DialogContent className="border-0 sm:rounded-3xl p-6 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
             <DialogHeader><DialogTitle className="text-2xl font-bold">{t('create_server')}</DialogTitle></DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-6 pt-4 pb-12 sm:pb-4">
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 <div className="space-y-2">
+            <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
                    <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="Frontend Node 1" />
                  </div>
-                 <div className="space-y-2">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_host')}</label>
                    <input required value={ipAddress} onChange={e=>setIp(e.target.value)} className="neu-input w-full font-mono text-sm" placeholder="192.168.1.1" />
                  </div>
-                 <div className="space-y-2">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_provider')}</label>
                    <input value={provider} onChange={e=>setProvider(e.target.value)} className="neu-input w-full" placeholder="AWS / DigitalOcean..." />
                  </div>
-                 <div className="space-y-2">
+                 <div className="space-y-1">
                    <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_os')}</label>
                    <input value={os} onChange={e=>setOs(e.target.value)} className="neu-input w-full" placeholder="Ubuntu 22.04 LTS" />
                  </div>
                </div>
                
-               <div className="space-y-2">
+               <div className="space-y-1">
                  <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_project')}</label>
                  <select 
                     value={projectId} 
@@ -119,12 +119,12 @@ export default function ServersPage() {
                  </select>
                </div>
                
-               <div className="space-y-2">
+               <div className="space-y-1">
                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
                   <textarea value={notes} onChange={e=>setNotes(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_notes')} />
                </div>
 
-              <div className="flex justify-end pt-4"><button type="submit" className="neu-button neu-button-accent px-8 py-3">{t('btn_save')}</button></div>
+              <div className="flex justify-end pt-2"><button type="submit" className="neu-button neu-button-accent px-8 py-3">{t('btn_save')}</button></div>
             </form>
           </DialogContent>
         </Dialog>

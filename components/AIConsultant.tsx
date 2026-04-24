@@ -150,38 +150,38 @@ export function AIConsultant() {
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className={`fixed z-50 flex flex-col overflow-hidden max-w-md w-[calc(100vw-32px)] sm:w-[400px] sm:h-[600px] h-[calc(100vh-100px)] bottom-24 right-4 sm:bottom-24 sm:right-6 bg-[var(--neu-bg)] neu-panel`}
+            className={`fixed z-50 flex flex-col overflow-hidden max-w-md w-[calc(100vw-32px)] sm:w-[500px] h-[calc(100vh-100px)] sm:h-[700px] bottom-24 right-4 sm:bottom-24 sm:right-6 bg-[var(--neu-bg)] neu-panel shadow-[12px_12px_24px_var(--neu-dark),-12px_-12px_24px_var(--neu-light)]`}
             style={{ 
-              borderRadius: '32px',
+              borderRadius: '48px',
             }}
           >
             {/* Header */}
-            <div className="flex flex-col items-center justify-center pt-8 pb-4 relative">
-              <h3 className="font-bold text-[22px] text-[var(--neu-text)] text-opacity-80 text-center w-full">StackBox AI Chat</h3>
+            <div className="flex flex-col items-center justify-center pt-10 pb-6 relative">
+              <h3 className="font-bold text-[32px] text-[var(--neu-text)] text-opacity-80 tracking-tight">StackBox AI Chat</h3>
               <button 
                 onClick={() => setIsOpen(false)} 
-                className="absolute right-6 top-8 p-1.5 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
+                className="absolute right-8 top-10 p-1.5 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
                 title="Закрыть"
               >
-                <X className="w-6 h-6" />
+                <X className="w-7 h-7" />
               </button>
             </div>
 
             {/* Main Panel Container */}
             <div className="flex-1 flex flex-col overflow-hidden">
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+              <div className="flex-1 overflow-y-auto px-8 py-4 space-y-8">
                 {messages.map((msg, idx) => (
                   <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[90%] px-6 py-5 text-[15px] shadow-sm leading-relaxed rounded-2xl ${
+                    <div className={`max-w-[100%] px-8 py-6 text-[18px] leading-relaxed ${
                       msg.role === 'user' 
-                        ? 'bg-[var(--neu-accent)] text-white font-medium rounded-br-md shadow-[0_4px_14px_0_rgba(14,165,233,0.39)]' 
-                        : 'neu-panel-inset text-[var(--neu-text)] font-medium rounded-bl-md'
+                        ? 'bg-[var(--neu-accent)] text-white font-semibold rounded-3xl rounded-br-md shadow-[0_4px_14px_0_rgba(14,165,233,0.39)]' 
+                        : 'neu-panel-inset text-[var(--neu-text)] font-medium rounded-3xl !shadow-[inset_4px_4px_10px_var(--neu-dark),inset_-4px_-4px_10px_var(--neu-light)] border-2 border-white/5'
                     }`}>
                       {msg.role === 'user' ? (
                         <div>{msg.text}</div>
                       ) : (
-                        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:mb-2 prose-headings:mt-3 prose-ul:my-1">
+                        <div className="prose prose-lg dark:prose-invert max-w-none prose-p:my-1 prose-headings:mb-2 prose-headings:mt-3 prose-ul:my-1">
                           <ReactMarkdown>{msg.text}</ReactMarkdown>
                         </div>
                       )}
@@ -190,10 +190,10 @@ export function AIConsultant() {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="neu-panel-inset rounded-[24px] rounded-bl-md px-6 py-5 flex gap-1.5 items-center">
-                      <span className="w-2 h-2 bg-[var(--neu-accent)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 bg-[var(--neu-accent)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-[var(--neu-accent)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="neu-panel-inset rounded-[24px] px-6 py-5 flex gap-1.5 items-center">
+                      <span className="w-2.5 h-2.5 bg-[var(--neu-accent)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2.5 h-2.5 bg-[var(--neu-accent)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2.5 h-2.5 bg-[var(--neu-accent)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 )}
@@ -201,22 +201,24 @@ export function AIConsultant() {
               </div>
 
               {/* Input Form */}
-              <div className="px-6 pb-6 pt-2 bg-transparent">
-                <form onSubmit={handleSubmit} className="flex gap-4 relative items-center">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder={t('ai_placeholder', 'Спросите меня о чем угодно...')}
-                    className="flex-1 text-[15px] py-4 pl-6 pr-4 neu-panel-inset rounded-2xl font-medium text-[var(--neu-text)] placeholder:text-[var(--neu-text-muted)] placeholder:opacity-60 focus:outline-none"
-                    disabled={isLoading}
-                  />
+              <div className="px-8 pb-10 pt-4 bg-transparent mt-auto">
+                <form onSubmit={handleSubmit} className="flex gap-5 relative items-center">
+                  <div className="flex-1 relative h-[64px]">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder={t('ai_placeholder', 'Спросите меня о чем угодно...')}
+                      className="w-full h-full text-[17px] pl-8 pr-12 neu-panel-inset rounded-[24px] font-medium text-[var(--neu-text)] placeholder:text-[var(--neu-text-muted)] placeholder:opacity-60 focus:outline-none !shadow-[inset_4px_4px_10px_var(--neu-dark),inset_-4px_-4px_10px_var(--neu-light)]"
+                      disabled={isLoading}
+                    />
+                  </div>
                   <button 
                     type="submit" 
                     disabled={!input.trim() || isLoading}
-                    className="w-[52px] h-[52px] shrink-0 flex items-center justify-center rounded-full neu-panel text-[#2563ea] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-[64px] h-[64px] shrink-0 flex items-center justify-center rounded-full neu-panel text-[#2563ea] disabled:opacity-50 disabled:cursor-not-allowed shadow-[6px_6px_12px_var(--neu-dark),-6px_-6px_12px_var(--neu-light)] active:shadow-inner"
                   >
-                    <Send className="w-[20px] h-[20px] ml-1" />
+                    <Send className="w-[28px] h-[28px] ml-1" />
                   </button>
                 </form>
               </div>

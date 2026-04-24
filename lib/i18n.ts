@@ -142,6 +142,7 @@ i18n
           "no_servers": "No servers found",
           "no_services": "No services found",
           "no_credentials": "No credentials found",
+          "add_service": "Add Service",
           "invalid_captcha": "Invalid verification code",
           "refresh": "Refresh"
         }
@@ -281,6 +282,7 @@ i18n
           "no_servers": "Серверы не найдены",
           "no_services": "Сервисы не найдены",
           "no_credentials": "Доступы не найдены",
+          "add_service": "Добавить сервис",
           "invalid_captcha": "Неверный код проверки",
           "refresh": "Обновить"
         }
