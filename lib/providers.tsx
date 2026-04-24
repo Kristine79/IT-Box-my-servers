@@ -155,12 +155,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}>
-      <I18nextProvider i18n={i18n}>
-        <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
-          {children}
-        </AuthContext.Provider>
-      </I18nextProvider>
-    </GoogleReCaptchaProvider>
+    <I18nextProvider i18n={i18n}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
+        {children}
+      </AuthContext.Provider>
+    </I18nextProvider>
   );
 }

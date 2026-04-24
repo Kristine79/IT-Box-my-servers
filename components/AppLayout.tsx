@@ -16,13 +16,12 @@ import { LoadingScreen } from './ui/LoadingScreen';
 import { motion, AnimatePresence } from 'motion/react';
 import { NotificationBell } from './NotificationBell';
 
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+// import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { AIConsultant } from './AIConsultant';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isPaywall, login, loginWithEmail, logout } = useAuth();
-  const { executeRecaptcha } = useGoogleReCaptcha();
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -80,28 +79,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       e.preventDefault();
       setAuthError('');
 
-      if (!executeRecaptcha) {
-        setAuthError('reCAPTCHA not ready');
-        return;
-      }
-
       try {
-        const token = await executeRecaptcha('login');
-        
-        // Verify token with our backend
-        const verifyResponse = await fetch('/api/verify-recaptcha', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-        });
-
-        const verifyData = await verifyResponse.json();
-
-        if (!verifyData.success) {
-          setAuthError(t('invalid_captcha', 'Captcha verification failed'));
-          return;
-        }
-
         await loginWithEmail(email, password, isRegistering);
       } catch (err: any) {
         setAuthError(err.message || 'Authentication error');
