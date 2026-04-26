@@ -12,7 +12,7 @@ import { LOGO_BASE64 } from '@/lib/logoBase64';
 
 import { Paywall } from './Paywall';
 import { LoadingScreen } from './ui/LoadingScreen';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { NotificationBell } from './NotificationBell';
 
 // import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
@@ -28,6 +28,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const pathname = usePathname();
+  const prefersReducedMotion = useReducedMotion();
+
+  const breadcrumbMap: Record<string, string> = {
+    projects: t('projects'),
+    servers: t('servers'),
+    services: t('services'),
+    credentials: t('credentials'),
+    pricing: t('pricing'),
+    admin: t('admin'),
+    profile: t('profile'),
+    faq: t('faq'),
+    about: t('about', 'About'),
+  };
   const [isNavigating, setIsNavigating] = useState(false);
   
   const [email, setEmail] = useState('');
@@ -94,11 +107,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: '/credentials', icon: KeyRound, label: t('credentials') },
   ];
 
+  const motionProps = prefersReducedMotion ? { initial: false, animate: false, exit: undefined } : {};
+
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--neu-bg)] text-[var(--neu-text)]">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[999] focus:px-4 focus:py-2 focus:neu-button focus:neu-button-accent focus:rounded-lg">
+        {t('skip_to_content', 'Skip to content')}
+      </a>
       <AnimatePresence>
         {isNavigating && (
           <motion.div 
+            {...motionProps}
             initial={{ width: 0, opacity: 1 }}
             animate={{ width: '100%', opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -308,7 +327,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </AnimatePresence>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
+        <main id="main-content" className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
           <nav aria-label="Breadcrumb" className="mb-4">
             <ol className="flex items-center gap-2 text-xs text-[var(--neu-text-muted)]">
               <li>
@@ -317,7 +336,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {pathname !== '/' && (
                 <>
                   <li>/</li>
-                  <li className="capitalize text-[var(--neu-text)] font-medium">{pathname.split('/')[1] || ''}</li>
+                  <li className="text-[var(--neu-text)] font-medium">{breadcrumbMap[pathname.split('/')[1]] || pathname.split('/')[1] || ''}</li>
                 </>
               )}
             </ol>

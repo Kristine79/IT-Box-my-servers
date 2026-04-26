@@ -196,7 +196,8 @@ i18n
           "technical_support": "Technical support",
           "useful_bots": "Useful Telegram bots",
           "personal_data_consent": "Personal data processing consent",
-          "confirm_delete": "Are you sure?"
+          "confirm_delete": "Are you sure?",
+          "skip_to_content": "Skip to content"
         }
       },
       ru: {
@@ -388,7 +389,8 @@ i18n
           "technical_support": "Техническая поддержка",
           "useful_bots": "Полезные Telegram боты",
           "personal_data_consent": "Согласие на обработку персональных данных",
-          "confirm_delete": "Вы уверены?"
+          "confirm_delete": "Вы уверены?",
+          "skip_to_content": "Перейти к контенту"
         }
       }
     },

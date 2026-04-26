@@ -7,6 +7,7 @@ import { collection, query, where, getCountFromServer, getDocs, orderBy, limit, 
 import { db, useAuth } from "@/lib/providers";
 import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, Info, AlertTriangle, CalendarDays, X } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -187,64 +188,32 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
         </HoverCard>
       </motion.div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <motion.div variants={item}>
-          <Link href="/projects" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start gap-2 mb-4">
-               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('active_projects')}</h3>
-               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-blue-400 group-hover:bg-blue-400/10 transition-colors">
-                 <FolderKanban className="w-4 h-4 md:w-5 md:h-5" />
-               </div>
-             </div>
-             <div>
-               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.projects}</div>
-             </div>
-          </Link>
-        </motion.div>
-
-        <motion.div variants={item}>
-          <Link href="/servers" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start gap-2 mb-4">
-               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('servers')}</h3>
-               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-purple-400 group-hover:bg-purple-400/10 transition-colors">
-                 <Server className="w-4 h-4 md:w-5 md:h-5" />
-               </div>
-             </div>
-             <div>
-               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.servers}</div>
-             </div>
-          </Link>
-        </motion.div>
-
-        <motion.div variants={item}>
-          <Link href="/services" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start gap-2 mb-4">
-               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('services')}</h3>
-               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-amber-500 group-hover:bg-amber-500/10 transition-colors">
-                 <Network className="w-4 h-4 md:w-5 md:h-5" />
-               </div>
-             </div>
-             <div>
-               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.services}</div>
-             </div>
-          </Link>
-        </motion.div>
-
-        <motion.div variants={item}>
-          <Link href="/credentials" prefetch={true} className="neu-panel p-4 md:p-5 flex flex-col justify-between h-full group cursor-pointer transition-all hover:scale-[1.02] block">
-             <div className="flex justify-between items-start gap-2 mb-4">
-               <h3 className="text-[10px] md:text-xs font-bold tracking-widest text-[var(--neu-text-muted)] uppercase line-clamp-2">{t('credentials')}</h3>
-               <div className="neu-panel-inset p-2 shrink-0 rounded-md text-rose-500 group-hover:bg-rose-500/10 transition-colors">
-                 <KeyRound className="w-4 h-4 md:w-5 md:h-5" />
-               </div>
-             </div>
-             <div>
-               <div className="text-3xl md:text-4xl font-bold mt-auto">{stats.credentials}</div>
-             </div>
-          </Link>
-        </motion.div>
-      </div>
+      {/* Stats — asymmetric inline bar (no hero-metric template) */}
+      <motion.div variants={item} className="neu-panel p-0 overflow-hidden">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-[var(--neu-text-muted)]/10">
+          {([
+            { href: '/projects', label: t('active_projects'), count: stats.projects, icon: FolderKanban, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+            { href: '/servers',  label: t('servers'),          count: stats.servers,  icon: Server,       color: 'text-purple-400', bg: 'bg-purple-400/10' },
+            { href: '/services', label: t('services'),         count: stats.services, icon: Network,      color: 'text-amber-500', bg: 'bg-amber-500/10' },
+            { href: '/credentials', label: t('credentials'),   count: stats.credentials, icon: KeyRound,  color: 'text-rose-500', bg: 'bg-rose-500/10' },
+          ] as const).map((s, i) => (
+            <Link
+              key={s.href}
+              href={s.href}
+              prefetch={true}
+              className="flex items-center gap-3 px-4 py-4 md:px-5 md:py-5 group hover:bg-[var(--neu-text-muted)]/5 transition-colors"
+            >
+              <div className={cn("p-2 rounded-lg shrink-0", s.bg, s.color, "group-hover:scale-110 transition-transform")}>
+                <s.icon className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-2xl font-bold leading-none mb-0.5">{s.count}</div>
+                <div className="text-[10px] md:text-xs text-[var(--neu-text-muted)] truncate">{s.label}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Urgent Tasks & Calendar Block */}
       <motion.div variants={item} className="neu-panel overflow-hidden !rounded-xl">
