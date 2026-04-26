@@ -68,7 +68,7 @@ export const defaultPricing = {
   en: {
     plans: [
       { id: 'free', name: 'Free Trial', price: '0', duration: '14 days', features: ['Up to 5 projects', 'Basic tracking', '1 user'], current: true },
-      { id: 'basic', name: 'Basic', price: '300', duration: 'per month', features: ['Unlimited projects', 'Encrypted vault', 'Priority support'], current: false },
+      { id: 'basic', name: 'Basic', price: '10', duration: 'per month', features: ['Unlimited projects', 'Encrypted vault', 'Priority support'], current: false },
       { id: 'pro', name: 'Pro', price: '700', duration: 'per month', features: ['Everything in Basic', 'Unlimited sharing', 'API access', 'Account manager'], current: false }
     ],
     enterpriseTitle: "Need more?",
@@ -78,7 +78,7 @@ export const defaultPricing = {
   ru: {
     plans: [
       { id: 'free', name: 'Бесплатный', price: '0', duration: '14 дней', features: ['До 5 проектов', 'Базовый трекинг', '1 пользователь'], current: true },
-      { id: 'basic', name: 'Базовый', price: '300', duration: 'в месяц', features: ['Безлимит проектов', 'Зашифрованное хранилище', 'Приоритетная поддержка'], current: false },
+      { id: 'basic', name: 'Базовый', price: '10', duration: 'в месяц', features: ['Безлимит проектов', 'Зашифрованное хранилище', 'Приоритетная поддержка'], current: false },
       { id: 'pro', name: 'Про', price: '700', duration: 'в месяц', features: ['Всё из Базового', 'Безлимит шеринг', 'API доступ', 'Персональный менеджер'], current: false }
     ],
     enterpriseTitle: "Нужно больше?",
