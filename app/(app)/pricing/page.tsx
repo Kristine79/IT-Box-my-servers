@@ -5,9 +5,11 @@ import { Check, Zap, Shield, Crown, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db, useAuth } from '@/lib/providers';
+import { db, useAuth, auth } from '@/lib/providers';
 import { defaultPricing } from '@/lib/contentDefaults';
 import { toast } from 'sonner';
+import { AuthModal } from '@/components/AuthModal';
+import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 
 const container = {
   hidden: { opacity: 0 },
@@ -32,6 +34,10 @@ export default function PricingPage() {
   const [content, setContent] = useState(defaultPricing);
   const [loading, setLoading] = useState(true);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
+  const [pendingPrice, setPendingPrice] = useState<string | null>(null);
+  const [pendingName, setPendingName] = useState<string | null>(null);
 
   useEffect(() => {
     getDoc(doc(db, 'siteContent', 'pricing')).then(snap => {
@@ -39,20 +45,47 @@ export default function PricingPage() {
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
-  const handleCheckout = async (planId: string, price: string, planName: string) => {
-    if (planId === 'free') return;
-    if (!user || user.isAnonymous) {
-      toast.error('Войдите в аккаунт для оформления подписки');
-      return;
+  // Handle magic link return: sign in and auto-checkout
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      const email = window.localStorage.getItem('emailForSignIn') || window.prompt('Введите ваш email для подтверждения') || '';
+      signInWithEmailLink(auth, email, window.location.href)
+        .then(() => {
+          window.localStorage.removeItem('emailForSignIn');
+          const saved = sessionStorage.getItem('pendingPlan');
+          if (saved) {
+            const { planId, price, name } = JSON.parse(saved);
+            sessionStorage.removeItem('pendingPlan');
+            startCheckout(planId, price, name);
+          }
+        })
+        .catch((e) => toast.error(e?.message || 'Ошибка входа по ссылке'));
     }
+  }, []);
+
+  // After login, auto-trigger checkout if pendingPlan exists
+  useEffect(() => {
+    if (user && !user.isAnonymous && pendingPlanId && pendingPrice && pendingName) {
+      const id = pendingPlanId;
+      const price = pendingPrice;
+      const name = pendingName;
+      setPendingPlanId(null);
+      setPendingPrice(null);
+      setPendingName(null);
+      startCheckout(id, price, name);
+    }
+  }, [user]);
+
+  const startCheckout = async (planId: string, price: string, planName: string) => {
     setLoadingPlanId(planId);
     try {
       const res = await fetch('/api/billing/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          uid: user.uid,
-          email: user.email,
+          uid: user!.uid,
+          email: user!.email,
           planId,
           amount: price,
           description: `StackBox — ${planName}`
@@ -72,12 +105,36 @@ export default function PricingPage() {
     }
   };
 
+  const handleCheckout = async (planId: string, price: string, planName: string) => {
+    if (planId === 'free') return;
+    if (!user || user.isAnonymous) {
+      // Save intent, open auth modal
+      sessionStorage.setItem('pendingPlan', JSON.stringify({ planId, price, name: planName }));
+      setPendingPlanId(planId);
+      setPendingPrice(price);
+      setPendingName(planName);
+      setAuthModalOpen(true);
+      return;
+    }
+    startCheckout(planId, price, planName);
+  };
+
   const c = content[lang] || defaultPricing[lang];
   const plans = c.plans;
 
   if (loading) return <div className="p-8 opacity-50">{t('loading')}</div>;
 
   return (
+    <>
+    <AuthModal
+      isOpen={authModalOpen}
+      onClose={() => setAuthModalOpen(false)}
+      onSuccess={() => setAuthModalOpen(false)}
+      title={isEn ? 'Sign in to subscribe' : 'Войдите для оформления подписки'}
+      description={isEn
+        ? 'After signing in, you will be automatically redirected to payment.'
+        : 'После входа вы автоматически перейдёте к оплате.'}
+    />
     <motion.div 
       variants={container}
       initial="hidden"
@@ -183,5 +240,6 @@ export default function PricingPage() {
         </a>
       </motion.div>
     </motion.div>
+    </>
   );
 }

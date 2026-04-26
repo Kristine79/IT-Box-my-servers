@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 import { I18nextProvider } from 'react-i18next';
@@ -29,8 +29,10 @@ type AuthContextType = {
   setTheme: (theme: ThemeMode) => void;
   canUsePremiumTheme: boolean;
   login: () => Promise<void>;
+  loginWithGitHub: () => Promise<void>;
   loginWithEmail: (e: string, p: string, isRegister?: boolean) => Promise<void>;
   loginWithApple: () => Promise<void>;
+  loginWithMagicLink: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<{ notificationsEnabled: boolean; theme?: ThemeMode }>) => Promise<void>;
 };
@@ -46,8 +48,10 @@ const AuthContext = createContext<AuthContextType>({
   setTheme: () => {},
   canUsePremiumTheme: false,
   login: async () => {},
+  loginWithGitHub: async () => {},
   loginWithEmail: async () => {},
   loginWithApple: async () => {},
+  loginWithMagicLink: async () => {},
   logout: async () => {},
   updateProfile: async () => {}
 });
@@ -171,9 +175,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
     await signInWithPopup(auth, provider);
   };
 
+  const loginWithGitHub = async () => {
+    const provider = new GithubAuthProvider();
+    await signInWithPopup(auth, provider);
+  };
+
   const loginWithApple = async () => {
     const provider = new OAuthProvider('apple.com');
     await signInWithPopup(auth, provider);
+  };
+
+  const loginWithMagicLink = async (email: string) => {
+    const actionCodeSettings = {
+      url: `${window.location.origin}/pricing?magiclink=1`,
+      handleCodeInApp: true,
+    };
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    window.localStorage.setItem('emailForSignIn', email);
   };
 
   const loginWithEmail = async (email: string, pass: string, isRegister = false) => {
@@ -216,7 +234,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>
