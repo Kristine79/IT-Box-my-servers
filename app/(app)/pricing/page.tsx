@@ -1,12 +1,13 @@
 'use client';
 
 import { useTranslation } from "react-i18next";
-import { Check, Zap, Shield, Crown } from "lucide-react";
+import { Check, Zap, Shield, Crown, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/providers';
+import { db, useAuth } from '@/lib/providers';
 import { defaultPricing } from '@/lib/contentDefaults';
+import { toast } from 'sonner';
 
 const container = {
   hidden: { opacity: 0 },
@@ -25,16 +26,51 @@ const item = {
 
 export default function PricingPage() {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const isEn = i18n.language === 'en';
   const lang = isEn ? 'en' : 'ru';
   const [content, setContent] = useState(defaultPricing);
   const [loading, setLoading] = useState(true);
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     getDoc(doc(db, 'siteContent', 'pricing')).then(snap => {
       if (snap.exists()) setContent(snap.data() as typeof defaultPricing);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
+
+  const handleCheckout = async (planId: string, price: string, planName: string) => {
+    if (planId === 'free') return;
+    if (!user || user.isAnonymous) {
+      toast.error('Войдите в аккаунт для оформления подписки');
+      return;
+    }
+    setLoadingPlanId(planId);
+    try {
+      const res = await fetch('/api/billing/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          planId,
+          amount: price,
+          description: `StackBox — ${planName}`
+        })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error('Не удалось создать платёж. Попробуйте ещё раз.');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Ошибка подключения к платёжному сервису.');
+    } finally {
+      setLoadingPlanId(null);
+    }
+  };
 
   const c = content[lang] || defaultPricing[lang];
   const plans = c.plans;
@@ -120,8 +156,17 @@ export default function PricingPage() {
               ))}
             </div>
 
-            <button className={`neu-button w-full py-4 font-bold transition-all ${plan.current ? 'opacity-50 cursor-not-allowed' : 'neu-button-accent hover:opacity-90'}`}>
-              {plan.current ? t('plan_current') : t('plan_choose')}
+            <button
+              className={`neu-button w-full py-4 font-bold transition-all flex items-center justify-center gap-2 ${plan.current || plan.id === 'free' ? 'opacity-50 cursor-not-allowed' : 'neu-button-accent hover:opacity-90'}`}
+              onClick={() => handleCheckout(plan.id, plan.price, plan.name)}
+              disabled={!!loadingPlanId || plan.id === 'free'}
+              aria-label={plan.current ? t('plan_current') : `${t('plan_choose')} ${plan.name}`}
+            >
+              {loadingPlanId === plan.id ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> {isEn ? 'Redirecting...' : 'Переход...'}</>
+              ) : (
+                plan.current ? t('plan_current') : t('plan_choose')
+              )}
             </button>
           </motion.div>
           );
