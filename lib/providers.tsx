@@ -22,6 +22,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   isPaywall: boolean;
+  isAdmin: boolean;
   trialEndsAt: Date | null;
   subscriptionEndsAt: Date | null;
   notificationsEnabled: boolean;
@@ -41,6 +42,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   isPaywall: false,
+  isAdmin: false,
   trialEndsAt: null,
   subscriptionEndsAt: null,
   notificationsEnabled: true,
@@ -225,6 +227,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     await setDoc(doc(db, 'users', user.uid), { theme: newTheme }, { merge: true });
   };
 
+  const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+  const isAdmin = !!(user && !user.isAnonymous && user.email && adminEmails.includes(user.email.toLowerCase()));
+
   const canUsePremiumTheme = !user?.isAnonymous && (!!trialEndsAt && new Date() <= trialEndsAt || !!subscriptionEndsAt && new Date() <= subscriptionEndsAt);
 
   const updateProfile = async (data: Partial<{ notificationsEnabled: boolean; theme?: ThemeMode }>) => {
@@ -234,7 +239,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>

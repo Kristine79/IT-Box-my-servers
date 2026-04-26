@@ -14,7 +14,7 @@ type Tab = 'about' | 'faq' | 'pricing';
 type Lang = 'en' | 'ru';
 
 export default function AdminPage() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('about');
   const [lang, setLang] = useState<Lang>('ru');
   const [saving, setSaving] = useState(false);
@@ -84,13 +84,13 @@ export default function AdminPage() {
     { id: 'pricing', label: 'Pricing', icon: CreditCard }
   ];
 
-  if (!user || user.isAnonymous) {
+  if (!isAdmin) {
     return (
       <div className="max-w-2xl mx-auto mt-20 neu-panel p-10 text-center">
         <Lock className="w-12 h-12 mx-auto mb-4 text-[var(--neu-accent)] opacity-60" />
-        <h2 className="text-xl font-bold mb-2">Доступ ограничен</h2>
-        <p className="text-[var(--neu-text-muted)] mb-6">Админ-панель доступна только авторизованным пользователям.</p>
-        <Link href="/" className="neu-button-accent px-6 py-3 font-bold inline-block">
+        <h2 className="text-xl font-bold mb-2">Доступ запрещён</h2>
+        <p className="text-[var(--neu-text-muted)] mb-6">Эта страница доступна только администратору.</p>
+        <Link href="/" className="neu-button neu-button-accent px-6 py-3 font-bold inline-block">
           На главную
         </Link>
       </div>

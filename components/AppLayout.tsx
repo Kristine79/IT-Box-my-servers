@@ -21,7 +21,7 @@ import { AIConsultant } from './AIConsultant';
 import { CommandPalette } from './CommandPalette';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isPaywall, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme } = useAuth();
+  const { user, loading, isPaywall, isAdmin, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme } = useAuth();
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -145,10 +145,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('pricing')}</span>}
             </Link>
             <div className={cn("my-1.5 h-px neu-panel-inset opacity-50", desktopSidebarOpen ? "w-full" : "w-10")} />
-            {user && !user.isAnonymous && (
+            {user && !user.isAnonymous && isAdmin && (
             <Link href="/admin" title={!desktopSidebarOpen ? 'Admin' : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/admin" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                <Settings className="h-4 w-4 shrink-0" />
                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">Admin</span>}
+            </Link>
+            )}
+            {user && !user.isAnonymous && (
+            <Link href="/profile" title={!desktopSidebarOpen ? 'Профиль' : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/profile" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+               <KeyRound className="h-4 w-4 shrink-0" />
+               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">Профиль</span>}
             </Link>
             )}
           </nav>
