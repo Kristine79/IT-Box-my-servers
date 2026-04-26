@@ -26,10 +26,10 @@ export default function ProfilePage() {
     return (
       <div className="max-w-lg mx-auto mt-20 neu-panel p-10 text-center">
         <User className="w-12 h-12 mx-auto mb-4 opacity-30" />
-        <h2 className="text-xl font-bold mb-2">ы не авторизованы</h2>
-        <p className="text-[var(--neu-text-muted)] mb-6">ойдите в аккаунт чтобы видеть свой профиль.</p>
+        <h2 className="text-xl font-bold mb-2">Вы не авторизованы</h2>
+        <p className="text-[var(--neu-text-muted)] mb-6">Войдите в аккаунт чтобы видеть свой профиль.</p>
         <Link href="/pricing" className="neu-button neu-button-accent px-6 py-3 font-bold inline-block">
-          ерейти к тарифам
+          Перейти к тарифам
         </Link>
       </div>
     );
@@ -52,7 +52,7 @@ export default function ProfilePage() {
             )}
           </div>
           <div>
-            <h1 className="text-xl font-bold">{user.displayName || 'ользователь'}</h1>
+            <h1 className="text-xl font-bold">{user.displayName || 'Пользователь'}</h1>
             <p className="text-sm text-[var(--neu-text-muted)]">{user.email}</p>
           </div>
         </div>
@@ -63,15 +63,15 @@ export default function ProfilePage() {
               <Shield className="w-4 h-4" />
               <span>Статус доступа</span>
             </div>
-            <StatusBadge active={hasAccess} label={hasAccess ? 'ктивен' : 'ет доступа'} />
+            <StatusBadge active={hasAccess} label={hasAccess ? 'Активен' : 'Нет доступа'} />
           </div>
           <div className="flex items-center justify-between py-3.5 border-b border-[var(--neu-shadow-dark)]/20">
             <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)]">
               <Clock className="w-4 h-4" />
-              <span>робный период</span>
+              <span>Пробный период</span>
             </div>
             <div className="text-right">
-              <StatusBadge active={trialActive} label={trialActive ? 'ктивен' : 'стёк'} />
+              <StatusBadge active={trialActive} label={trialActive ? 'Активен' : 'Истёк'} />
               {trialEndsAt && (
                 <p className="text-xs text-[var(--neu-text-muted)] mt-1">
                   {trialActive ? 'до ' : 'закончился '}{formatDate(trialEndsAt)}
@@ -82,18 +82,18 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between py-3.5">
             <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)]">
               <CalendarDays className="w-4 h-4" />
-              <span>одписка</span>
+              <span>Подписка</span>
             </div>
             <div className="text-right">
               {subscriptionEndsAt ? (
                 <>
-                  <StatusBadge active={subActive} label={subActive ? 'ктивна' : 'стекла'} />
+                  <StatusBadge active={subActive} label={subActive ? 'Активна' : 'Истекла'} />
                   <p className="text-xs text-[var(--neu-text-muted)] mt-1">
                     {subActive ? 'до ' : 'закончилась '}{formatDate(subscriptionEndsAt)}
                   </p>
                 </>
               ) : (
-                <span className="text-xs text-[var(--neu-text-muted)]">е оформлена</span>
+                <span className="text-xs text-[var(--neu-text-muted)]">Не оформлена</span>
               )}
             </div>
           </div>
@@ -106,15 +106,15 @@ export default function ProfilePage() {
             <CreditCard className="w-5 h-5 text-[var(--neu-accent)] shrink-0 mt-0.5" />
             <div className="flex-1">
               <h2 className="font-bold mb-1">
-                {subscriptionEndsAt ? 'одписка истекла' : 'формите подписку'}
+                {subscriptionEndsAt ? 'Подписка истекла' : 'Оформите подписку'}
               </h2>
               <p className="text-sm text-[var(--neu-text-muted)] mb-4">
                 {subscriptionEndsAt
-                  ? 'родлите подписку чтобы сохранить доступ ко всем функциям.'
-                  : 'олучите полный доступ ко всем возможностям StackBox.'}
+                  ? 'Продлите подписку чтобы сохранить доступ ко всем функциям.'
+                  : 'Получите полный доступ ко всем возможностям StackBox.'}
               </p>
               <Link href="/pricing" className="neu-button neu-button-accent px-5 py-2.5 font-bold text-sm inline-block">
-                {subscriptionEndsAt ? 'родлить подписку' : 'ыбрать тариф'}
+                {subscriptionEndsAt ? 'Продлить подписку' : 'Выбрать тариф'}
               </Link>
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function ProfilePage() {
           className="neu-button w-full py-3 font-bold flex items-center justify-center gap-2 text-red-400 hover:text-red-500 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          ыйти из аккаунта
+          Выйти из аккаунта
         </button>
       </motion.div>
     </div>
