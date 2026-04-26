@@ -1,23 +1,39 @@
 import { NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 import config from '@/firebase-applet-config.json';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 if (!admin.apps.length) {
-  // Use ADC (Application Default Credentials) provided by Google Cloud Run.
-  admin.initializeApp({
-    projectId: config.projectId,
-  });
+  const saJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  if (saJson) {
+    // Vercel / external host: explicit Service Account credentials
+    try {
+      const serviceAccount = JSON.parse(saJson);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: serviceAccount.project_id || config.projectId,
+      });
+    } catch (e) {
+      console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON:', e);
+      admin.initializeApp({ projectId: config.projectId });
+    }
+  } else {
+    // Google Cloud Run: Application Default Credentials
+    admin.initializeApp({ projectId: config.projectId });
+  }
 }
 
 const db = getFirestore(admin.app(), config.firestoreDatabaseId);
 
 // YooKassa official IP ranges for webhook notifications
+// https://yookassa.ru/developers/using-api/webhooks
 const YOOKASSA_IP_RANGES = [
   '185.71.76.',   // 185.71.76.0/27
   '185.71.77.',   // 185.71.77.0/27
   '77.75.153.',   // 77.75.153.0/25
+  '77.75.154.',   // 77.75.154.128/25
   '77.75.156.',   // 77.75.156.11, 77.75.156.35
+  '2a02:5180:',   // IPv6 2a02:5180::/32
 ];
 
 function isYooKassaIP(ip: string): boolean {
@@ -82,17 +98,24 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No UID in payment metadata' }, { status: 400 });
       }
 
-      const userRef = db.collection('users').doc(uid);
-      const userDoc = await userRef.get();
+      // Idempotency guard: skip if this paymentId already processed
+      const processedRef = db.collection('processedPayments').doc(paymentId);
+      const processedSnap = await processedRef.get();
+      if (processedSnap.exists) {
+        console.log(`Payment ${paymentId} already processed, skipping`);
+        return NextResponse.json({ status: 'ok', duplicate: true });
+      }
 
+      const userRef = db.collection('users').doc(uid);
       const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
       const now = new Date();
 
-      if (userDoc.exists) {
-        let currentSubEnd = userDoc.data()?.subscriptionEndsAt;
-        let newEnd = new Date(now.getTime() + THIRTY_DAYS);
+      // Atomic update inside a transaction so concurrent webhooks can't double-extend
+      await db.runTransaction(async (tx) => {
+        const userDoc = await tx.get(userRef);
+        const currentSubEnd = userDoc.exists ? userDoc.data()?.subscriptionEndsAt : null;
 
-        // If currently valid, add 30 days to existing subscription
+        let newEnd = new Date(now.getTime() + THIRTY_DAYS);
         if (currentSubEnd) {
           const currentSubDate = new Date(currentSubEnd);
           if (currentSubDate > now) {
@@ -100,18 +123,27 @@ export async function POST(req: Request) {
           }
         }
 
-        await userRef.update({
-          subscriptionEndsAt: newEnd.toISOString()
-        });
+        if (userDoc.exists) {
+          tx.update(userRef, { subscriptionEndsAt: newEnd.toISOString() });
+        } else {
+          tx.set(userRef, { subscriptionEndsAt: newEnd.toISOString() }, { merge: true });
+        }
 
-      } else {
-        // Fallback if doc was deleted, mostly an edge case
-        await userRef.set({
-          subscriptionEndsAt: new Date(now.getTime() + THIRTY_DAYS).toISOString()
-        }, { merge: true });
-      }
+        tx.set(processedRef, {
+          uid,
+          amount: verified.amount?.value,
+          currency: verified.amount?.currency,
+          processedAt: FieldValue.serverTimestamp(),
+        });
+      });
 
       console.log(`Subscription activated for user ${uid}, payment ${paymentId}`);
+    }
+
+    if (body.event === 'payment.canceled') {
+      const paymentId = body.object?.id;
+      console.log(`Payment canceled: ${paymentId}`);
+      // No action needed — subscription was never granted
     }
 
     return NextResponse.json({ status: 'ok' });
