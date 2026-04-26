@@ -135,7 +135,7 @@ function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string
             onChange={e => setFilterPriority(e.target.value)}
             className="neu-input flex-1 appearance-none cursor-pointer py-1.5 text-sm"
           >
-            <option value="all" className="bg-[var(--neu-bg)]">Все приоритеты</option>
+            <option value="all" className="bg-[var(--neu-bg)]">{t('all_priorities')}</option>
             <option value="low" className="bg-[var(--neu-bg)]">{t('priority_low')}</option>
             <option value="normal" className="bg-[var(--neu-bg)]">{t('priority_normal')}</option>
             <option value="urgent" className="bg-[var(--neu-bg)]">{t('priority_urgent')}</option>
@@ -409,7 +409,7 @@ export default function ProjectsPage() {
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
           <DialogContent className="border-0 sm:rounded-3xl p-8" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
             <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
-            <DialogHeader><DialogTitle className="text-xl font-bold">Редактировать проект</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle className="text-xl font-bold">{t('edit_project')}</DialogTitle></DialogHeader>
             <form onSubmit={handleUpdate} className="space-y-4 pt-2">
               <div className="space-y-1">
                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
@@ -449,7 +449,7 @@ export default function ProjectsPage() {
               </div>
               
               <div className="space-y-1">
-                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">Cтатус</label>
+                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('status_label')}</label>
                  <select value={status} onChange={e=>setStatus(e.target.value)} className="neu-input w-full p-2 appearance-none cursor-pointer">
                    <option value="active" className="bg-[var(--neu-bg)] text-[var(--neu-text)]">{t('status_active')}</option>
                    <option value="archived" className="bg-[var(--neu-bg)] text-[var(--neu-text)]">{t('status_archive')}</option>
@@ -462,11 +462,11 @@ export default function ProjectsPage() {
 
         <Dialog open={!!deleteId} onOpenChange={(val) => !val && setDeleteId(null)}>
           <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-sm text-center" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
-            <DialogHeader><DialogTitle className="text-xl font-bold flex flex-col items-center gap-4"><Trash2 className="w-12 h-12 text-red-500"/> Удалить проект?</DialogTitle></DialogHeader>
-            <p className="opacity-80 py-4">Это действие нельзя отменить.</p>
+            <DialogHeader><DialogTitle className="text-xl font-bold flex flex-col items-center gap-4"><Trash2 className="w-12 h-12 text-red-500"/> {t('delete_project_title')}</DialogTitle></DialogHeader>
+            <p className="opacity-80 py-4">{t('delete_project_confirm')}</p>
             <div className="flex w-full gap-3 mt-4">
-               <button onClick={() => setDeleteId(null)} className="neu-button flex-1 py-2 font-medium">Отмена</button>
-               <button onClick={handleDelete} className="neu-button flex-1 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 font-bold">Удалить</button>
+               <button onClick={() => setDeleteId(null)} className="neu-button flex-1 py-2 font-medium">{t('cancel')}</button>
+               <button onClick={handleDelete} className="neu-button flex-1 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 font-bold">{t('delete')}</button>
             </div>
           </DialogContent>
         </Dialog>
@@ -475,7 +475,7 @@ export default function ProjectsPage() {
       {projects.length >= 2 && (
         <div className="flex flex-col xl:flex-row gap-2 bg-[var(--neu-bg)] px-3 py-2.5 rounded-xl w-full items-start xl:items-center" style={{ boxShadow: 'var(--neu-shadow-inset)' }}>
           <div className="flex flex-wrap items-center gap-1 md:gap-1.5 flex-1 w-full xl:w-auto shrink min-w-0">
-            <span className="text-[10px] md:text-xs font-bold text-[var(--neu-text-muted)] uppercase tracking-wider pl-1.5 md:pr-1.5 hidden sm:inline">Сортировка</span>
+            <span className="text-[10px] md:text-xs font-bold text-[var(--neu-text-muted)] uppercase tracking-wider pl-1.5 md:pr-1.5 hidden sm:inline">{t('sorting')}</span>
             <button onClick={() => setSortBy('date')} className={cn("neu-button py-1.5 px-1.5 flex items-center justify-center min-w-[32px] md:min-w-[36px]", sortBy === 'date' && 'neu-button-accent')} title="Дата">
               <CalendarDays className="w-3.5 h-3.5 md:w-4 md:h-4" />
             </button>
@@ -493,13 +493,13 @@ export default function ProjectsPage() {
           <div className="hidden xl:block w-px h-6 bg-[var(--neu-text-muted)] opacity-20"></div>
 
           <div className="flex items-center gap-1.5 md:gap-2 w-full xl:w-auto border-t xl:border-0 border-[var(--neu-text-muted)]/10 pt-2 xl:pt-0 shrink min-w-0">
-             <span className="text-[10px] md:text-xs font-bold text-[var(--neu-text-muted)] uppercase tracking-wider pl-1.5">Фильтр</span>
+             <span className="text-[10px] md:text-xs font-bold text-[var(--neu-text-muted)] uppercase tracking-wider pl-1.5">{t('filter')}</span>
              <select 
                value={filterStack} 
                onChange={(e) => setFilterStack(e.target.value)} 
                className="neu-input py-1 px-1.5 md:py-1.5 md:px-2 text-xs md:text-sm min-w-[90px] max-w-[140px] flex-1 xl:flex-none cursor-pointer"
              >
-               <option value="all">Любой стэк</option>
+               <option value="all">{t('any_stack')}</option>
                {POPULAR_STACKS.map(s => <option key={s} value={s}>{s}</option>)}
              </select>
 
@@ -508,9 +508,9 @@ export default function ProjectsPage() {
                onChange={(e) => setFilterTasks(e.target.value as any)} 
                className="neu-input py-1 px-1.5 md:py-1.5 md:px-2 text-xs md:text-sm min-w-[100px] flex-1 xl:flex-none cursor-pointer"
              >
-               <option value="all">Все задачи</option>
-               <option value="with-tasks">С задачами</option>
-               <option value="no-tasks">Без задач</option>
+               <option value="all">{t('all_tasks')}</option>
+               <option value="with-tasks">{t('with_tasks')}</option>
+               <option value="no-tasks">{t('without_tasks')}</option>
              </select>
           </div>
         </div>
@@ -532,7 +532,7 @@ export default function ProjectsPage() {
                     {p.status === 'active' ? t('status_active') : t('status_archive')}
                   </div>
                   <div className="flex gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity relative z-10">
-                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEdit(p); }} className="neu-button h-8 w-8 text-blue-500 flex items-center justify-center shrink-0" aria-label="Редактировать"><Edit className="w-4 h-4"/></button>
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEdit(p); }} className="neu-button h-8 w-8 text-blue-500 flex items-center justify-center shrink-0" aria-label={t('edit')}><Edit className="w-4 h-4"/></button>
                     <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteId(p.id); }} className="neu-button h-8 w-8 text-red-500 flex items-center justify-center shrink-0" aria-label={t('delete_project')}><Trash2 className="w-4 h-4"/></button>
                   </div>
                 </div>

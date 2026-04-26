@@ -49,7 +49,7 @@ export default function PricingPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (isSignInWithEmailLink(auth, window.location.href)) {
-      const email = window.localStorage.getItem('emailForSignIn') || window.prompt('Введите ваш email для подтверждения') || '';
+      const email = window.localStorage.getItem('emailForSignIn') || window.prompt(t('enter_email_confirm')) || '';
       signInWithEmailLink(auth, email, window.location.href)
         .then(() => {
           window.localStorage.removeItem('emailForSignIn');
@@ -60,7 +60,7 @@ export default function PricingPage() {
             startCheckout(planId, price, name);
           }
         })
-        .catch((e) => toast.error(e?.message || 'Ошибка входа по ссылке'));
+        .catch((e) => toast.error(e?.message || t('link_sign_in_error')));
     }
   }, []);
 
@@ -95,11 +95,11 @@ export default function PricingPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        toast.error('Не удалось создать платёж. Попробуйте ещё раз.');
+        toast.error(t('payment_failed'));
       }
     } catch (e) {
       console.error(e);
-      toast.error('Ошибка подключения к платёжному сервису.');
+      toast.error(t('payment_service_error'));
     } finally {
       setLoadingPlanId(null);
     }
@@ -220,7 +220,7 @@ export default function PricingPage() {
               aria-label={plan.current ? t('plan_current') : `${t('plan_choose')} ${plan.name}`}
             >
               {loadingPlanId === plan.id ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> {isEn ? 'Redirecting...' : 'Переход...'}</>
+                <><Loader2 className="w-4 h-4 animate-spin" /> {t('redirecting')}</>
               ) : (
                 plan.current ? t('plan_current') : t('plan_choose')
               )}

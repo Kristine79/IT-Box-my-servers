@@ -64,13 +64,13 @@ export default function ServersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if(!confirm("Вы уверены?")) return;
+    if(!confirm(t('confirm_delete'))) return;
     try {
       await deleteDoc(doc(db, "servers", id));
-      toast.success("Сервер удален");
+      toast.success(t('server_deleted'));
       loadData();
     } catch (error) {
-      toast.error("Не удалось удалить сервер");
+      toast.error(t('server_delete_failed'));
     }
   };
 
@@ -90,26 +90,27 @@ export default function ServersPage() {
             <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                   <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="Frontend Node 1" />
+                   <label htmlFor="srv-name" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                   <input id="srv-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="Frontend Node 1" />
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_host')}</label>
-                   <input required value={ipAddress} onChange={e=>setIp(e.target.value)} className="neu-input w-full font-mono text-sm" placeholder="192.168.1.1" />
+                   <label htmlFor="srv-host" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_host')}</label>
+                   <input id="srv-host" required value={ipAddress} onChange={e=>setIp(e.target.value)} className="neu-input w-full font-mono text-sm" placeholder="192.168.1.1" />
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_provider')}</label>
-                   <input value={provider} onChange={e=>setProvider(e.target.value)} className="neu-input w-full" placeholder="AWS / DigitalOcean..." />
+                   <label htmlFor="srv-provider" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_provider')}</label>
+                   <input id="srv-provider" value={provider} onChange={e=>setProvider(e.target.value)} className="neu-input w-full" placeholder="AWS / DigitalOcean..." />
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_os')}</label>
-                   <input value={os} onChange={e=>setOs(e.target.value)} className="neu-input w-full" placeholder="Ubuntu 22.04 LTS" />
+                   <label htmlFor="srv-os" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_os')}</label>
+                   <input id="srv-os" value={os} onChange={e=>setOs(e.target.value)} className="neu-input w-full" placeholder="Ubuntu 22.04 LTS" />
                  </div>
                </div>
                
                <div className="space-y-1">
-                 <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_project')}</label>
+                 <label htmlFor="srv-project" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_project')}</label>
                  <select 
+                    id="srv-project"
                     value={projectId} 
                     onChange={(e) => setProjectId(e.target.value)}
                     className="neu-input w-full appearance-none cursor-pointer"
@@ -120,8 +121,8 @@ export default function ServersPage() {
                </div>
                
                <div className="space-y-1">
-                  <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
-                  <textarea value={notes} onChange={e=>setNotes(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_notes')} />
+                  <label htmlFor="srv-notes" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
+                  <textarea id="srv-notes" value={notes} onChange={e=>setNotes(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_notes')} />
                </div>
 
               <div className="flex justify-end pt-2"><button type="submit" className="neu-button neu-button-accent px-8 py-3">{t('btn_save')}</button></div>

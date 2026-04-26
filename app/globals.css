@@ -66,11 +66,11 @@
     --border: oklch(0.85 0 0);
     --input: oklch(0.85 0 0);
     --ring: oklch(0.6 0.15 250);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --chart-1: oklch(0.87 0.01 250);
+    --chart-2: oklch(0.556 0.01 250);
+    --chart-3: oklch(0.439 0.01 250);
+    --chart-4: oklch(0.371 0.008 250);
+    --chart-5: oklch(0.269 0.005 250);
     --radius: 1.5rem;
     --sidebar: oklch(0.92 0.01 250);
     --sidebar-foreground: oklch(0.2 0 0);
@@ -157,6 +157,10 @@ body.glassmorphism-theme .neu-button-accent:hover {
     box-shadow: var(--glass-shadow), 0 0 30px var(--glass-accent-glow) !important;
 }
 
+body.glassmorphism-theme .neu-button-accent:active {
+    box-shadow: var(--glass-shadow), 0 0 10px var(--glass-accent-glow) !important;
+}
+
 body.glassmorphism-theme .neu-input {
     background: rgba(15, 23, 42, 0.6) !important;
     border: 1px solid var(--glass-border) !important;
@@ -213,11 +217,11 @@ body.glassmorphism-theme header {
     --border: oklch(0.3 0.04 260);
     --input: oklch(0.3 0.04 260);
     --ring: oklch(0.65 0.15 250);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --chart-1: oklch(0.87 0.01 250);
+    --chart-2: oklch(0.556 0.01 250);
+    --chart-3: oklch(0.439 0.01 250);
+    --chart-4: oklch(0.371 0.008 250);
+    --chart-5: oklch(0.269 0.005 250);
     --sidebar: oklch(0.22 0.03 260);
     --sidebar-foreground: oklch(0.95 0 0);
     --sidebar-primary: oklch(0.65 0.15 250);
@@ -227,12 +231,12 @@ body.glassmorphism-theme header {
     --sidebar-border: oklch(0.3 0.04 260);
     --sidebar-ring: oklch(0.65 0.15 250);
     
-    --neu-bg: #1a1e27;
-    --neu-light: #242935;
-    --neu-dark: #101319;
-    --neu-accent: #0ea5e9;
-    --neu-text: #f8fafc;
-    --neu-text-muted: #94a3b8;
+    --neu-bg: oklch(0.22 0.02 260);
+    --neu-light: oklch(0.28 0.02 260);
+    --neu-dark: oklch(0.14 0.02 260);
+    --neu-accent: oklch(0.65 0.19 220);
+    --neu-text: oklch(0.97 0.005 250);
+    --neu-text-muted: oklch(0.7 0.02 250);
     --neu-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
     --neu-shadow-inset: inset 6px 6px 12px var(--neu-dark), inset -6px -6px 12px var(--neu-light);
     --neu-shadow-hover: 4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light);
@@ -247,7 +251,7 @@ body.glassmorphism-theme header {
     @apply bg-background text-foreground;
     background-color: var(--neu-bg);
     color: var(--neu-text);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease-out, color 0.3s ease-out;
   }
   html {
     @apply font-sans;
@@ -267,7 +271,7 @@ body.glassmorphism-theme header {
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow);
     border-radius: 1.5rem;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+    transition: transform 0.4s ease-out, box-shadow 0.4s ease-out, background 0.3s ease-out;
   }
   
   .neu-panel:hover {
@@ -279,21 +283,21 @@ body.glassmorphism-theme header {
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow-inset);
     border-radius: 1.5rem;
-    transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+    transition: box-shadow 0.4s ease-out, background 0.3s ease-out;
   }
   
   .neu-panel-sidebar {
     background: var(--neu-bg);
     border: 1px solid var(--neu-light);
     border-radius: 1rem;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease-out;
   }
 
   .neu-button {
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow);
     border-radius: 9999px;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, background 0.2s ease, outline 0.2s ease;
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, color 0.2s ease-out, background 0.2s ease-out, outline 0.2s ease-out;
     color: var(--neu-text);
     display: inline-flex;
     align-items: center;
@@ -306,7 +310,7 @@ body.glassmorphism-theme header {
   .neu-button:focus-visible {
     outline: 2px solid var(--neu-accent);
     outline-offset: 2px;
-    box-shadow: var(--neu-shadow), 0 0 0 4px rgba(14, 165, 233, 0.2);
+    box-shadow: var(--neu-shadow), 0 0 0 4px oklch(0.65 0.19 220 / 0.2);
   }
 
   .neu-button:hover {
@@ -321,18 +325,24 @@ body.glassmorphism-theme header {
 
   .neu-button-accent {
     background: var(--neu-accent);
-    color: white;
-    box-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.39);
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+    color: oklch(0.98 0.005 250);
+    box-shadow: 0 4px 14px 0 oklch(0.65 0.19 220 / 0.39);
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, background 0.2s ease-out;
   }
   
+  .neu-button-accent:focus-visible {
+    outline: 2px solid oklch(0.98 0.005 250);
+    outline-offset: 2px;
+    box-shadow: 0 4px 14px 0 oklch(0.65 0.19 220 / 0.39), 0 0 0 4px oklch(0.65 0.19 220 / 0.3);
+  }
+
   .neu-button-accent:hover {
-    box-shadow: 0 6px 20px 0 rgba(14, 165, 233, 0.5);
+    box-shadow: 0 6px 20px 0 oklch(0.65 0.19 220 / 0.5);
     transform: translateY(-2px);
   }
 
   .neu-button-accent:active {
-    box-shadow: 0 2px 5px 0 rgba(14, 165, 233, 0.39);
+    box-shadow: 0 2px 5px 0 oklch(0.65 0.19 220 / 0.39);
     transform: translateY(2px);
   }
 
@@ -342,7 +352,7 @@ body.glassmorphism-theme header {
     border-radius: 1rem;
     color: var(--neu-text);
     padding: 0.75rem 1rem;
-    transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    transition: box-shadow 0.3s ease-out, border-color 0.3s ease-out;
     border: 2px solid transparent;
   }
   
@@ -350,6 +360,11 @@ body.glassmorphism-theme header {
     outline: none;
     border-color: var(--neu-accent);
     box-shadow: inset 8px 8px 16px var(--neu-dark), inset -8px -8px 16px var(--neu-light);
+  }
+
+  .neu-input:focus-visible {
+    outline: 2px solid var(--neu-accent);
+    outline-offset: 2px;
   }
 }
 

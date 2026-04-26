@@ -117,7 +117,7 @@ export default function CredentialsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if(!confirm("Are you sure?")) return;
+    if(!confirm(t('confirm_delete'))) return;
     try {
       await deleteDoc(doc(db, "credentials", id));
       toast.success("Credential deleted");
@@ -163,12 +163,13 @@ export default function CredentialsPage() {
             <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                   <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="e.g. Prod DB Root" />
+                   <label htmlFor="cred-name" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                   <input id="cred-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="e.g. Prod DB Root" />
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_type')}</label>
+                   <label htmlFor="cred-type" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_type')}</label>
                    <select 
+                      id="cred-type"
                       value={type} 
                       onChange={e=>setType(e.target.value)}
                       className="neu-input w-full appearance-none cursor-pointer"
@@ -182,12 +183,12 @@ export default function CredentialsPage() {
                    </select>
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_username')}</label>
-                   <input value={username} onChange={e=>setUsername(e.target.value)} className="neu-input w-full" placeholder="root" />
+                   <label htmlFor="cred-username" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_username')}</label>
+                   <input id="cred-username" value={username} onChange={e=>setUsername(e.target.value)} className="neu-input w-full" placeholder="root" />
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)] flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-green-500"/> {t('field_password')}</label>
-                   <input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full" placeholder="••••••••••••" />
+                   <label htmlFor="cred-password" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)] flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-green-500"/> {t('field_password')}</label>
+                   <input id="cred-password" type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full" placeholder="••••••••••••" />
                  </div>
                </div>
 

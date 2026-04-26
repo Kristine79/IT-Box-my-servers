@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Mail, Github, Loader2, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { useAuth } from '@/lib/providers';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const firebaseErrorRu: Record<string, string> = {
   'auth/account-exists-with-different-credential':
@@ -38,6 +39,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose, onSuccess, title, description }: AuthModalProps) {
+  const { t } = useTranslation();
   const { login, loginWithGitHub, loginWithEmail } = useAuth();
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [emailView, setEmailView] = useState(false);
@@ -74,7 +76,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
 
   const handleEmailSubmit = async () => {
     if (!email.trim() || !password.trim()) {
-      toast.error('Заполните email и пароль');
+      toast.error(t('fill_email_password'));
       return;
     }
     setLoadingProvider('email');
@@ -85,7 +87,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
     } catch (e: any) {
       if (e?.code === 'auth/email-already-in-use') {
         setIsRegister(false);
-        toast.error('Этот email уже зарегистрирован. Введите пароль и войдите.');
+        toast.error(t('email_already_registered'));
       } else {
         toast.error(getAuthError(e));
       }
@@ -116,19 +118,19 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="neu-panel w-full max-w-md p-8 relative"
           >
             <button
               onClick={onClose}
               className="absolute top-4 right-4 neu-button w-8 h-8 flex items-center justify-center text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
-              aria-label="Закрыть"
+              aria-label={t('close')}
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="mb-6">
-              <h2 className="text-xl font-bold mb-1">{title || 'Войдите в аккаунт'}</h2>
+              <h2 className="text-xl font-bold mb-1">{title || t('sign_in_title')}</h2>
               {description && (
                 <p className="text-sm text-[var(--neu-text-muted)]">{description}</p>
               )}
@@ -158,7 +160,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                       </svg>
                     )}
-                    Войти через Google
+                    {t('sign_in_google')}
                   </button>
 
                   <button
@@ -171,12 +173,12 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                     ) : (
                       <Github className="w-4 h-4" />
                     )}
-                    Войти через GitHub
+                    {t('sign_in_github')}
                   </button>
 
                   <div className="flex items-center gap-3 py-1">
                     <div className="flex-1 h-px neu-panel-inset opacity-40" />
-                    <span className="text-xs text-[var(--neu-text-muted)] uppercase tracking-widest">или</span>
+                    <span className="text-xs text-[var(--neu-text-muted)] uppercase tracking-widest">{t('or')}</span>
                     <div className="flex-1 h-px neu-panel-inset opacity-40" />
                   </div>
 
@@ -186,7 +188,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                     className="neu-button w-full py-3 font-bold flex items-center justify-center gap-3 disabled:opacity-60 hover:text-[var(--neu-accent)]"
                   >
                     <Mail className="w-4 h-4" />
-                    Войти по email и паролю
+                    {t('sign_in_email')}
                   </button>
                 </motion.div>
               ) : (
@@ -202,13 +204,13 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                       onClick={() => setIsRegister(false)}
                       className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${!isRegister ? 'neu-button text-[var(--neu-accent)]' : 'opacity-50 hover:opacity-80'}`}
                     >
-                      Войти
+                      {t('tab_login')}
                     </button>
                     <button
                       onClick={() => setIsRegister(true)}
                       className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${isRegister ? 'neu-button text-[var(--neu-accent)]' : 'opacity-50 hover:opacity-80'}`}
                     >
-                      Зарегистрироваться
+                      {t('tab_register')}
                     </button>
                   </div>
 
@@ -227,7 +229,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleEmailSubmit()}
-                      placeholder={isRegister ? 'Придумайте пароль (мин. 6 символов)' : 'Пароль'}
+                      placeholder={isRegister ? t('password_register_placeholder') : t('password_placeholder')}
                       autoComplete={isRegister ? 'new-password' : 'current-password'}
                       className="w-full neu-panel-inset px-4 py-3 pr-11 text-sm rounded-xl bg-transparent outline-none text-[var(--neu-text)] placeholder:text-[var(--neu-text-muted)]"
                     />
@@ -235,7 +237,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                       type="button"
                       onClick={() => setShowPass(!showPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--neu-text-muted)] hover:text-[var(--neu-text)]"
-                      aria-label={showPass ? 'Скрыть пароль' : 'Показать пароль'}
+                      aria-label={showPass ? t('hide_password') : t('show_password')}
                     >
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -251,14 +253,14 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
                     ) : (
                       <KeyRound className="w-4 h-4" />
                     )}
-                    {isRegister ? 'Создать аккаунт' : 'Войти'}
+                    {isRegister ? t('create_account') : t('tab_login')}
                   </button>
 
                   <button
                     onClick={resetEmailView}
                     className="w-full text-xs text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] py-1 transition-colors"
                   >
-                    ← Назад к другим способам входа
+                    {t('back_to_methods')}
                   </button>
                 </motion.div>
               )}

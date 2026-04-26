@@ -180,10 +180,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex gap-1.5 md:gap-2 ml-auto items-center">
-             <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} role="button" tabIndex={0}>
+             <button className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}>
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-             </div>
-               <div 
+             </button>
+               <button 
                className={cn(
                  "neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center shrink-0 relative",
                  canUsePremiumTheme ? "cursor-pointer" : "cursor-not-allowed opacity-50",
@@ -195,26 +195,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                }}
                title={canUsePremiumTheme ? (theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism Premium') : 'Premium theme - requires active subscription'}
                aria-label={canUsePremiumTheme ? 'Toggle premium theme' : 'Premium theme locked'}
-               role="button"
-               tabIndex={0}
+               disabled={!canUsePremiumTheme}
              >
                 <Sparkles className="h-4 w-4" />
                 {!canUsePremiumTheme && <Lock className="h-2.5 w-2.5 absolute bottom-1 right-1 text-[var(--neu-text-muted)]" />}
-             </div>
+             </button>
              <NotificationBell />
              <CommandPalette />
-               <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')} aria-label="Change language">
+               <button className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')} aria-label="Change language">
                   {i18n.language === 'ru' ? 'RU' : 'EN'}
-               </div>
+               </button>
               {user && user.isAnonymous ? (
-                <div className="neu-button h-9 px-3 md:h-10 hidden md:flex items-center justify-center cursor-pointer gap-2 shrink-0" onClick={login}>
+                <button className="neu-button h-9 px-3 md:h-10 hidden md:flex items-center justify-center cursor-pointer gap-2 shrink-0" onClick={login}>
                   <LogIn className="h-4 w-4" />
-                  <span className="text-xs font-bold">{t('sign_in', 'Войти')}</span>
-                </div>
+                  <span className="text-xs font-bold">{t('sign_in')}</span>
+                </button>
               ) : (
-                <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout} aria-label="Log out" role="button" tabIndex={0}>
+                <button className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout} aria-label="Log out">
                   <LogOut className="h-4 w-4" />
-                </div>
+                </button>
               )}
           </div>
         </header>
@@ -277,7 +276,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        {t('pricing')}
                     </Link>
                     <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
-                    {user && !user.isAnonymous && (
+                    {user && !user.isAnonymous && isAdmin && (
                     <Link href="/admin" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/admin" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
                        <Settings className="h-4 w-4" />
                        {t('admin')}
@@ -339,12 +338,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <p>© 2026 StackBox</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors">{i18n.language === 'en' ? 'Technical support' : 'Техническая поддержка'}</a>
-                  <a href="https://t.me/usefulbots2026_bot" target="_blank" className="hover:text-[var(--neu-accent)] transition-colors">{i18n.language === 'en' ? 'Useful Telegram bots' : 'Полезные Telegram боты'}</a>
+                  <a href="mailto:info@premiumwebsite.ru" className="hover:text-[var(--neu-accent)] transition-colors">{t('technical_support')}</a>
+                  <a href="https://t.me/usefulbots2026_bot" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--neu-accent)] transition-colors">{t('useful_bots')}</a>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">Согласие на обработку персональных данных</a>
-                  <a href="#" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</a>
+                  <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">{t('personal_data_consent')}</a>
+                  <Link href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</Link>
                 </div>
               </footer>
             </motion.div>
