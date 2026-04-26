@@ -137,7 +137,7 @@ export function AIConsultant() {
             exit={{ scale: 0, opacity: 0 }}
             className="fixed bottom-4 right-4 z-50 flex flex-col items-center gap-2"
           >
-             <button title="Скрыть ИИ-консультанта" onClick={() => setIsHiddenFully(true)} className="w-6 h-6 neu-button rounded-full flex items-center justify-center text-[var(--neu-text-muted)] opacity-50 hover:opacity-100 hover:text-red-400 focus:outline-none transition-colors">
+             <button title="Скрыть ИИ-консультанта" aria-label="Hide AI assistant" onClick={() => setIsHiddenFully(true)} className="w-6 h-6 neu-button rounded-full flex items-center justify-center text-[var(--neu-text-muted)] opacity-50 hover:opacity-100 hover:text-red-400 focus:outline-none transition-colors">
                 <X className="w-3.5 h-3.5" />
              </button>
             <motion.button
@@ -145,6 +145,7 @@ export function AIConsultant() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
               className="w-12 h-12 neu-button-accent rounded-full flex items-center justify-center shadow-lg opacity-90 hover:opacity-100 focus:outline-none"
+              aria-label="Open AI assistant"
             >
               <Bot className="w-5 h-5" />
             </motion.button>

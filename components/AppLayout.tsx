@@ -3,12 +3,11 @@
 import { useAuth } from '@/lib/providers';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, Search, X, LogIn, Settings, Sparkles, Lock } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, X, LogIn, Settings, Sparkles, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import { Input } from './ui/input';
 import { LOGO_BASE64 } from '@/lib/logoBase64';
 
 import { Paywall } from './Paywall';

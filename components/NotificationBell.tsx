@@ -63,6 +63,9 @@ export function NotificationBell() {
           !notificationsEnabled && "opacity-50 grayscale-[0.5]"
         )}
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close notifications' : `Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+        role="button"
+        tabIndex={0}
       >
         {notificationsEnabled ? (
           <Bell className={cn("h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:rotate-12", isOpen && "scale-110")} />
@@ -98,6 +101,7 @@ export function NotificationBell() {
                      "p-2 rounded-full transition-all",
                      showSettings ? "bg-[var(--neu-accent)] text-white shadow-lg" : "hover:bg-white/10 opacity-60 hover:opacity-100"
                    )}
+                   aria-label="Notification settings"
                 >
                   <Settings className="w-4 h-4" />
                 </button>

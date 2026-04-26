@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { collection, query, where, getCountFromServer, getDocs, orderBy, limit, collectionGroup, doc, getDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
-import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, Info, AlertTriangle } from "lucide-react";
+import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, Info, AlertTriangle, CalendarDays, X } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
@@ -262,11 +262,12 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
               </div>
               <button 
                 onClick={() => setIsCalendarOpen(!isCalendarOpen)} 
-                className="neu-button p-2 md:px-3 md:py-2 text-xs font-bold uppercase tracking-widest text-[var(--neu-text-muted)] flex items-center justify-center shrink-0"
+                className="neu-button p-2 md:px-3 md:py-2 text-xs font-bold uppercase tracking-widest text-[var(--neu-text-muted)] flex items-center justify-center gap-2 shrink-0"
                 title={isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}
+                aria-label={isCalendarOpen ? 'Свернуть календарь' : 'Выбрать дату'}
               >
-                 <span className="text-base leading-none">📅</span>
-                 <span className="hidden md:inline ml-2">{isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}</span>
+                 {isCalendarOpen ? <X className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
+                 <span className="hidden md:inline">{isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}</span>
               </button>
             </div>
 
