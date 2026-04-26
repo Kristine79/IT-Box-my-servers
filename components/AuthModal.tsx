@@ -21,7 +21,6 @@ const firebaseErrorRu: Record<string, string> = {
   'auth/email-already-in-use': 'Этот email уже зарегистрирован. Попробуйте войти.',
   'auth/weak-password': 'Пароль слишком простой. Минимум 6 символов.',
   'auth/invalid-credential': 'Неверный email или пароль.',
-  'auth/wrong-password': 'Неверный пароль.',
   'auth/operation-not-allowed': 'Этот способ входа отключён. Обратитесь к администратору.',
 };
 
