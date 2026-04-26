@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { useEffect, useState } from "react";
 import { collection, query, where, getCountFromServer, getDocs, orderBy, limit, collectionGroup, doc, getDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
@@ -13,7 +14,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { ru, enUS } from "date-fns/locale";
 
 const container = {
   hidden: { opacity: 0 },
@@ -253,7 +254,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
                  <div className="p-1.5 md:p-2 rounded-md bg-orange-500/10 text-orange-500 shrink-0">
                    <AlertTriangle className="w-4 h-4 md:w-5 md:h-5" />
                  </div>
-                 <h3 className="text-[13px] sm:text-base md:text-lg font-bold truncate tracking-tight">Срочные задачи</h3>
+                 <h3 className="text-[13px] sm:text-base md:text-lg font-bold truncate tracking-tight">{t('urgent_tasks')}</h3>
                  {displayedTasks.length > 0 && (
                    <span className="bg-orange-500 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 md:px-2 rounded-full shrink-0">
                      {displayedTasks.length}
@@ -263,11 +264,11 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
               <button 
                 onClick={() => setIsCalendarOpen(!isCalendarOpen)} 
                 className="neu-button p-2 md:px-3 md:py-2 text-xs font-bold uppercase tracking-widest text-[var(--neu-text-muted)] flex items-center justify-center gap-2 shrink-0"
-                title={isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}
-                aria-label={isCalendarOpen ? 'Свернуть календарь' : 'Выбрать дату'}
+                title={isCalendarOpen ? t('collapse') : t('select_date')}
+                aria-label={isCalendarOpen ? t('collapse') : t('select_date')}
               >
                  {isCalendarOpen ? <X className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
-                 <span className="hidden md:inline">{isCalendarOpen ? 'Свернуть' : 'Выбрать дату'}</span>
+                 <span className="hidden md:inline">{isCalendarOpen ? t('collapse') : t('select_date')}</span>
               </button>
             </div>
 
@@ -287,7 +288,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
                       mode="single"
                       selected={selectedDate}
                       onSelect={(newDate) => { setSelectedDate(newDate); setIsCalendarOpen(false); }}
-                      locale={ru}
+                      locale={i18n.language === 'ru' ? ru : enUS}
                       className="p-3 bg-[var(--neu-bg)] rounded-md"
                       style={{ boxShadow: 'var(--neu-shadow-inset)' }}
                       classNames={{
@@ -304,11 +305,11 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
                  <div className="text-center py-10 opacity-50 px-4 flex flex-col items-center">
                    <FolderKanban className="w-8 h-8 mb-2 opacity-50" />
                    <p className="text-sm font-medium tracking-wide">
-                     {selectedDate ? `Нет задач на ${selectedDate.toLocaleDateString('ru-RU')}.` : 'Нет срочных задач. Отличная работа!'}
+                     {selectedDate ? `${t('no_tasks_for_date')} ${selectedDate.toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : 'en-US')}.` : t('no_urgent_tasks')}
                    </p>
                    {selectedDate && (
                      <button onClick={() => setSelectedDate(undefined)} className="mt-4 text-xs font-bold uppercase text-[var(--neu-accent)] hover:underline">
-                       Показать все
+                       {t('show_all')}
                      </button>
                    )}
                  </div>
@@ -327,7 +328,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
                           )}
                        </div>
                        <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-orange-500/10 text-orange-500 whitespace-nowrap">
-                         {task.priority === 'critical' ? 'Критично' : 'Срочно'}
+                         {task.priority === 'critical' ? t('critical') : t('urgent')}
                        </span>
                      </div>
                    </Link>

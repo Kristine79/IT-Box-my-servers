@@ -144,7 +144,17 @@ i18n
           "no_credentials": "No credentials found",
           "add_service": "Add Service",
           "invalid_captcha": "Invalid verification code",
-          "refresh": "Refresh"
+          "admin": "Admin",
+          "profile": "Profile",
+          "refresh": "Refresh",
+          "urgent_tasks": "Urgent Tasks",
+          "collapse": "Collapse",
+          "select_date": "Select Date",
+          "show_all": "Show all",
+          "no_tasks_for_date": "No tasks for",
+          "no_urgent_tasks": "No urgent tasks. Great job!",
+          "critical": "Critical",
+          "urgent": "Urgent"
         }
       },
       ru: {
@@ -284,7 +294,17 @@ i18n
           "no_credentials": "Доступы не найдены",
           "add_service": "Добавить сервис",
           "invalid_captcha": "Неверный код проверки",
-          "refresh": "Обновить"
+          "admin": "Админ",
+          "profile": "Профиль",
+          "refresh": "Обновить",
+          "urgent_tasks": "Срочные задачи",
+          "collapse": "Свернуть",
+          "select_date": "Выбрать дату",
+          "show_all": "Показать все",
+          "no_tasks_for_date": "Нет задач на",
+          "no_urgent_tasks": "Нет срочных задач. Отличная работа!",
+          "critical": "Критично",
+          "urgent": "Срочно"
         }
       }
     },
