@@ -3,6 +3,10 @@
 import { useTranslation } from "react-i18next";
 import { Check, Zap, Shield, Crown } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/providers';
+import { defaultPricing } from '@/lib/contentDefaults';
 
 const container = {
   hidden: { opacity: 0 },
@@ -20,53 +24,22 @@ const item = {
 };
 
 export default function PricingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
+  const lang = isEn ? 'en' : 'ru';
+  const [content, setContent] = useState(defaultPricing);
+  const [loading, setLoading] = useState(true);
 
-  const plans = [
-    {
-      id: 'free',
-      name: t('plan_free'),
-      price: '0',
-      duration: t('plan_days'),
-      features: [
-        t('plan_features_free'),
-        t('feat_basic_tracking'),
-        t('feat_1_user')
-      ],
-      icon: Zap,
-      color: 'text-blue-400',
-      current: true
-    },
-    {
-      id: 'basic',
-      name: t('plan_basic'),
-      price: '300',
-      duration: t('plan_month'),
-      features: [
-        t('plan_features_basic'),
-        t('feat_encrypted'),
-        t('feat_priority')
-      ],
-      icon: Shield,
-      color: 'text-purple-400',
-      current: false
-    },
-    {
-      id: 'pro',
-      name: t('plan_pro'),
-      price: '700',
-      duration: t('plan_month'),
-      features: [
-        t('plan_features_pro'),
-        t('feat_unlimited_share'),
-        t('feat_api'),
-        t('feat_manager')
-      ],
-      icon: Crown,
-      color: 'text-amber-500',
-      current: false
-    }
-  ];
+  useEffect(() => {
+    getDoc(doc(db, 'siteContent', 'pricing')).then(snap => {
+      if (snap.exists()) setContent(snap.data() as typeof defaultPricing);
+    }).catch(console.error).finally(() => setLoading(false));
+  }, []);
+
+  const c = content[lang] || defaultPricing[lang];
+  const plans = c.plans;
+
+  if (loading) return <div className="p-8 opacity-50">{t('loading')}</div>;
 
   return (
     <motion.div 
@@ -105,7 +78,10 @@ export default function PricingPage() {
       </motion.div>
 
       <div className="grid md:grid-cols-3 gap-8">
-        {plans.map((plan) => (
+        {plans.map((plan, idx) => {
+          const PlanIcon = [Zap, Shield, Crown][idx];
+          const planColor = ['text-blue-400', 'text-purple-400', 'text-amber-500'][idx];
+          return (
           <motion.div 
             key={plan.id}
             variants={item}
@@ -118,8 +94,8 @@ export default function PricingPage() {
             )}
             
             <div className="flex items-center gap-4 mb-8">
-              <div className={`neu-panel-inset p-3 rounded-2xl ${plan.color}`}>
-                <plan.icon className="w-8 h-8" />
+              <div className={`neu-panel-inset p-3 rounded-2xl ${planColor}`}>
+                <PlanIcon className="w-8 h-8" />
               </div>
               <div>
                 <h3 className="text-xl font-bold">{plan.name}</h3>
@@ -148,16 +124,17 @@ export default function PricingPage() {
               {plan.current ? t('plan_current') : t('plan_choose')}
             </button>
           </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       <motion.div variants={item} className="neu-panel p-8 md:p-12 text-center bg-muted/30">
-        <h3 className="text-2xl font-bold mb-4">{t('enterprise_title')}</h3>
+        <h3 className="text-2xl font-bold mb-4">{c.enterpriseTitle}</h3>
         <p className="text-[var(--neu-text-muted)] mb-8 max-w-xl mx-auto">
-          {t('enterprise_desc')}
+          {c.enterpriseDesc}
         </p>
         <a href="mailto:info@premiumwebsite.ru" className="neu-button neu-button-accent px-10 py-4 font-bold inline-block">
-          {t('contact_sales')}
+          {c.contactSales}
         </a>
       </motion.div>
     </motion.div>

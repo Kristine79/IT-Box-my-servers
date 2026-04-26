@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 import config from '@/firebase-applet-config.json';
 import { getFirestore } from 'firebase-admin/firestore';
+import crypto from 'crypto';
 
 if (!admin.apps.length) {
   // Use ADC (Application Default Credentials) provided by Google Cloud Run.
@@ -12,16 +13,30 @@ if (!admin.apps.length) {
 
 const db = getFirestore(admin.app(), config.firestoreDatabaseId);
 
+function verifyYooKassaWebhook(body: string, signature: string | null, secretKey: string): boolean {
+  if (!signature) return false;
+  const hmac = crypto.createHmac('sha256', secretKey);
+  hmac.update(body);
+  const digest = hmac.digest('base64');
+  return digest === signature;
+}
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const bodyText = await req.text();
+    const body = JSON.parse(bodyText);
 
-    // The YooKassa webhook payload:
-    // {
-    //   "type": "notification",
-    //   "event": "payment.succeeded",
-    //   "object": { ... payment object ... }
-    // }
+    const YOOKASSA_SECRET_KEY = process.env.YOOKASSA_SECRET_KEY;
+    if (!YOOKASSA_SECRET_KEY) {
+      console.error('YOOKASSA_SECRET_KEY not configured');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    const signature = req.headers.get('Authorization') || req.headers.get('authorization');
+    if (!verifyYooKassaWebhook(bodyText, signature, YOOKASSA_SECRET_KEY)) {
+      console.error('Invalid YooKassa webhook signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
 
     if (body.event === 'payment.succeeded') {
       const payment = body.object;

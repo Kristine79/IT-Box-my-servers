@@ -4,10 +4,27 @@ import { Shield, FolderKanban, Server, Network, KeyRound, Share2, Search, Zap, S
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/providers';
+import { defaultAbout } from '@/lib/contentDefaults';
 
 export default function AboutPage() {
   const { t, i18n } = useTranslation();
   const isEn = i18n.language === 'en';
+  const lang = isEn ? 'en' : 'ru';
+  const [content, setContent] = useState(defaultAbout);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteContent', 'about')).then(snap => {
+      if (snap.exists()) setContent(snap.data() as typeof defaultAbout);
+    }).catch(console.error).finally(() => setLoading(false));
+  }, []);
+
+  const c = content[lang] || defaultAbout[lang];
+
+  if (loading) return <div className="p-8 opacity-50">{t('loading')}</div>;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-10">
@@ -27,11 +44,7 @@ export default function AboutPage() {
             <p className="text-[var(--neu-text-muted)] text-[10px] uppercase tracking-widest mt-0.5">{t('about')}</p>
           </div>
         </div>
-        <p className="text-[var(--neu-text-muted)] leading-relaxed text-sm md:text-base mt-4">
-          {isEn 
-            ? "StackBox is a centralized vault for IT infrastructure: servers, projects, services, access, and secure configuration sharing." 
-            : "StackBox — централизованный сейф для IT-инфраструктуры: серверы, проекты, сервисы, доступы и безопасный шеринг конфигураций."}
-        </p>
+        <p className="text-[var(--neu-text-muted)] leading-relaxed text-sm md:text-base mt-4">{c.intro}</p>
       </motion.div>
 
       {/* Intro section section */}
@@ -42,49 +55,16 @@ export default function AboutPage() {
         className="neu-panel p-6 md:p-8 rounded-2xl"
       >
         <h2 className="text-lg md:text-xl font-bold tracking-tight text-[var(--neu-text)] mb-3">{isEn ? "What is StackBox?" : "Что такое StackBox?"}</h2>
-        <p className="text-[var(--neu-text-muted)] leading-relaxed text-sm md:text-base">
-          {isEn 
-            ? "StackBox is a web application for system administrators, DevOps engineers, and webmasters. It allows you to keep all your infrastructure at your fingertips: servers, projects, services, and credentials — in one secure place."
-            : "StackBox — это веб-приложение для системных администраторов, DevOps-инженеров и веб-мастеров. Оно позволяет держать всю инфраструктуру под рукой: серверы, проекты, сервисы и учётные данные — в одном защищённом месте."}
-        </p>
+        <p className="text-[var(--neu-text-muted)] leading-relaxed text-sm md:text-base">{c.whatIs}</p>
       </motion.div>
 
       {/* Main Modules */}
       <div className="space-y-4">
         <h2 className="text-lg md:text-xl font-bold tracking-tight text-[var(--neu-text)] px-2">{isEn ? "Core Modules" : "Основные модули"}</h2>
         <div className="grid gap-3">
-          <ModuleCard 
-            icon={FolderKanban}
-            title={isEn ? "Projects" : "Проекты"}
-            description={isEn 
-              ? "Manage projects: status, URLs, and tech stack. Links to servers and credentials."
-              : "Управляйте проектами: статус, URL и стек. Привязка серверов и доступов."}
-            delay={0.15}
-          />
-          <ModuleCard 
-            icon={Server}
-            title={isEn ? "Servers" : "Серверы"}
-            description={isEn 
-              ? "Inventory: IP, provider, OS, and notes. Instant linking to projects."
-              : "Инвентаризация: IP, провайдер, ОС и заметки. Мгновенная привязка к проектам."}
-            delay={0.2}
-          />
-          <ModuleCard 
-            icon={Network}
-            title={isEn ? "Services" : "Сервисы"}
-            description={isEn 
-              ? "Dashboard for server services: URLs, ports, and availability status."
-              : "Дашборд сервисов: URL, порты и статус доступности приложений."}
-            delay={0.25}
-          />
-          <ModuleCard 
-            icon={KeyRound}
-            title={isEn ? "Credentials" : "Доступы"}
-            description={isEn 
-              ? "AES-256-GCM encrypted vault for SSH, FTP, DB, and API keys."
-              : "Зашифрованное AES-256-GCM хранилище для SSH, FTP, БД и API ключей."}
-            delay={0.3}
-          />
+          {c.modules.map((m, i) => (
+            <ModuleCard key={i} icon={[FolderKanban, Server, Network, KeyRound][i]} title={m.title} description={m.desc} delay={0.15 + i * 0.05} />
+          ))}
         </div>
       </div>
 
@@ -92,38 +72,9 @@ export default function AboutPage() {
       <div className="space-y-4">
         <h2 className="text-lg md:text-xl font-bold tracking-tight text-[var(--neu-text)] px-2">{isEn ? "Key Features" : "Ключевые возможности"}</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          <ModuleCard 
-            icon={Shield}
-            title={isEn ? "Security" : "Безопасность"}
-            description={isEn ? "AES-256 encryption." : "Шифрование AES-256."}
-            delay={0.4}
-            iconColor="text-blue-400"
-            compact
-          />
-          <ModuleCard 
-            icon={Share2}
-            title={isEn ? "Sharing" : "Шеринг"}
-            description={isEn ? "Secure temporary links." : "Временные ссылки."}
-            delay={0.45}
-            iconColor="text-blue-400"
-            compact
-          />
-          <ModuleCard 
-            icon={Smartphone}
-            title={isEn ? "PWA" : "PWA"}
-            description={isEn ? "Native web experience." : "Нативное веб-приложение."}
-            delay={0.5}
-            iconColor="text-blue-400"
-            compact
-          />
-          <ModuleCard 
-            icon={Search}
-            title={isEn ? "Search" : "Поиск"}
-            description={isEn ? "Instant global search." : "Мгновенный поиск."}
-            delay={0.55}
-            iconColor="text-blue-400"
-            compact
-          />
+          {c.features.map((f, i) => (
+            <ModuleCard key={i} icon={[Shield, Share2, Smartphone, Search][i]} title={f.title} description={f.desc} delay={0.4 + i * 0.05} iconColor="text-blue-400" compact />
+          ))}
         </div>
       </div>
 
@@ -131,34 +82,9 @@ export default function AboutPage() {
       <div className="space-y-6">
         <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[var(--neu-text)] px-2">{isEn ? "Who is it for?" : "Для кого?"}</h2>
         <div className="grid gap-6 md:grid-cols-2">
-          <AudienceCard 
-            title={isEn ? "System Administrator" : "Системный администратор"}
-            description={isEn 
-              ? "Maintains a full server registry, stores encrypted SSH/RDP access, shares configuration via temporary links."
-              : "Ведёт полный реестр серверов компании, хранит SSH/RDP-доступы в зашифрованном виде, делится конфигурацией с коллегами через временные ссылки."}
-            delay={0.7}
-          />
-          <AudienceCard 
-            title={isEn ? "DevOps Engineer" : "DevOps-инженер"}
-            description={isEn 
-              ? "Structures infrastructure by projects, links services to servers, tracks each project's technology stack."
-              : "Структурирует инфраструктуру по проектам, привязывает сервисы к серверам, отслеживает стек технологий каждого проекта."}
-            delay={0.75}
-          />
-          <AudienceCard 
-            title={isEn ? "Webmaster / Freelancer" : "Веб-мастер / фрилансер"}
-            description={isEn 
-              ? "Manages client hostings and sites, stores FTP/cPanel credentials, quickly finds servers by project."
-              : "Управляет хостингами и сайтами клиентов, хранит FTP/cPanel-доступы, быстро находит нужный сервер по проекту."}
-            delay={0.8}
-          />
-          <AudienceCard 
-            title={isEn ? "Small IT Team" : "Небольшая IT-команда"}
-            description={isEn 
-              ? "Centralized infrastructure knowledge hub instead of fragmented tables and messengers."
-              : "Централизованное хранилище знаний об инфраструктуре вместо разрозненных таблиц и мессенджеров."}
-            delay={0.85}
-          />
+          {c.audience.map((a, i) => (
+            <AudienceCard key={i} title={a.title} description={a.desc} delay={0.7 + i * 0.05} />
+          ))}
         </div>
       </div>
 

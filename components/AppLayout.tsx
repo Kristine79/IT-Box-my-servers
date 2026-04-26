@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/providers';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, Search, X } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, Search, X, LogIn, Settings, Sparkles, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -19,9 +19,10 @@ import { NotificationBell } from './NotificationBell';
 // import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { AIConsultant } from './AIConsultant';
+import { CommandPalette } from './CommandPalette';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isPaywall, login, loginWithEmail, logout } = useAuth();
+  const { user, loading, isPaywall, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme } = useAuth();
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -53,6 +54,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (theme === 'glassmorphism') {
+      document.body.classList.add('glassmorphism-theme');
+    } else {
+      document.body.classList.remove('glassmorphism-theme');
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -136,6 +145,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                <CreditCard className="h-4 w-4 shrink-0" />
                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('pricing')}</span>}
             </Link>
+            <div className={cn("my-1.5 h-px neu-panel-inset opacity-50", desktopSidebarOpen ? "w-full" : "w-10")} />
+            {user && !user.isAnonymous && (
+            <Link href="/admin" title={!desktopSidebarOpen ? 'Admin' : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/admin" ? "neu-panel text-[var(--neu-accent)] border-l-2 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+               <Settings className="h-4 w-4 shrink-0" />
+               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">Admin</span>}
+            </Link>
+            )}
           </nav>
         </div>
        </aside>
@@ -143,10 +159,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center justify-between px-4 mt-2">
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Open sidebar menu">
               <Menu className="h-5 w-5" />
             </Button>
-            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 hidden md:flex" onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}>
+            <Button variant="outline" size="icon" className="neu-button h-8 w-8 border-0 bg-transparent shrink-0 hidden md:flex" onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)} aria-label="Toggle sidebar">
               <Menu className="h-5 w-5" />
             </Button>
             
@@ -159,18 +175,39 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex gap-1.5 md:gap-2 ml-auto items-center">
-             <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme}>
+             <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} role="button" tabIndex={0}>
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
              </div>
-             <NotificationBell />
-             <div className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0">
-                <Search className="h-4 w-4" />
+               <div 
+               className={cn(
+                 "neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center shrink-0 relative",
+                 canUsePremiumTheme ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+                 theme === 'glassmorphism' && canUsePremiumTheme && "text-[var(--neu-accent)]"
+               )} 
+               onClick={() => {
+                 if (!canUsePremiumTheme) return;
+                 setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
+               }}
+               title={canUsePremiumTheme ? (theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism Premium') : 'Premium theme - requires active subscription'}
+               aria-label={canUsePremiumTheme ? 'Toggle premium theme' : 'Premium theme locked'}
+               role="button"
+               tabIndex={0}
+             >
+                <Sparkles className="h-4 w-4" />
+                {!canUsePremiumTheme && <Lock className="h-2.5 w-2.5 absolute bottom-1 right-1 text-[var(--neu-text-muted)]" />}
              </div>
-               <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')}>
+             <NotificationBell />
+             <CommandPalette />
+               <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')} aria-label="Change language">
                   {i18n.language === 'ru' ? 'RU' : 'EN'}
                </div>
-              {user && !user.isAnonymous && (
-                <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout}>
+              {user && user.isAnonymous ? (
+                <div className="neu-button h-9 px-3 md:h-10 hidden md:flex items-center justify-center cursor-pointer gap-2 shrink-0" onClick={login}>
+                  <LogIn className="h-4 w-4" />
+                  <span className="text-xs font-bold">{t('sign_in', 'Войти')}</span>
+                </div>
+              ) : (
+                <div className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer ml-1 md:ml-3 text-red-500 shrink-0" onClick={logout} aria-label="Log out" role="button" tabIndex={0}>
                   <LogOut className="h-4 w-4" />
                 </div>
               )}
@@ -235,6 +272,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        {t('pricing')}
                     </Link>
                     <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
+                    {user && !user.isAnonymous && (
+                    <Link href="/admin" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/admin" ? "neu-panel text-[var(--neu-accent)] border-l-4 border-[var(--neu-accent)]" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <Settings className="h-4 w-4" />
+                       Admin
+                    </Link>
+                    )}
+                    <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
                     <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
                        {isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}
@@ -243,7 +287,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
                        {t('change_language', 'Сменить язык')}
                     </button>
-                    {user && !user.isAnonymous && (
+                    {user && user.isAnonymous ? (
+                      <button onClick={() => { login(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-accent)] opacity-80 hover:opacity-100 text-left w-full">
+                        <LogIn className="h-4 w-4 shrink-0" />
+                        {t('sign_in', 'Войти')}
+                      </button>
+                    ) : (
                       <button onClick={logout} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-red-500 opacity-60 hover:opacity-100 text-left w-full">
                         <LogOut className="h-4 w-4 shrink-0" />
                         {t('logout', 'Выйти')}
@@ -256,6 +305,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
+          <nav aria-label="Breadcrumb" className="mb-4">
+            <ol className="flex items-center gap-2 text-xs text-[var(--neu-text-muted)]">
+              <li>
+                <Link href="/" className="hover:text-[var(--neu-accent)] transition-colors">{t('dashboard', 'Dashboard')}</Link>
+              </li>
+              {pathname !== '/' && (
+                <>
+                  <li>/</li>
+                  <li className="capitalize text-[var(--neu-text)] font-medium">{pathname.split('/')[1] || ''}</li>
+                </>
+              )}
+            </ol>
+          </nav>
           <AnimatePresence initial={false}>
             <motion.div
               key={pathname}

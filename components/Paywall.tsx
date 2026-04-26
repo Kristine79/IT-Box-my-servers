@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/providers';
 import { Lock, CreditCard, Check, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 export function Paywall() {
   const { logout, user } = useAuth();
@@ -23,12 +24,12 @@ export function Paywall() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert('Failed to initialize payment.');
+        toast.error('Failed to initialize payment. Please try again.');
         setLoading(false);
       }
     } catch (e) {
       console.error(e);
-      alert('Error connecting to payment provider.');
+      toast.error('Error connecting to payment provider. Please try again later.');
       setLoading(false);
     }
   };

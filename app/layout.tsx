@@ -7,6 +7,9 @@ import { NotificationProvider } from '@/lib/notifications';
 import { Toaster } from '@/components/ui/sonner';
 import { GoogleAnalytics } from '@next/third-parties/google';
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-YD1230Y7R5';
+import { SchemaMarkup } from '@/components/SchemaMarkup';
+
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
@@ -54,47 +57,16 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
         <meta name="theme-color" content="#3b82f6" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="manifest" href="/manifest.json" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebApplication",
-              "name": "StackBox",
-              "url": "https://stackbox.app",
-              "applicationCategory": "BusinessApplication",
-              "operatingSystem": "Web, Windows, macOS, Linux, iOS, Android",
-              "description": "Unified secure vault for IT infrastructure: servers, projects, services, and credentials with enterprise-grade encryption.",
-              "author": {
-                "@type": "Organization",
-                "name": "StackBox Team"
-              },
-              "offers": {
-                "@type": "AggregateOffer",
-                "priceCurrency": "RUB",
-                "lowPrice": "0",
-                "highPrice": "700",
-                "offerCount": "3"
-              },
-              "featureList": [
-                "AES-256-GCM Encryption",
-                "Secure Configuration Sharing",
-                "Project & Server Management",
-                "Team Collaboration",
-                "PWA Support"
-              ]
-            })
-          }}
-        />
       </head>
       <body suppressHydrationWarning>
+        <SchemaMarkup />
         <Providers>
           <NotificationProvider>
             {children}
             <Toaster />
           </NotificationProvider>
         </Providers>
-        <GoogleAnalytics gaId="G-YD1230Y7R5" />
+        <GoogleAnalytics gaId={GA_ID} />
       </body>
     </html>
   );

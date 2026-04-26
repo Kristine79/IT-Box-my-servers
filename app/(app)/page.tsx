@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { collection, query, where, getCountFromServer, getDocs, orderBy, limit, collectionGroup, doc, getDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
-import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, ArrowRight, Info, AlertTriangle } from "lucide-react";
+import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, Info, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
@@ -34,10 +34,14 @@ export default function DashboardPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   
+interface Project { id: string; name?: string; description?: string; status?: string; }
+interface ServerItem { id: string; name?: string; ipAddress?: string; }
+interface Task { id: string; projectId?: string | null; projectName?: string; content?: string; priority?: string; status?: string; createdAt?: any; }
+
   const [stats, setStats] = useState({ projects: 0, servers: 0, services: 0, credentials: 0 });
-  const [recentProjects, setRecentProjects] = useState<any[]>([]);
-  const [recentServers, setRecentServers] = useState<any[]>([]);
-  const [urgentTasks, setUrgentTasks] = useState<any[]>([]);
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+  const [recentServers, setRecentServers] = useState<ServerItem[]>([]);
+  const [urgentTasks, setUrgentTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -119,13 +123,32 @@ export default function DashboardPage() {
     loadDashboard();
   }, [user]);
 
-  const displayedTasks = selectedDate ? urgentTasks.filter((t: any) => {
+  const displayedTasks = selectedDate ? urgentTasks.filter((t: Task) => {
     if (!t.createdAt) return true; // if no date, maybe keep it or exclude it. Let's keep it.
     const d = t.createdAt.toDate ? t.createdAt.toDate() : new Date(t.createdAt);
     return d.toDateString() === selectedDate.toDateString();
   }) : urgentTasks;
 
-  if (loading) return <div className="p-4 opacity-50">{t('loading')}</div>;
+  if (loading) return (
+    <div className="flex flex-col gap-8 md:gap-10 max-w-7xl mx-auto animate-pulse">
+      <div className="h-8 w-48 bg-[var(--neu-bg)] rounded-xl neu-panel-inset" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {[1,2,3,4].map(i => (
+          <div key={i} className="neu-panel p-4 md:p-5 h-28 rounded-2xl">
+            <div className="h-4 w-24 bg-[var(--neu-bg)] rounded neu-panel-inset mb-4" />
+            <div className="h-8 w-12 bg-[var(--neu-bg)] rounded neu-panel-inset" />
+          </div>
+        ))}
+      </div>
+      <div className="neu-panel p-5 rounded-2xl h-48">
+        <div className="h-4 w-32 bg-[var(--neu-bg)] rounded neu-panel-inset mb-4" />
+        <div className="space-y-3">
+          <div className="h-10 bg-[var(--neu-bg)] rounded-lg neu-panel-inset" />
+          <div className="h-10 bg-[var(--neu-bg)] rounded-lg neu-panel-inset" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <motion.div 
@@ -289,7 +312,7 @@ export default function DashboardPage() {
                    )}
                  </div>
                ) : (
-                 displayedTasks.map((task: any) => (
+                 displayedTasks.map((task: Task) => (
                    <Link 
                      key={task.id} 
                      href={`/projects?project=${task.projectId}`} 

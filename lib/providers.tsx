@@ -7,7 +7,6 @@ import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from '
 import firebaseConfig from '../firebase-applet-config.json';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/lib/i18n';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -17,6 +16,8 @@ export const auth = getAuth(app);
 
 
 
+type ThemeMode = 'neumorphic' | 'glassmorphism';
+
 type AuthContextType = {
   user: User | null;
   loading: boolean;
@@ -24,11 +25,14 @@ type AuthContextType = {
   trialEndsAt: Date | null;
   subscriptionEndsAt: Date | null;
   notificationsEnabled: boolean;
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  canUsePremiumTheme: boolean;
   login: () => Promise<void>;
   loginWithEmail: (e: string, p: string, isRegister?: boolean) => Promise<void>;
   loginWithApple: () => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (data: Partial<{ notificationsEnabled: boolean }>) => Promise<void>;
+  updateProfile: (data: Partial<{ notificationsEnabled: boolean; theme?: ThemeMode }>) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -38,6 +42,9 @@ const AuthContext = createContext<AuthContextType>({
   trialEndsAt: null,
   subscriptionEndsAt: null,
   notificationsEnabled: true,
+  theme: 'neumorphic',
+  setTheme: () => {},
+  canUsePremiumTheme: false,
   login: async () => {},
   loginWithEmail: async () => {},
   loginWithApple: async () => {},
@@ -56,6 +63,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
   const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<Date | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [theme, setThemeState] = useState<ThemeMode>('neumorphic');
 
   useEffect(() => {
     let unsubscribeDoc = () => {};
@@ -69,11 +77,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
           uid: 'guest_user', 
           email: 'guest@stackbox.pro', 
           displayName: 'Guest',
-          isAnonymous: true 
-        } as any);
+          isAnonymous: true,
+          providerId: '',
+          metadata: {},
+          photoURL: null,
+          phoneNumber: null,
+          emailVerified: false,
+          tenantId: null,
+          refreshToken: '',
+          toJSON: () => ({}),
+          delete: async () => {},
+          getIdToken: async () => '',
+          getIdTokenResult: async () => ({} as unknown as import('firebase/auth').IdTokenResult),
+          reload: async () => {},
+          providerData: [],
+        } as unknown as User);
       }
       
-      const currentUser = u || { uid: 'guest_user' } as any;
+      const currentUser = u || { uid: 'guest_user', email: 'guest@stackbox.pro' };
       
       // Check user document for subscription logic
       const userRef = doc(db, 'users', currentUser.uid);
@@ -117,6 +138,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
           // If trial is over and no active subscription (or it's expired) -> Paywall
           setIsPaywall(trialExpired && subExpired);
+          
+          // Theme: load saved or default to neumorphic
+          const savedTheme = data.theme as ThemeMode;
+          if (savedTheme === 'glassmorphism' || savedTheme === 'neumorphic') {
+            setThemeState(savedTheme);
+          }
+          
+          // Can use premium theme if has active subscription or trial
+          const canUsePremium = !trialExpired || !subExpired;
+          // If they selected premium but can't use it, revert to neumorphic
+          if (savedTheme === 'glassmorphism' && !canUsePremium) {
+            setThemeState('neumorphic');
+          }
         }
         setLoading(false);
       }, (err) => {
@@ -158,14 +192,31 @@ export function Providers({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   };
 
-  const updateProfile = async (data: Partial<{ notificationsEnabled: boolean }>) => {
+  const setTheme = async (newTheme: ThemeMode) => {
+    if (!user) return;
+    if (newTheme === 'glassmorphism') {
+      const now = new Date();
+      const trialActive = trialEndsAt ? now <= trialEndsAt : false;
+      const subActive = subscriptionEndsAt ? now <= subscriptionEndsAt : false;
+      if (!trialActive && !subActive) {
+        // Can't switch to premium without active subscription
+        return;
+      }
+    }
+    setThemeState(newTheme);
+    await setDoc(doc(db, 'users', user.uid), { theme: newTheme }, { merge: true });
+  };
+
+  const canUsePremiumTheme = !user?.isAnonymous && (!!trialEndsAt && new Date() <= trialEndsAt || !!subscriptionEndsAt && new Date() <= subscriptionEndsAt);
+
+  const updateProfile = async (data: Partial<{ notificationsEnabled: boolean; theme?: ThemeMode }>) => {
     if (!user) return;
     await setDoc(doc(db, 'users', user.uid), data, { merge: true });
   };
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, login, loginWithEmail, loginWithApple, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>

@@ -91,6 +91,107 @@
     --neu-shadow-inset: inset 6px 6px 12px var(--neu-dark), inset -6px -6px 12px var(--neu-light);
     --neu-shadow-hover: 4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light);
     --neu-shadow-active: inset 4px 4px 8px var(--neu-dark), inset -4px -4px 8px var(--neu-light);
+
+    /* Glassmorphism Premium Theme - Trust Colors */
+    --glass-bg: #0f172a;
+    --glass-bg-secondary: #1e293b;
+    --glass-surface: rgba(30, 41, 59, 0.7);
+    --glass-surface-hover: rgba(51, 65, 85, 0.8);
+    --glass-border: rgba(148, 163, 184, 0.15);
+    --glass-border-strong: rgba(148, 163, 184, 0.3);
+    --glass-accent: #0ea5e9;
+    --glass-accent-glow: rgba(14, 165, 233, 0.3);
+    --glass-text: #f1f5f9;
+    --glass-text-muted: #94a3b8;
+    --glass-success: #10b981;
+    --glass-warning: #f59e0b;
+    --glass-danger: #ef4444;
+    --glass-shadow: 0 8px 32px rgba(2, 8, 20, 0.4);
+    --glass-shadow-glow: 0 0 20px rgba(14, 165, 233, 0.15);
+    --glass-blur: blur(16px) saturate(180%);
+    --glass-blur-light: blur(8px) saturate(140%);
+}
+
+/* Glassmorphism body class */
+body.glassmorphism-theme {
+    background: var(--glass-bg) !important;
+    color: var(--glass-text) !important;
+}
+
+body.glassmorphism-theme * {
+    --neu-bg: var(--glass-bg) !important;
+    --neu-light: var(--glass-bg-secondary) !important;
+    --neu-dark: rgba(2, 8, 20, 0.5) !important;
+    --neu-accent: var(--glass-accent) !important;
+    --neu-text: var(--glass-text) !important;
+    --neu-text-muted: var(--glass-text-muted) !important;
+}
+
+body.glassmorphism-theme .neu-panel,
+body.glassmorphism-theme .neu-card,
+body.glassmorphism-theme .neu-button,
+body.glassmorphism-theme .neu-button-accent {
+    background: var(--glass-surface) !important;
+    border: 1px solid var(--glass-border) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-shadow) !important;
+    border-radius: 1rem !important;
+}
+
+body.glassmorphism-theme .neu-panel:hover,
+body.glassmorphism-theme .neu-card:hover {
+    background: var(--glass-surface-hover) !important;
+    border-color: var(--glass-border-strong) !important;
+    box-shadow: var(--glass-shadow), var(--glass-shadow-glow) !important;
+}
+
+body.glassmorphism-theme .neu-button-accent {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.8), rgba(59, 130, 246, 0.8)) !important;
+    border-color: var(--glass-accent-glow) !important;
+    box-shadow: var(--glass-shadow), 0 0 20px var(--glass-accent-glow) !important;
+}
+
+body.glassmorphism-theme .neu-button-accent:hover {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 1), rgba(59, 130, 246, 1)) !important;
+    box-shadow: var(--glass-shadow), 0 0 30px var(--glass-accent-glow) !important;
+}
+
+body.glassmorphism-theme .neu-input {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid var(--glass-border) !important;
+    backdrop-filter: var(--glass-blur-light);
+    color: var(--glass-text) !important;
+}
+
+body.glassmorphism-theme .neu-input:focus {
+    border-color: var(--glass-accent) !important;
+    box-shadow: 0 0 0 3px var(--glass-accent-glow) !important;
+}
+
+body.glassmorphism-theme .neu-sidebar {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-right: 1px solid var(--glass-border) !important;
+    backdrop-filter: var(--glass-blur);
+}
+
+body.glassmorphism-theme .neu-sidebar-item:hover {
+    background: var(--glass-surface-hover) !important;
+}
+
+body.glassmorphism-theme .neu-sidebar-item.active {
+    background: rgba(14, 165, 233, 0.15) !important;
+    border-left: 3px solid var(--glass-accent) !important;
+}
+
+body.glassmorphism-theme .neu-divider {
+    background: linear-gradient(90deg, transparent, var(--glass-border-strong), transparent) !important;
+}
+
+body.glassmorphism-theme header {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    backdrop-filter: var(--glass-blur);
 }
 
 .dark {
@@ -237,5 +338,17 @@
     outline: none;
     border-color: var(--neu-accent);
     box-shadow: inset 8px 8px 16px var(--neu-dark), inset -8px -8px 16px var(--neu-light);
+  }
+}
+
+/* Accessibility: respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -3,11 +3,16 @@ import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 
+const MAX_TEXT_LENGTH = 5000;
+
 export async function POST(req: Request) {
   try {
     const { text } = await req.json();
-    if (!text) {
-      return NextResponse.json({ error: 'Missing text' }, { status: 400 });
+    if (!text || typeof text !== 'string') {
+      return NextResponse.json({ error: 'Missing or invalid text' }, { status: 400 });
+    }
+    if (text.length > MAX_TEXT_LENGTH) {
+      return NextResponse.json({ error: `Text exceeds maximum length of ${MAX_TEXT_LENGTH} characters` }, { status: 400 });
     }
 
     const secretKey = process.env.AES_SECRET_KEY;

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, Bot, User, Minimize2, Maximize2 } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
@@ -31,7 +31,15 @@ export function AIConsultant() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHiddenFully, setIsHiddenFully] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ai-chat-history');
+      if (saved) {
+        try { return JSON.parse(saved); } catch { return []; }
+      }
+    }
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,6 +50,12 @@ export function AIConsultant() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && messages.length > 0) {
+      localStorage.setItem('ai-chat-history', JSON.stringify(messages));
+    }
+  }, [messages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -150,33 +164,34 @@ export function AIConsultant() {
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className={`fixed z-50 flex flex-col overflow-hidden max-w-md w-[calc(100vw-32px)] sm:w-[500px] h-[calc(100vh-100px)] sm:h-[700px] bottom-24 right-4 sm:bottom-24 sm:right-6 bg-[var(--neu-bg)] neu-panel shadow-[12px_12px_24px_var(--neu-dark),-12px_-12px_24px_var(--neu-light)]`}
+            className={`fixed z-50 flex flex-col overflow-hidden max-w-md w-[calc(100vw-32px)] sm:w-[400px] md:w-[420px] h-[calc(100vh-120px)] sm:h-[560px] bottom-20 right-3 sm:right-4 md:right-5 bg-[var(--neu-bg)] neu-panel shadow-[8px_8px_16px_var(--neu-dark),-8px_-8px_16px_var(--neu-light)]`}
             style={{ 
-              borderRadius: '48px',
+              borderRadius: '32px',
             }}
           >
             {/* Header */}
-            <div className="flex flex-col items-center justify-center pt-10 pb-6 relative">
-              <h3 className="font-bold text-[32px] text-[var(--neu-text)] text-opacity-80 tracking-tight">StackBox AI Chat</h3>
+            <div className="flex flex-col items-center justify-center pt-5 pb-3 relative shrink-0">
+              <h3 className="font-bold text-[20px] md:text-[22px] text-[var(--neu-text)] text-opacity-80 tracking-tight">StackBox AI Chat</h3>
               <button 
                 onClick={() => setIsOpen(false)} 
-                className="absolute right-8 top-10 p-1.5 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
+                className="absolute right-5 top-4 p-1 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
                 title="Закрыть"
+                aria-label="Close AI chat"
               >
-                <X className="w-7 h-7" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Main Panel Container */}
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden min-h-0">
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-8 py-4 space-y-8">
+              <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
                 {messages.map((msg, idx) => (
                   <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[100%] px-8 py-6 text-[18px] leading-relaxed ${
+                    <div className={`max-w-[90%] px-4 py-3 text-[14px] leading-relaxed ${
                       msg.role === 'user' 
-                        ? 'bg-[var(--neu-accent)] text-white font-semibold rounded-3xl rounded-br-md shadow-[0_4px_14px_0_rgba(14,165,233,0.39)]' 
-                        : 'neu-panel-inset text-[var(--neu-text)] font-medium rounded-3xl !shadow-[inset_4px_4px_10px_var(--neu-dark),inset_-4px_-4px_10px_var(--neu-light)] border-2 border-white/5'
+                        ? 'bg-[var(--neu-accent)] text-white font-medium rounded-2xl rounded-br-md shadow-[0_4px_14px_0_rgba(14,165,233,0.39)]' 
+                        : 'neu-panel-inset text-[var(--neu-text)] font-medium rounded-2xl !shadow-[inset_3px_3px_8px_var(--neu-dark),inset_-3px_-3px_8px_var(--neu-light)] border border-white/5'
                     }`}>
                       {msg.role === 'user' ? (
                         <div>{msg.text}</div>
@@ -201,24 +216,25 @@ export function AIConsultant() {
               </div>
 
               {/* Input Form */}
-              <div className="px-8 pb-10 pt-4 bg-transparent mt-auto">
-                <form onSubmit={handleSubmit} className="flex gap-5 relative items-center">
-                  <div className="flex-1 relative h-[64px]">
+              <div className="px-5 pb-6 pt-3 bg-transparent mt-auto">
+                <form onSubmit={handleSubmit} className="flex gap-3 relative items-center">
+                  <div className="flex-1 relative h-[48px]">
                     <input
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder={t('ai_placeholder', 'Спросите меня о чем угодно...')}
-                      className="w-full h-full text-[17px] pl-8 pr-12 neu-panel-inset rounded-[24px] font-medium text-[var(--neu-text)] placeholder:text-[var(--neu-text-muted)] placeholder:opacity-60 focus:outline-none !shadow-[inset_4px_4px_10px_var(--neu-dark),inset_-4px_-4px_10px_var(--neu-light)]"
+                      className="w-full h-full text-[14px] pl-4 pr-10 neu-panel-inset rounded-2xl font-medium text-[var(--neu-text)] placeholder:text-[var(--neu-text-muted)] placeholder:opacity-60 focus:outline-none !shadow-[inset_3px_3px_8px_var(--neu-dark),inset_-3px_-3px_8px_var(--neu-light)]"
                       disabled={isLoading}
                     />
                   </div>
                   <button 
                     type="submit" 
                     disabled={!input.trim() || isLoading}
-                    className="w-[64px] h-[64px] shrink-0 flex items-center justify-center rounded-full neu-panel text-[#2563ea] disabled:opacity-50 disabled:cursor-not-allowed shadow-[6px_6px_12px_var(--neu-dark),-6px_-6px_12px_var(--neu-light)] active:shadow-inner"
+                    className="w-[44px] h-[44px] shrink-0 flex items-center justify-center rounded-full neu-panel text-[#2563ea] disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_8px_var(--neu-dark),-4px_-4px_8px_var(--neu-light)] active:shadow-inner"
+                    aria-label="Send message"
                   >
-                    <Send className="w-[28px] h-[28px] ml-1" />
+                    <Send className="w-5 h-5 ml-0.5" />
                   </button>
                 </form>
               </div>

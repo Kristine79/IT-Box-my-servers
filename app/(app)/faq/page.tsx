@@ -3,56 +3,27 @@
 import { HelpCircle } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
-
-const faqs_ru = [
-  {
-    q: "Что такое StackBox?",
-    a: "StackBox — это централизованный сейф для хранения информации о ваших серверах, проектах, микросервисах и аутентификационных данных."
-  },
-  {
-    q: "Где хранятся мои пароли?",
-    a: "Все данные безопасно хранятся в защищенной базе. При этом пароли, приватные ключи и прочие критические секреты шифруются на сервере с использованием алгоритма AES-256-GCM."
-  },
-  {
-    q: "Могу ли я поделиться доступом с подрядчиком?",
-    a: "Да, вы можете сгенерировать временную ссылку с определенным таймером и счетчиком открытий, чтобы безопасно передать нужные доступы внешним подрядчикам. Пароли в ссылку не попадают."
-  },
-  {
-    q: "Как восстановить доступ?",
-    a: "Авторизация происходит через ваш привязанный Google Аккаунт. Отдельного мастер-пароля, который можно было бы потерять или забыть, в системе не требуется."
-  },
-  {
-    q: "Безопасно ли использовать систему?",
-    a: "Да, мы используем строгие правила безопасности Firebase Security Rules (нулевое доверие). Пароли скрыты по умолчанию, и их дешифровка происходит исключительно при явном запросе через защищенный API."
-  }
-];
-
-const faqs_en = [
-  {
-    q: "What is StackBox?",
-    a: "StackBox is a centralized vault for storing information about your servers, projects, microservices, and authentication data."
-  },
-  {
-    q: "Where are my passwords stored?",
-    a: "All data is securely stored in a protected database. Passwords, private keys, and other critical secrets are encrypted on the server using the AES-256-GCM algorithm."
-  },
-  {
-    q: "Can I share access with a contractor?",
-    a: "Yes, you can generate a temporary link with a specific timer and view counter to securely transfer necessary access to external contractors. Passwords are not included in the link."
-  },
-  {
-    q: "How do I restore access?",
-    a: "Authorization happens through your linked Google Account. No separate master password, which could be lost or forgotten, is required in the system."
-  },
-  {
-    q: "Is it safe to use the system?",
-    a: "Yes, we use strict Firebase Security Rules (zero trust). Passwords are hidden by default, and their decryption occurs only upon explicit request through a secure API."
-  }
-];
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/providers';
+import { defaultFAQ } from '@/lib/contentDefaults';
 
 export default function FAQPage() {
   const { t, i18n } = useTranslation();
-  const faqs = i18n.language === 'en' ? faqs_en : faqs_ru;
+  const [faqs, setFaqs] = useState(i18n.language === 'en' ? defaultFAQ.en : defaultFAQ.ru);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteContent', 'faq')).then(snap => {
+      if (snap.exists()) {
+        const data = snap.data() as typeof defaultFAQ;
+        const langFaqs = i18n.language === 'en' ? data.en : data.ru;
+        if (langFaqs && langFaqs.length > 0) setFaqs(langFaqs);
+      }
+    }).catch(console.error).finally(() => setLoading(false));
+  }, [i18n.language]);
+
+  if (loading) return <div className="p-8 opacity-50">{t('loading')}</div>;
 
   return (
     <div className="mx-auto max-w-4xl space-y-12 pb-10">
