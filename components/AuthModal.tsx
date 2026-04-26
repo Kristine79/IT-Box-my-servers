@@ -83,7 +83,12 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
       onSuccess?.();
       onClose();
     } catch (e: any) {
-      toast.error(getAuthError(e));
+      if (e?.code === 'auth/email-already-in-use') {
+        setIsRegister(false);
+        toast.error('Этот email уже зарегистрирован. Введите пароль и войдите.');
+      } else {
+        toast.error(getAuthError(e));
+      }
     } finally {
       setLoadingProvider(null);
     }
