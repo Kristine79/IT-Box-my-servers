@@ -187,7 +187,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   const loginWithMagicLink = async (email: string) => {
     const actionCodeSettings = {
-      url: `${window.location.origin}/pricing?magiclink=1`,
+      url: `${window.location.origin}/pricing`,
       handleCodeInApp: true,
     };
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);

@@ -6,6 +6,27 @@ import { X, Mail, Github, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/lib/providers';
 import { toast } from 'sonner';
 
+const firebaseErrorRu: Record<string, string> = {
+  'auth/account-exists-with-different-credential':
+    'Этот email уже привязан к другому способу входа. Войдите через Google или GitHub, которым регистрировались.',
+  'auth/popup-closed-by-user': 'Окно входа закрыто. Попробуйте ещё раз.',
+  'auth/popup-blocked': 'Браузер заблокировал всплывающее окно. Разрешите попапы для этого сайта.',
+  'auth/cancelled-popup-request': 'Запрос отменён. Попробуйте ещё раз.',
+  'auth/unauthorized-continue-uri': 'Домен не авторизован в Firebase. Обратитесь к администратору.',
+  'auth/invalid-email': 'Неверный формат email.',
+  'auth/user-not-found': 'Пользователь с таким email не найден.',
+  'auth/wrong-password': 'Неверный пароль.',
+  'auth/too-many-requests': 'Слишком много попыток. Подождите немного и попробуйте снова.',
+  'auth/network-request-failed': 'Ошибка сети. Проверьте подключение к интернету.',
+  'auth/email-already-in-use': 'Этот email уже используется.',
+  'auth/operation-not-allowed': 'Этот способ входа отключён. Обратитесь к администратору.',
+};
+
+function getAuthError(e: any): string {
+  const code = e?.code as string;
+  return firebaseErrorRu[code] || e?.message || 'Произошла ошибка. Попробуйте ещё раз.';
+}
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,7 +48,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
       onSuccess?.();
       onClose();
     } catch (e: any) {
-      toast.error(e?.message || 'Ошибка входа через Google');
+      toast.error(getAuthError(e));
     } finally {
       setLoadingProvider(null);
     }
@@ -40,7 +61,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
       onSuccess?.();
       onClose();
     } catch (e: any) {
-      toast.error(e?.message || 'Ошибка входа через GitHub');
+      toast.error(getAuthError(e));
     } finally {
       setLoadingProvider(null);
     }
@@ -56,7 +77,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
       await loginWithMagicLink(magicEmail.trim());
       setMagicSent(true);
     } catch (e: any) {
-      toast.error(e?.message || 'Ошибка отправки ссылки');
+      toast.error(getAuthError(e));
     } finally {
       setLoadingProvider(null);
     }
