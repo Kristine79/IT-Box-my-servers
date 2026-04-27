@@ -55,3 +55,7 @@ User-agent: Bytespider
 Disallow: /
 
 Sitemap: https://stackbox.app/sitemap.xml
+
+# LLM-readable product description
+# https://llmstxt.org
+LLMs: https://stackbox.app/llms.txt

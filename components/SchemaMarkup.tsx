@@ -123,7 +123,23 @@ export function SchemaMarkup() {
     ]
   } : null;
 
-  const schemas: Record<string, unknown>[] = [organization, softwareApp];
+  const webPage = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "StackBox",
+    "url": `${baseUrl}${pathname}`,
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": ["h1", "h2", "article"]
+    },
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "StackBox",
+      "url": baseUrl
+    }
+  };
+
+  const schemas: Record<string, unknown>[] = [organization, softwareApp, webPage];
   if (pathname === '/faq' || pathname === '/') schemas.push(faqSchema);
   if (breadcrumbs) schemas.push(breadcrumbs);
 
