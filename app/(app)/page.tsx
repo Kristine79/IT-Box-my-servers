@@ -5,7 +5,7 @@ import i18n from "i18next";
 import { useEffect, useState } from "react";
 import { collection, query, where, getCountFromServer, getDocs, orderBy, limit, collectionGroup, doc, getDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
-import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, Info, AlertTriangle, CalendarDays, X } from "lucide-react";
+import { FolderKanban, Server, Network, KeyRound, Lock, MousePointer2, Users, Info, AlertTriangle, CalendarDays, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +34,8 @@ const item = {
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, userPlan, planLimits } = useAuth();
+  const [showUpsell, setShowUpsell] = useState(false);
   
 interface Project { id: string; name?: string; description?: string; status?: string; }
 interface ServerItem { id: string; name?: string; ipAddress?: string; }
@@ -47,6 +48,18 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  useEffect(() => {
+    if (userPlan === 'free' && user && !user.isAnonymous) {
+      const key = 'stackbox_visit_count';
+      const count = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+      localStorage.setItem(key, String(count));
+      const dismissed = localStorage.getItem('stackbox_upsell_dismissed');
+      if (count >= 5 && !dismissed) {
+        setShowUpsell(true);
+      }
+    }
+  }, [userPlan, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -339,6 +352,31 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
           </div>
         </motion.div>
       </div>
+      {showUpsell && userPlan === 'free' && (
+        <motion.div variants={item} className="neu-panel p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative">
+          <div className="neu-panel-inset p-3 rounded-2xl text-purple-500 shrink-0">
+            <Zap className="w-6 h-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-sm">{t('upsell_title', 'Пора расширяться?')}</h3>
+            <p className="text-xs text-[var(--neu-text-muted)] mt-1">
+              {t('upsell_desc', 'Вы активно пользуетесь сервисом. Оформите Standard за 300 \u20bd/мес — всего 10 \u20bd в день. Экспорт, уведомления, до 10 проектов.')}
+            </p>
+          </div>
+          <Link href="/pricing" className="neu-button neu-button-accent px-5 py-2 text-sm font-bold shrink-0">
+            {t('upgrade_to_standard', 'Перейти на Standard')}
+          </Link>
+          <button
+            className="absolute top-3 right-3 opacity-40 hover:opacity-100 transition-opacity"
+            onClick={() => {
+              setShowUpsell(false);
+              localStorage.setItem('stackbox_upsell_dismissed', '1');
+            }}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

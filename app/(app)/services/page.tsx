@@ -8,11 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, ExternalLink, Share2, Network, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 export default function ServicesPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, planLimits } = useAuth();
   const { sendNotification } = useNotifications();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [services, setServices] = useState<any[]>([]);
   const [servers, setServers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,8 +82,24 @@ export default function ServicesPage() {
            <h1 className="text-3xl font-bold tracking-tight mb-2">{t('services')}</h1>
            <p className="text-[var(--neu-text-muted)]">{t('manage_services_desc')}</p>
         </div>
+        <UpgradeModal
+          open={upgradeOpen}
+          onClose={() => setUpgradeOpen(false)}
+          title={t('limit_services_title', 'Достигнут лимит сервисов')}
+          description={t('limit_services_desc', 'В бесплатном тарифе можно добавить не больше {{max}} сервисов. Переходите на Standard — до 15 сервисов.', { max: planLimits.maxServices })}
+          targetPlan="standard"
+          buttonText={t('view_plans', 'Смотреть тарифы')}
+        />
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center font-semibold text-sm">
+          <DialogTrigger
+            className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center font-semibold text-sm"
+            onClick={(e) => {
+              if (services.length >= planLimits.maxServices) {
+                e.preventDefault();
+                setUpgradeOpen(true);
+              }
+            }}
+          >
              <Plus className="w-4 h-4 mr-2"/> {t('add_service')}
           </DialogTrigger>
           <DialogContent className="border-0 sm:rounded-3xl p-6 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>

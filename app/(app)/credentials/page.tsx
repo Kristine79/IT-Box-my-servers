@@ -9,11 +9,16 @@ import { Plus, Trash2, Eye, EyeOff, Copy, KeyRound, ShieldCheck, Database, Termi
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { ShareModal } from "@/components/ShareModal";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 export default function CredentialsPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, planLimits } = useAuth();
   const { sendNotification } = useNotifications();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeTitle, setUpgradeTitle] = useState('');
+  const [upgradeDesc, setUpgradeDesc] = useState('');
+  const [upgradeTarget, setUpgradeTarget] = useState<'standard' | 'premium'>('standard');
   const [credentials, setCredentials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -159,8 +164,26 @@ export default function CredentialsPage() {
              {t('secure_storage')}
            </p>
         </div>
+        <UpgradeModal
+          open={upgradeOpen}
+          onClose={() => setUpgradeOpen(false)}
+          title={upgradeTitle}
+          description={upgradeDesc}
+          targetPlan={upgradeTarget}
+        />
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 shadow-rose-500/30 flex items-center font-semibold">
+          <DialogTrigger
+            className="neu-button neu-button-accent px-6 py-3 shrink-0 shadow-rose-500/30 flex items-center font-semibold"
+            onClick={(e) => {
+              if (credentials.length >= planLimits.maxCredentials) {
+                e.preventDefault();
+                setUpgradeTitle(t('limit_credentials_title', 'Достигнут лимит доступов'));
+                setUpgradeDesc(t('limit_credentials_desc', 'В бесплатном тарифе можно хранить не больше {{max}} доступов. Переходите на Standard — до 50 доступов.', { max: planLimits.maxCredentials }));
+                setUpgradeTarget('standard');
+                setUpgradeOpen(true);
+              }
+            }}
+          >
              <Plus className="w-4 h-4 mr-2"/> {t('add_credential')}
           </DialogTrigger>
           <DialogContent className="border-0 sm:rounded-3xl p-6 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
@@ -236,6 +259,13 @@ export default function CredentialsPage() {
                        <button 
                           className="neu-button h-8 w-8 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" 
                           onClick={() => {
+                            if (!planLimits.canShare) {
+                              setUpgradeTitle(t('sharing_locked_title', 'Шаринг недоступен'));
+                              setUpgradeDesc(t('sharing_locked_desc', 'Делиться настройками с коллегами можно в тарифах Standard (только чтение) и Premium (гибкие права).'));
+                              setUpgradeTarget('standard');
+                              setUpgradeOpen(true);
+                              return;
+                            }
                             setShareCredential(c);
                             setShareModalOpen(true);
                           }}

@@ -19,14 +19,16 @@ import { NotificationBell } from './NotificationBell';
 
 import { AIConsultant } from './AIConsultant';
 import { CommandPalette } from './CommandPalette';
+import { UpgradeModal } from './UpgradeModal';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isPaywall, isAdmin, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme } = useAuth();
+  const { user, loading, isPaywall, isAdmin, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme, planLimits } = useAuth();
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [themeUpgradeOpen, setThemeUpgradeOpen] = useState(false);
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
 
@@ -113,6 +115,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--neu-bg)] text-[var(--neu-text)]">
+      <UpgradeModal
+        open={themeUpgradeOpen}
+        onClose={() => setThemeUpgradeOpen(false)}
+        title={t('theme_locked_title', 'Выбор темы — в Standard')}
+        description={t('theme_locked_desc', 'В бесплатном тарифе доступна только стандартная тема. Переходите на Standard за 300 ₽/мес — выбор цветовой схемы, экспорт, уведомления и многое другое.')}
+        targetPlan="standard"
+      />
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[999] focus:px-4 focus:py-2 focus:neu-button focus:neu-button-accent focus:rounded-lg">
         {t('skip_to_content', 'Skip to content')}
       </a>
@@ -197,17 +206,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 "text-[var(--neu-text)] opacity-60 hover:opacity-100"
               )}
               onClick={() => {
+                if (!planLimits.canChangeTheme) {
+                  setThemeUpgradeOpen(true);
+                  return;
+                }
                 if (!canUsePremiumTheme) return;
                 setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
               }}
-              disabled={!canUsePremiumTheme}
+              disabled={false}
             >
               <Sparkles className="h-4 w-4 shrink-0" />
-              {!canUsePremiumTheme && !desktopSidebarOpen && <Lock className="h-2 w-2 absolute bottom-2 right-2 text-[var(--neu-text-muted)]" />}
+              {!planLimits.canChangeTheme && !desktopSidebarOpen && <Lock className="h-2 w-2 absolute bottom-2 right-2 text-[var(--neu-text-muted)]" />}
               {desktopSidebarOpen && (
                 <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">
                   {theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism'}
-                  {!canUsePremiumTheme && <span className="text-[10px] text-[var(--neu-text-muted)] ml-1">🔒</span>}
+                  {!planLimits.canChangeTheme && <Lock className="inline h-3 w-3 text-[var(--neu-text-muted)] ml-1" />}
                 </span>
               )}
             </button>
@@ -334,20 +347,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </button>
                     <button 
                       onClick={() => { 
+                        if (!planLimits.canChangeTheme) {
+                          setThemeUpgradeOpen(true);
+                          setSidebarOpen(false);
+                          return;
+                        }
                         if (!canUsePremiumTheme) return;
                         setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
                         setSidebarOpen(false); 
                       }} 
                       className={cn(
                         "flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-left w-full",
-                        canUsePremiumTheme ? "" : "opacity-50",
+                        planLimits.canChangeTheme && canUsePremiumTheme ? "" : "opacity-50",
                         theme === 'glassmorphism' && canUsePremiumTheme ? "text-[var(--neu-accent)]" : "text-[var(--neu-text)]",
                         "opacity-60 hover:opacity-100"
                       )}
                     >
                        <Sparkles className="h-4 w-4 shrink-0" />
                        {theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism'}
-                       {!canUsePremiumTheme && <span className="text-[10px] text-[var(--neu-text-muted)] ml-1">🔒</span>}
+                       {!planLimits.canChangeTheme && <Lock className="inline h-3 w-3 text-[var(--neu-text-muted)] ml-1" />}
                     </button>
                     <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>

@@ -7,6 +7,7 @@ import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from '
 import firebaseConfig from '../firebase-applet-config.json';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/lib/i18n';
+import { PlanId, getPlanLimits, PlanLimits } from '@/lib/planLimits';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -29,6 +30,8 @@ type AuthContextType = {
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
   canUsePremiumTheme: boolean;
+  userPlan: PlanId;
+  planLimits: PlanLimits;
   login: () => Promise<void>;
   loginWithGitHub: () => Promise<void>;
   loginWithEmail: (e: string, p: string, isRegister?: boolean) => Promise<void>;
@@ -49,6 +52,8 @@ const AuthContext = createContext<AuthContextType>({
   theme: 'neumorphic',
   setTheme: () => {},
   canUsePremiumTheme: false,
+  userPlan: 'free',
+  planLimits: getPlanLimits('free'),
   login: async () => {},
   loginWithGitHub: async () => {},
   loginWithEmail: async () => {},
@@ -70,6 +75,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<Date | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [theme, setThemeState] = useState<ThemeMode>('neumorphic');
+  const [userPlan, setUserPlan] = useState<PlanId>('free');
 
   useEffect(() => {
     let unsubscribeDoc = () => {};
@@ -137,6 +143,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
           setTrialEndsAt(tEnd);
           setSubscriptionEndsAt(sEnd);
           setNotificationsEnabled(data.notificationsEnabled !== false);
+          const plan = (data.plan as PlanId) || 'free';
+          setUserPlan(plan);
 
           const now = new Date();
           const trialExpired = tEnd ? now > tEnd : false;
@@ -239,7 +247,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, userPlan, planLimits: getPlanLimits(userPlan), login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>

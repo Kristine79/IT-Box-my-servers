@@ -9,11 +9,13 @@ import { Plus, Trash2, Edit, Share2, Server as ServerIcon, Network, Cpu, MemoryS
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { ShareModal } from "@/components/ShareModal";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 export default function ServersPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, planLimits, userPlan } = useAuth();
   const { sendNotification } = useNotifications();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [servers, setServers] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,8 +88,24 @@ export default function ServersPage() {
            <h1 className="text-3xl font-bold tracking-tight mb-2">{t('servers')}</h1>
            <p className="text-[var(--neu-text-muted)]">{t('manage_servers_desc')}</p>
         </div>
+        <UpgradeModal
+          open={upgradeOpen}
+          onClose={() => setUpgradeOpen(false)}
+          title={t('limit_servers_title', 'Можно только {{max}} сервер', { max: planLimits.maxServers, count: planLimits.maxServers })}
+          description={t('limit_servers_desc', 'В бесплатном тарифе разрешён только {{max}} сервер. Чтобы управлять несколькими — выберите Standard (до 5) или Premium (без ограничений).', { max: planLimits.maxServers })}
+          targetPlan="standard"
+          buttonText={t('view_plans', 'Смотреть тарифы')}
+        />
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm">
+          <DialogTrigger
+            className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm"
+            onClick={(e) => {
+              if (servers.length >= planLimits.maxServers) {
+                e.preventDefault();
+                setUpgradeOpen(true);
+              }
+            }}
+          >
              <Plus className="w-4 h-4 mr-2"/> {t('create_server')}
           </DialogTrigger>
           <DialogContent className="border-0 sm:rounded-3xl p-6 max-w-2xl" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
@@ -194,6 +212,10 @@ export default function ServersPage() {
                           className="neu-button h-10 w-10 text-blue-500" 
                           title={t('share')}
                           onClick={() => {
+                            if (!planLimits.canShare) {
+                              setUpgradeOpen(true);
+                              return;
+                            }
                             setShareServer({
                               ...s,
                               projectName: project?.name

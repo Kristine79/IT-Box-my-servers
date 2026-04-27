@@ -13,30 +13,51 @@ import { SchemaMarkup } from '@/components/SchemaMarkup';
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: 'StackBox | Unified Asset Manager',
-  description: 'Secure vault for your infrastructure. Manage servers, services, and credentials with enterprise-grade AES-256-GCM encryption.',
-  keywords: ['IT Asset Management', 'Infrastructure Security', 'Server Management', 'Credential Vault', 'AES-256-GCM'],
-  authors: [{ name: 'StackBox Team' }],
+  metadataBase: new URL('https://stackbox.app'),
+  title: {
+    default: 'StackBox — Управление серверами, сервисами и доступами',
+    template: '%s | StackBox',
+  },
+  description: 'Единое защищённое хранилище IT-инфраструктуры: серверы, проекты, сервисы и пароли с шифрованием AES-256-GCM. Бесплатный старт.',
+  keywords: [
+    'управление серверами', 'хранилище паролей', 'менеджер IT инфраструктуры',
+    'IT Asset Management', 'server management', 'credential vault',
+    'AES-256-GCM', 'шифрование данных', 'SaaS', 'StackBox',
+    'безопасность инфраструктуры', 'командный доступ',
+  ],
+  authors: [{ name: 'StackBox Team', url: 'https://stackbox.app' }],
+  creator: 'StackBox',
+  publisher: 'StackBox',
   icons: {
     icon: '/favicon.ico',
+    apple: '/logo.png',
   },
   openGraph: {
-    title: 'StackBox | Unified Asset Manager',
-    description: 'Secure vault for your infrastructure tools.',
+    title: 'StackBox — Управление серверами и доступами',
+    description: 'Единое защищённое хранилище IT-инфраструктуры. Шифрование AES-256. Бесплатный старт.',
     type: 'website',
     url: 'https://stackbox.app',
     siteName: 'StackBox',
+    locale: 'ru_RU',
+    alternateLocale: 'en_US',
+    images: [{
+      url: '/api/og',
+      width: 1200,
+      height: 630,
+      alt: 'StackBox — Управление IT-инфраструктурой',
+    }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StackBox | Unified Asset Manager',
-    description: 'Secure vault for your infrastructure tools.',
+    title: 'StackBox — Управление серверами и доступами',
+    description: 'Единое защищённое хранилище IT-инфраструктуры. AES-256. Бесплатный старт.',
+    images: ['/api/og'],
   },
   alternates: {
     canonical: 'https://stackbox.app',
     languages: {
-      'en-US': 'https://stackbox.app',
-      'ru-RU': 'https://stackbox.app/ru', // Assuming middleware or segment is planned, but adding it for crawler awareness
+      'ru-RU': 'https://stackbox.app',
+      'en-US': 'https://stackbox.app/en',
     },
   },
   manifest: '/manifest.json',
@@ -46,8 +67,12 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large' as const,
+      'max-snippet': -1,
     },
   },
+  category: 'technology',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
@@ -56,7 +81,12 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <head>
         <meta name="theme-color" content="#3b82f6" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
       </head>
       <body suppressHydrationWarning>
         <SchemaMarkup />

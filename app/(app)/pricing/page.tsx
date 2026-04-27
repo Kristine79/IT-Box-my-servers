@@ -38,6 +38,7 @@ export default function PricingPage() {
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
   const [pendingPrice, setPendingPrice] = useState<string | null>(null);
   const [pendingName, setPendingName] = useState<string | null>(null);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   useEffect(() => {
     // Temporarily disabled: using default pricing from contentDefaults.ts
@@ -90,6 +91,7 @@ export default function PricingPage() {
           email: user!.email,
           planId,
           amount: price,
+          billingPeriod,
           description: `StackBox — ${planName}`
         })
       });
@@ -109,16 +111,19 @@ export default function PricingPage() {
 
   const handleCheckout = async (planId: string, price: string, planName: string) => {
     if (planId === 'free') return;
+    const finalPrice = billingPeriod === 'annual' && plans.find(p => p.id === planId)?.annualPrice
+      ? plans.find(p => p.id === planId)!.annualPrice
+      : price;
     if (!user || user.isAnonymous) {
       // Save intent, open auth modal
-      sessionStorage.setItem('pendingPlan', JSON.stringify({ planId, price, name: planName }));
+      sessionStorage.setItem('pendingPlan', JSON.stringify({ planId, price: finalPrice, name: planName, billingPeriod }));
       setPendingPlanId(planId);
       setPendingPrice(price);
       setPendingName(planName);
       setAuthModalOpen(true);
       return;
     }
-    startCheckout(planId, price, planName);
+    startCheckout(planId, finalPrice, planName);
   };
 
   const c = content[lang] || defaultPricing[lang];
@@ -170,6 +175,21 @@ export default function PricingPage() {
         <p className="text-lg text-[var(--neu-text-muted)] max-w-2xl mx-auto">
           {t('pricing_subtitle')}
         </p>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <button
+            onClick={() => setBillingPeriod('monthly')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'neu-button-accent neu-button' : 'neu-button opacity-60'}`}
+          >
+            {isEn ? 'Monthly' : 'Помесячно'}
+          </button>
+          <button
+            onClick={() => setBillingPeriod('annual')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${billingPeriod === 'annual' ? 'neu-button-accent neu-button' : 'neu-button opacity-60'}`}
+          >
+            {isEn ? 'Annual' : 'Годовой'}
+            <span className="ml-1.5 text-green-500 text-xs">− 17%</span>
+          </button>
+        </div>
       </motion.div>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -199,10 +219,12 @@ export default function PricingPage() {
 
             <div className="mb-8">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">{plan.price} ₽</span>
+                <span className="text-4xl font-bold">
+                  {billingPeriod === 'annual' && plan.annualPrice ? plan.annualPrice : plan.price} ₽
+                </span>
                 <span className="text-[var(--neu-text-muted)]">{plan.duration}</span>
               </div>
-              {plan.annualPrice && (
+              {billingPeriod === 'annual' && plan.annualPrice && (
                 <div className="mt-2 text-sm text-[var(--neu-text-muted)]">
                   <span className="line-through opacity-60">{plan.price} ₽</span>
                   {' → '}

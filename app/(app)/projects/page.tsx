@@ -9,6 +9,7 @@ import { Plus, Trash2, Edit, FolderKanban, Globe, Code2, ClipboardList, CheckCir
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/lib/notifications";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string; projectName: string; onTaskChange?: () => void }) {
   const { t } = useTranslation();
@@ -185,7 +186,7 @@ const POPULAR_STACKS = ["React", "Next.js", "Vue", "Angular", "Node.js", "Expres
 
 export default function ProjectsPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, planLimits, userPlan } = useAuth();
   const { sendNotification } = useNotifications();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -193,6 +194,7 @@ export default function ProjectsPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // Sorting & Filtering State
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'status'>('date');
@@ -357,8 +359,23 @@ export default function ProjectsPage() {
           <h1 className="text-3xl font-bold tracking-tight mb-2">{t('projects')}</h1>
           <p className="text-[var(--neu-text-muted)]">{t('manage_projects_desc')}</p>
         </div>
+        <UpgradeModal
+          open={upgradeOpen}
+          onClose={() => setUpgradeOpen(false)}
+          title={t('limit_projects_title', 'Достигнут лимит проектов')}
+          description={t('limit_projects_desc', 'В бесплатном тарифе можно хранить не больше {{max}} проектов. Переходите на Standard за 300 \u20bd/мес — до 10 проектов, экспорт данных и уведомления.', { max: planLimits.maxProjects })}
+          targetPlan="standard"
+        />
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm">
+          <DialogTrigger
+            className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm"
+            onClick={(e) => {
+              if (projects.length >= planLimits.maxProjects) {
+                e.preventDefault();
+                setUpgradeOpen(true);
+              }
+            }}
+          >
              <Plus className="w-4 h-4 mr-2"/> {t('create_project')}
           </DialogTrigger>
           <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>

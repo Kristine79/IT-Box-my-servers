@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { uid, email, amount, description, planId } = await req.json();
+    const { uid, email, amount, description, planId, billingPeriod } = await req.json();
 
     if (!uid) {
       return NextResponse.json({ error: 'Missing UID' }, { status: 400 });
@@ -26,8 +26,12 @@ export async function POST(req: Request) {
 
     const basicAuth = Buffer.from(`${YOOKASSA_SHOP_ID}:${YOOKASSA_SECRET_KEY}`).toString('base64');
 
-    const amountValue = amount ? parseFloat(amount).toFixed(2) : '300.00';
-    const paymentDescription = description || 'StackBox subscription';
+    const isAnnual = billingPeriod === 'annual';
+    const monthlyAmount = amount ? parseFloat(amount) : 300;
+    const amountValue = isAnnual ? (monthlyAmount * 12).toFixed(2) : monthlyAmount.toFixed(2);
+    const paymentDescription = description
+      ? `${description}${isAnnual ? ' (годовой)' : ''}`
+      : `StackBox subscription${isAnnual ? ' (annual)' : ''}`;
 
     const paymentPayload = {
       amount: {
@@ -40,7 +44,7 @@ export async function POST(req: Request) {
         return_url: returnUrl
       },
       description: paymentDescription,
-      metadata: { uid, planId: planId || 'basic' }
+      metadata: { uid, planId: planId || 'standard', billingPeriod: billingPeriod || 'monthly' }
     };
 
     const response = await fetch('https://api.yookassa.ru/v3/payments', {

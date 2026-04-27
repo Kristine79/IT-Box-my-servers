@@ -3,30 +3,55 @@ Allow: /
 Allow: /about
 Allow: /faq
 Allow: /pricing
+Allow: /privacy
+Allow: /consent
 Disallow: /api/
 Disallow: /projects/
 Disallow: /servers/
 Disallow: /services/
 Disallow: /credentials/
 Disallow: /share-links/
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /share/
 
 # AI Crawler Optimization
 User-agent: GPTBot
 Allow: /about
 Allow: /faq
 Allow: /pricing
+Allow: /privacy
 Disallow: /
 
 User-agent: Google-Extended
 Allow: /about
 Allow: /faq
 Allow: /pricing
+Allow: /privacy
 Disallow: /
 
 User-agent: anthropic-ai
 Allow: /about
 Allow: /faq
 Allow: /pricing
+Allow: /privacy
+Disallow: /
+
+User-agent: ClaudeBot
+Allow: /about
+Allow: /faq
+Allow: /pricing
+Allow: /privacy
+Disallow: /
+
+User-agent: PerplexityBot
+Allow: /about
+Allow: /faq
+Allow: /pricing
+Allow: /privacy
+Disallow: /
+
+User-agent: Bytespider
 Disallow: /
 
 Sitemap: https://stackbox.app/sitemap.xml
