@@ -40,9 +40,11 @@ export default function PricingPage() {
   const [pendingName, setPendingName] = useState<string | null>(null);
 
   useEffect(() => {
-    getDoc(doc(db, 'siteContent', 'pricing')).then(snap => {
-      if (snap.exists()) setContent(snap.data() as typeof defaultPricing);
-    }).catch(console.error).finally(() => setLoading(false));
+    // Temporarily disabled: using default pricing from contentDefaults.ts
+    // getDoc(doc(db, 'siteContent', 'pricing')).then(snap => {
+    //   if (snap.exists()) setContent(snap.data() as typeof defaultPricing);
+    // }).catch(console.error).finally(() => setLoading(false));
+    setLoading(false);
   }, []);
 
   // Handle magic link return: sign in and auto-checkout
