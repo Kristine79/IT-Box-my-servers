@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, Edit, Share2, Server as ServerIcon, Network, Cpu, MemoryStick } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
+import { ShareModal } from "@/components/ShareModal";
 
 export default function ServersPage() {
   const { t } = useTranslation();
@@ -25,6 +26,10 @@ export default function ServersPage() {
   const [os, setOs] = useState("");
   const [projectId, setProjectId] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Share modal state
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareServer, setShareServer] = useState<any>(null);
 
   const loadData = useCallback(async () => {
     if(!user) return;
@@ -89,39 +94,39 @@ export default function ServersPage() {
             <DialogHeader><DialogTitle className="text-2xl font-bold">{t('create_server')}</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <div className="space-y-1">
-                   <label htmlFor="srv-name" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                   <input id="srv-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="Frontend Node 1" />
+                 <div className="space-y-1.5">
+                   <label htmlFor="srv-name" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                   <input id="srv-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full py-2.5" placeholder="Frontend Node 1" />
                  </div>
-                 <div className="space-y-1">
-                   <label htmlFor="srv-host" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_host')}</label>
-                   <input id="srv-host" required value={ipAddress} onChange={e=>setIp(e.target.value)} className="neu-input w-full font-mono text-sm" placeholder="192.168.1.1" />
+                 <div className="space-y-1.5">
+                   <label htmlFor="srv-host" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_host')}</label>
+                   <input id="srv-host" required value={ipAddress} onChange={e=>setIp(e.target.value)} className="neu-input w-full py-2.5 font-mono text-sm" placeholder="192.168.1.1" />
                  </div>
-                 <div className="space-y-1">
-                   <label htmlFor="srv-provider" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_provider')}</label>
-                   <input id="srv-provider" value={provider} onChange={e=>setProvider(e.target.value)} className="neu-input w-full" placeholder="AWS / DigitalOcean..." />
+                 <div className="space-y-1.5">
+                   <label htmlFor="srv-provider" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_provider')}</label>
+                   <input id="srv-provider" value={provider} onChange={e=>setProvider(e.target.value)} className="neu-input w-full py-2.5" placeholder="AWS / DigitalOcean..." />
                  </div>
-                 <div className="space-y-1">
-                   <label htmlFor="srv-os" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_os')}</label>
-                   <input id="srv-os" value={os} onChange={e=>setOs(e.target.value)} className="neu-input w-full" placeholder="Ubuntu 22.04 LTS" />
+                 <div className="space-y-1.5">
+                   <label htmlFor="srv-os" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_os')}</label>
+                   <input id="srv-os" value={os} onChange={e=>setOs(e.target.value)} className="neu-input w-full py-2.5" placeholder="Ubuntu 22.04 LTS" />
                  </div>
                </div>
                
-               <div className="space-y-1">
-                 <label htmlFor="srv-project" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_project')}</label>
+               <div className="space-y-1.5">
+                 <label htmlFor="srv-project" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_project')}</label>
                  <select 
                     id="srv-project"
                     value={projectId} 
                     onChange={(e) => setProjectId(e.target.value)}
-                    className="neu-input w-full appearance-none cursor-pointer"
+                    className="neu-input w-full py-2.5 appearance-none cursor-pointer"
                   >
                     <option value="" className="bg-[var(--neu-bg)]">{t('status_no_project')}</option>
                     {projects.map(p => <option key={p.id} value={p.id} className="bg-[var(--neu-bg)]">{p.name}</option>)}
                  </select>
                </div>
                
-               <div className="space-y-1">
-                  <label htmlFor="srv-notes" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
+               <div className="space-y-1.5">
+                  <label htmlFor="srv-notes" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
                   <textarea id="srv-notes" value={notes} onChange={e=>setNotes(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_notes')} />
                </div>
 
@@ -185,7 +190,17 @@ export default function ServersPage() {
                        }}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                        </button>
-                       <button className="neu-button h-10 w-10 text-blue-500" title={t('share')}>
+                       <button 
+                          className="neu-button h-10 w-10 text-blue-500" 
+                          title={t('share')}
+                          onClick={() => {
+                            setShareServer({
+                              ...s,
+                              projectName: project?.name
+                            });
+                            setShareModalOpen(true);
+                          }}
+                        >
                           <Share2 className="w-4 h-4" />
                        </button>
                        <button className="neu-button h-10 w-10 text-red-500" onClick={() => handleDelete(s.id)}>
@@ -197,6 +212,17 @@ export default function ServersPage() {
            )})}
         </div>
       )}
+
+      <ShareModal
+        isOpen={shareModalOpen}
+        onClose={() => {
+          setShareModalOpen(false);
+          setShareServer(null);
+        }}
+        resourceType="server"
+        resourceData={shareServer || {}}
+        resourceId={shareServer?.id || ''}
+      />
     </div>
   );
 }

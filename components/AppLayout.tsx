@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/providers';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, X, LogIn, Settings, Sparkles, Lock } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, X, LogIn, Settings, Sparkles, Lock, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -40,6 +40,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     profile: t('profile'),
     faq: t('faq'),
     about: t('about', 'About'),
+    privacy: t('privacy_policy'),
+    consent: t('personal_data_consent'),
   };
   const [isNavigating, setIsNavigating] = useState(false);
   
@@ -172,10 +174,51 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             )}
             {user && !user.isAnonymous && (
             <Link href="/profile" title={!desktopSidebarOpen ? t('profile') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/profile" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <KeyRound className="h-4 w-4 shrink-0" />
+               <User className="h-4 w-4 shrink-0" />
                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('profile')}</span>}
             </Link>
             )}
+            <div className={cn("my-1.5 h-px neu-panel-inset opacity-50", desktopSidebarOpen ? "w-full" : "w-10")} />
+            <button 
+              title={!desktopSidebarOpen ? (isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')) : undefined}
+              className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", "text-[var(--neu-text)] opacity-60 hover:opacity-100")}
+              onClick={toggleTheme}
+            >
+              {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+              {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}</span>}
+            </button>
+            <button 
+              title={!desktopSidebarOpen ? (theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism Premium') : undefined}
+              className={cn(
+                "flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden relative",
+                desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10",
+                canUsePremiumTheme ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+                theme === 'glassmorphism' && canUsePremiumTheme && "text-[var(--neu-accent)]",
+                "text-[var(--neu-text)] opacity-60 hover:opacity-100"
+              )}
+              onClick={() => {
+                if (!canUsePremiumTheme) return;
+                setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
+              }}
+              disabled={!canUsePremiumTheme}
+            >
+              <Sparkles className="h-4 w-4 shrink-0" />
+              {!canUsePremiumTheme && !desktopSidebarOpen && <Lock className="h-2 w-2 absolute bottom-2 right-2 text-[var(--neu-text-muted)]" />}
+              {desktopSidebarOpen && (
+                <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">
+                  {theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism'}
+                  {!canUsePremiumTheme && <span className="text-[10px] text-[var(--neu-text-muted)] ml-1">🔒</span>}
+                </span>
+              )}
+            </button>
+            <button 
+              title={!desktopSidebarOpen ? t('change_language', 'Сменить язык') : undefined}
+              className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", "text-[var(--neu-text)] opacity-60 hover:opacity-100")}
+              onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')}
+            >
+              <span className="h-4 w-4 shrink-0 flex items-center justify-center font-bold text-[10px]">{i18n.language === 'ru' ? 'RU' : 'EN'}</span>
+              {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('change_language', 'Сменить язык')}</span>}
+            </button>
           </nav>
         </div>
        </aside>
@@ -199,31 +242,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex gap-1.5 md:gap-2 ml-auto items-center">
-             <button className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer shrink-0" onClick={toggleTheme} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}>
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-             </button>
-               <button 
-               className={cn(
-                 "neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center shrink-0 relative",
-                 canUsePremiumTheme ? "cursor-pointer" : "cursor-not-allowed opacity-50",
-                 theme === 'glassmorphism' && canUsePremiumTheme && "text-[var(--neu-accent)]"
-               )} 
-               onClick={() => {
-                 if (!canUsePremiumTheme) return;
-                 setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
-               }}
-               title={canUsePremiumTheme ? (theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism Premium') : 'Premium theme - requires active subscription'}
-               aria-label={canUsePremiumTheme ? 'Toggle premium theme' : 'Premium theme locked'}
-               disabled={!canUsePremiumTheme}
-             >
-                <Sparkles className="h-4 w-4" />
-                {!canUsePremiumTheme && <Lock className="h-2.5 w-2.5 absolute bottom-1 right-1 text-[var(--neu-text-muted)]" />}
-             </button>
              <NotificationBell />
              <CommandPalette />
-               <button className="neu-button h-9 w-9 md:h-10 md:w-10 hidden md:flex items-center justify-center cursor-pointer font-bold text-[10px] md:text-xs shrink-0 transition-colors" onClick={() => i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru')} aria-label="Change language">
-                  {i18n.language === 'ru' ? 'RU' : 'EN'}
-               </button>
               {user && user.isAnonymous ? (
                 <button className="neu-button h-9 px-3 md:h-10 hidden md:flex items-center justify-center cursor-pointer gap-2 shrink-0" onClick={login}>
                   <LogIn className="h-4 w-4" />
@@ -301,10 +321,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        {t('admin')}
                     </Link>
                     )}
+                    {user && !user.isAnonymous && (
+                    <Link href="/profile" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/profile" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
+                       <User className="h-4 w-4" />
+                       {t('profile')}
+                    </Link>
+                    )}
                     <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
                     <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
                        {isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}
+                    </button>
+                    <button 
+                      onClick={() => { 
+                        if (!canUsePremiumTheme) return;
+                        setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
+                        setSidebarOpen(false); 
+                      }} 
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-left w-full",
+                        canUsePremiumTheme ? "" : "opacity-50",
+                        theme === 'glassmorphism' && canUsePremiumTheme ? "text-[var(--neu-accent)]" : "text-[var(--neu-text)]",
+                        "opacity-60 hover:opacity-100"
+                      )}
+                    >
+                       <Sparkles className="h-4 w-4 shrink-0" />
+                       {theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism'}
+                       {!canUsePremiumTheme && <span className="text-[10px] text-[var(--neu-text-muted)] ml-1">🔒</span>}
                     </button>
                     <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
@@ -361,8 +404,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <a href="https://t.me/usefulbots2026_bot" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--neu-accent)] transition-colors">{t('useful_bots')}</a>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <a href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">{t('personal_data_consent')}</a>
-                  <Link href="/privacy-consent" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</Link>
+                  <Link href="/consent" className="hover:text-[var(--neu-accent)] transition-colors">{t('personal_data_consent')}</Link>
+                  <Link href="/privacy" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</Link>
                 </div>
               </footer>
             </motion.div>

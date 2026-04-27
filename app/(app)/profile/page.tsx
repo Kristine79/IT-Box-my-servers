@@ -57,20 +57,23 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="space-y-1">
-          <div className="flex items-center justify-between py-3.5 border-b border-[var(--neu-shadow-dark)]/20">
-            <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)]">
-              <Shield className="w-4 h-4" />
+        <div className="space-y-0">
+          <div className="flex items-start justify-between py-4 gap-4">
+            <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)] pt-0.5">
+              <Shield className="w-4 h-4 shrink-0" />
               <span>Статус доступа</span>
             </div>
-            <StatusBadge active={hasAccess} label={hasAccess ? 'Активен' : 'Нет доступа'} />
+            <div className="text-right shrink-0">
+              <StatusBadge active={hasAccess} label={hasAccess ? 'Активен' : 'Нет доступа'} />
+            </div>
           </div>
-          <div className="flex items-center justify-between py-3.5 border-b border-[var(--neu-shadow-dark)]/20">
-            <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)]">
-              <Clock className="w-4 h-4" />
+          <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
+          <div className="flex items-start justify-between py-4 gap-4">
+            <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)] pt-0.5">
+              <Clock className="w-4 h-4 shrink-0" />
               <span>Пробный период</span>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0">
               <StatusBadge active={trialActive} label={trialActive ? 'Активен' : 'Истёк'} />
               {trialEndsAt && (
                 <p className="text-xs text-[var(--neu-text-muted)] mt-1">
@@ -79,12 +82,13 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          <div className="flex items-center justify-between py-3.5">
-            <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)]">
-              <CalendarDays className="w-4 h-4" />
+          <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
+          <div className="flex items-start justify-between py-4 gap-4">
+            <div className="flex items-center gap-2 text-sm text-[var(--neu-text-muted)] pt-0.5">
+              <CalendarDays className="w-4 h-4 shrink-0" />
               <span>Подписка</span>
             </div>
-            <div className="text-right">
+            <div className="text-right shrink-0">
               {subscriptionEndsAt ? (
                 <>
                   <StatusBadge active={subActive} label={subActive ? 'Активна' : 'Истекла'} />
@@ -93,7 +97,7 @@ export default function ProfilePage() {
                   </p>
                 </>
               ) : (
-                <span className="text-xs text-[var(--neu-text-muted)]">Не оформлена</span>
+                <span className="text-xs text-[var(--neu-text-muted)] inline-block mt-1.5">Не оформлена</span>
               )}
             </div>
           </div>

@@ -5,9 +5,10 @@ import { useEffect, useState, useCallback } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, deleteDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, Eye, EyeOff, Copy, KeyRound, ShieldCheck, Database, TerminalSquare, Key, Globe, Search, Lock } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Copy, KeyRound, ShieldCheck, Database, TerminalSquare, Key, Globe, Search, Lock, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
+import { ShareModal } from "@/components/ShareModal";
 
 export default function CredentialsPage() {
   const { t } = useTranslation();
@@ -28,6 +29,10 @@ export default function CredentialsPage() {
   const [password, setPassword] = useState("");
   const [resourceType, setResourceType] = useState("none");
   const [resourceId, setResourceId] = useState("");
+
+  // Share modal state
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareCredential, setShareCredential] = useState<any>(null);
   const [notes, setNotes] = useState("");
 
   const loadData = useCallback(async () => {
@@ -162,17 +167,17 @@ export default function CredentialsPage() {
             <DialogHeader><DialogTitle className="text-2xl font-bold flex items-center gap-2"><Lock className="w-5 h-5"/> {t('add_credential')}</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <div className="space-y-1">
-                   <label htmlFor="cred-name" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                   <input id="cred-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="e.g. Prod DB Root" />
+                 <div className="space-y-1.5">
+                   <label htmlFor="cred-name" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                   <input id="cred-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full py-2.5" placeholder="e.g. Prod DB Root" />
                  </div>
-                 <div className="space-y-1">
-                   <label htmlFor="cred-type" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_type')}</label>
+                 <div className="space-y-1.5">
+                   <label htmlFor="cred-type" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_type')}</label>
                    <select 
                       id="cred-type"
                       value={type} 
                       onChange={e=>setType(e.target.value)}
-                      className="neu-input w-full appearance-none cursor-pointer"
+                      className="neu-input w-full py-2.5 appearance-none cursor-pointer"
                     >
                       <option value="SSH" className="bg-[var(--neu-bg)]">SSH</option>
                       <option value="FTP" className="bg-[var(--neu-bg)]">FTP</option>
@@ -182,13 +187,13 @@ export default function CredentialsPage() {
                       <option value="OTHER" className="bg-[var(--neu-bg)]">Other</option>
                    </select>
                  </div>
-                 <div className="space-y-1">
-                   <label htmlFor="cred-username" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_username')}</label>
-                   <input id="cred-username" value={username} onChange={e=>setUsername(e.target.value)} className="neu-input w-full" placeholder="root" />
+                 <div className="space-y-1.5">
+                   <label htmlFor="cred-username" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_username')}</label>
+                   <input id="cred-username" value={username} onChange={e=>setUsername(e.target.value)} className="neu-input w-full py-2.5" placeholder="root" />
                  </div>
-                 <div className="space-y-1">
-                   <label htmlFor="cred-password" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)] flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-green-500"/> {t('field_password')}</label>
-                   <input id="cred-password" type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full" placeholder="••••••••••••" />
+                 <div className="space-y-1.5">
+                   <label htmlFor="cred-password" className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)] flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-green-500 shrink-0"/> {t('field_password')}</label>
+                   <input id="cred-password" type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="neu-input w-full py-2.5" placeholder="••••••••••••" />
                  </div>
                </div>
 
@@ -197,6 +202,17 @@ export default function CredentialsPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <ShareModal
+        isOpen={shareModalOpen}
+        onClose={() => {
+          setShareModalOpen(false);
+          setShareCredential(null);
+        }}
+        resourceType="credential"
+        resourceData={shareCredential || {}}
+        resourceId={shareCredential?.id || ''}
+      />
 
       {loading ? <p className="opacity-50">{t('loading')}</p> : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -217,6 +233,16 @@ export default function CredentialsPage() {
                     </div>
                     
                     <div className="flex gap-2">
+                       <button 
+                          className="neu-button h-8 w-8 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" 
+                          onClick={() => {
+                            setShareCredential(c);
+                            setShareModalOpen(true);
+                          }}
+                          aria-label="Поделиться доступом"
+                        >
+                          <Share2 className="w-4 h-4" />
+                       </button>
                        <button className="neu-button h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(c.id)} aria-label={t('delete_credential')}>
                           <Trash2 className="w-4 h-4" />
                        </button>

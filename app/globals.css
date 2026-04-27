@@ -129,13 +129,13 @@ body.glassmorphism-theme * {
 body.glassmorphism-theme .neu-panel,
 body.glassmorphism-theme .neu-card,
 body.glassmorphism-theme .neu-button,
-body.glassmorphism-theme .neu-button-accent {
+body.glassmorphism-theme .neu-panel {
     background: var(--glass-surface);
     border: 1px solid var(--glass-border);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     box-shadow: var(--glass-shadow);
-    border-radius: 1rem;
+    border-radius: 1.5rem;
 }
 
 body.glassmorphism-theme .neu-panel:hover,
@@ -149,6 +149,7 @@ body.glassmorphism-theme .neu-button-accent {
     background: linear-gradient(135deg, rgba(14, 165, 233, 0.8), rgba(59, 130, 246, 0.8));
     border-color: var(--glass-accent-glow);
     box-shadow: var(--glass-shadow), 0 0 20px var(--glass-accent-glow);
+    border-radius: 1.5rem;
 }
 
 body.glassmorphism-theme .neu-button-accent:hover {
@@ -165,6 +166,7 @@ body.glassmorphism-theme .neu-input {
     border: 1px solid var(--glass-border);
     backdrop-filter: var(--glass-blur-light);
     color: var(--glass-text);
+    border-radius: 1.5rem;
 }
 
 body.glassmorphism-theme .neu-input:focus {
@@ -288,14 +290,14 @@ body.glassmorphism-theme header {
   .neu-panel-sidebar {
     background: var(--neu-bg);
     border: 1px solid var(--neu-light);
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     transition: background 0.3s ease-out;
   }
 
   .neu-button {
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow);
-    border-radius: 9999px;
+    border-radius: 1.5rem;
     transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, color 0.2s ease-out, background 0.2s ease-out, outline 0.2s ease-out;
     color: var(--neu-text);
     display: inline-flex;
@@ -326,6 +328,7 @@ body.glassmorphism-theme header {
     background: var(--neu-accent);
     color: oklch(0.98 0.005 250);
     box-shadow: 0 4px 14px 0 oklch(0.65 0.19 220 / 0.39);
+    border-radius: 1.5rem;
     transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, background 0.2s ease-out;
   }
   
@@ -348,7 +351,7 @@ body.glassmorphism-theme header {
   .neu-input {
     background: var(--neu-bg);
     box-shadow: var(--neu-shadow-inset);
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     color: var(--neu-text);
     padding: 0.75rem 1rem;
     transition: box-shadow 0.3s ease-out, border-color 0.3s ease-out;

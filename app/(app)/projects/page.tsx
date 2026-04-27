@@ -96,9 +96,9 @@ function TaskModal({ projectId, projectName, onTaskChange }: { projectId: string
     <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-2xl max-h-[85vh] overflow-y-auto scrollbar-hide" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
       <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
       <DialogHeader>
-        <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-          <ClipboardList className="w-6 h-6 text-[var(--neu-accent)]" />
-          {projectName}
+        <DialogTitle className="text-2xl font-bold flex items-center gap-3 min-w-0">
+          <ClipboardList className="w-6 h-6 text-[var(--neu-accent)] shrink-0" />
+          <span className="truncate">{projectName}</span>
         </DialogTitle>
       </DialogHeader>
 
@@ -361,27 +361,27 @@ export default function ProjectsPage() {
           <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm">
              <Plus className="w-4 h-4 mr-2"/> {t('create_project')}
           </DialogTrigger>
-          <DialogContent className="border-0 sm:rounded-3xl p-8" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
             <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
             <DialogHeader><DialogTitle className="text-xl font-bold">{t('create_project')}</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4 pt-2">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_name')} />
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full py-2.5 px-3" placeholder={t('placeholder_name')} />
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
-                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[70px] p-2 resize-none" placeholder={t('placeholder_desc')} />
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
+                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[80px] py-2.5 px-3 resize-none" placeholder={t('placeholder_desc')} />
               </div>
               
-              <div className="space-y-1">
-                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
-                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full p-2" placeholder="https://" />
+              <div className="space-y-1.5">
+                 <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
+                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full py-2.5 px-3" placeholder="https://" />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
-                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_stack')} />
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
+                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full py-2.5 px-3" placeholder={t('placeholder_stack')} />
                 <div className="flex flex-wrap gap-2 mt-3 px-1">
                   {POPULAR_STACKS.map(tech => {
                     const isSelected = stack.split(',').map(s=>s.trim()).includes(tech);
@@ -407,27 +407,27 @@ export default function ProjectsPage() {
         </Dialog>
 
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="border-0 sm:rounded-3xl p-8" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
             <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
             <DialogHeader><DialogTitle className="text-xl font-bold">{t('edit_project')}</DialogTitle></DialogHeader>
             <form onSubmit={handleUpdate} className="space-y-4 pt-2">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_name')} />
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full py-2.5 px-3" placeholder={t('placeholder_name')} />
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
-                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[70px] p-2 resize-none" placeholder={t('placeholder_desc')} />
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_description')}</label>
+                <textarea value={desc} onChange={e=>setDesc(e.target.value)} className="neu-input w-full min-h-[80px] py-2.5 px-3 resize-none" placeholder={t('placeholder_desc')} />
               </div>
               
-              <div className="space-y-1">
-                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
-                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full p-2" placeholder="https://" />
+              <div className="space-y-1.5">
+                 <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
+                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full py-2.5 px-3" placeholder="https://" />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
-                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full p-2" placeholder={t('placeholder_stack')} />
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('field_stack')}</label>
+                <input value={stack} onChange={e=>setStack(e.target.value)} className="neu-input w-full py-2.5 px-3" placeholder={t('placeholder_stack')} />
                 <div className="flex flex-wrap gap-2 mt-3 px-1">
                   {POPULAR_STACKS.map(tech => {
                     const isSelected = stack.split(',').map(s=>s.trim()).includes(tech);
@@ -448,9 +448,9 @@ export default function ProjectsPage() {
                 </div>
               </div>
               
-              <div className="space-y-1">
-                 <label className="text-xs font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('status_label')}</label>
-                 <select value={status} onChange={e=>setStatus(e.target.value)} className="neu-input w-full p-2 appearance-none cursor-pointer">
+              <div className="space-y-1.5">
+                 <label className="text-sm font-semibold tracking-wide uppercase text-[var(--neu-text-muted)]">{t('status_label')}</label>
+                 <select value={status} onChange={e=>setStatus(e.target.value)} className="neu-input w-full py-2.5 px-3 appearance-none cursor-pointer">
                    <option value="active" className="bg-[var(--neu-bg)] text-[var(--neu-text)]">{t('status_active')}</option>
                    <option value="archived" className="bg-[var(--neu-bg)] text-[var(--neu-text)]">{t('status_archive')}</option>
                  </select>

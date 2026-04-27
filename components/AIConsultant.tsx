@@ -165,14 +165,14 @@ export function AIConsultant() {
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className={`fixed z-50 flex flex-col overflow-hidden max-w-md w-[calc(100vw-32px)] sm:w-[400px] md:w-[420px] h-[calc(100vh-120px)] sm:h-[560px] bottom-20 right-3 sm:right-4 md:right-5 bg-[var(--neu-bg)] neu-panel shadow-[8px_8px_16px_var(--neu-dark),-8px_-8px_16px_var(--neu-light)]`}
+            className={`fixed z-50 flex flex-col overflow-hidden max-w-sm w-[calc(100vw-24px)] sm:w-[340px] md:w-[360px] h-[calc(100vh-160px)] sm:h-[420px] md:h-[460px] bottom-16 right-2 sm:right-4 md:right-5 bg-[var(--neu-bg)] neu-panel shadow-[8px_8px_16px_var(--neu-dark),-8px_-8px_16px_var(--neu-light)]`}
             style={{ 
               borderRadius: '32px',
             }}
           >
             {/* Header */}
             <div className="flex flex-col items-center justify-center pt-5 pb-3 relative shrink-0">
-              <h3 className="font-bold text-[20px] md:text-[22px] text-[var(--neu-text)] text-opacity-80 tracking-tight">StackBox AI Chat</h3>
+              <h3 className="font-bold text-lg md:text-xl text-[var(--neu-text)] text-opacity-80 tracking-tight">StackBox AI</h3>
               <button 
                 onClick={() => setIsOpen(false)} 
                 className="absolute right-5 top-4 p-1 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
@@ -186,7 +186,7 @@ export function AIConsultant() {
             {/* Main Panel Container */}
             <div className="flex-1 flex flex-col overflow-hidden min-h-0">
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin scrollbar-thumb-[var(--neu-text-muted)]/30 scrollbar-track-transparent">
                 {messages.map((msg, idx) => (
                   <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[90%] px-4 py-3 text-[14px] leading-relaxed ${

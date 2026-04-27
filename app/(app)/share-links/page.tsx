@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { collection, query, where, getDocs, doc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
-import { Trash2, Link as LinkIcon, Ban, Clock, ExternalLink } from "lucide-react";
+import { Trash2, Link as LinkIcon, Ban, Clock, ExternalLink, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ShareLinksPage() {
@@ -110,12 +110,16 @@ export default function ShareLinksPage() {
                        
                        <div className="flex flex-col gap-1 mt-2 text-sm text-[var(--neu-text-muted)]">
                           <div className="flex items-center gap-2">
-                            <span className="w-16">Target:</span>
+                            <span className="w-20">Target:</span>
                             <span className="font-mono bg-[var(--neu-bg)] px-2 block truncate max-w-[200px] sm:max-w-xs">{l.resourceId}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="w-16">Expires:</span>
+                            <span className="w-20">Expires:</span>
                             <span>{l.expiresAt ? l.expiresAt.toDate().toLocaleString() : 'Never'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-20 flex items-center gap-1"><Eye className="w-3 h-3" /> Views:</span>
+                            <span>{l.viewCount || 0}{l.maxViews ? ` / ${l.maxViews}` : ''}</span>
                           </div>
                        </div>
                     </div>
