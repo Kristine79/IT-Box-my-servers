@@ -2,25 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, Bot, User } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { X, Send, Bot } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { db, useAuth } from '@/lib/providers';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-
-let _ai: any = null;
-
-const getAiClient = () => {
-  if (!_ai) {
-    if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
-      console.warn("NEXT_PUBLIC_GEMINI_API_KEY is not set. AI Consultant will not work.");
-      return null;
-    }
-    _ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
-  }
-  return _ai;
-};
 
 interface Message {
   role: 'user' | 'model';
@@ -29,7 +15,6 @@ interface Message {
 
 export function AIConsultant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isHiddenFully, setIsHiddenFully] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window !== 'undefined') {
@@ -42,9 +27,10 @@ export function AIConsultant() {
   });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [remaining, setRemaining] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, userPlan } = useAuth();
   const [contextData, setContextData] = useState<string>('');
 
   const scrollToBottom = () => {
@@ -66,22 +52,33 @@ export function AIConsultant() {
       setMessages([
         { 
           role: 'model', 
-          text: t('ai_welcome', 'Здравствуйте! Я ИИ-консультант StackBox. Я могу помочь вам в управлении проектами и серверами. Что вас интересует?') 
+          text: t('ai_welcome', 'Здравствуйте! Я StackBox AI — ваш технический консультант. Помогу с управлением инфраструктурой, напишу конфиги Nginx/Docker/systemd, помогу с DevOps-задачами. Что вас интересует?') 
         }
       ]);
       
-      // Fetch user data right after opening snippet context
-      if (user) {
+      if (user && !user.isAnonymous) {
         const fetchContext = async () => {
           try {
-            const qProjects = query(collection(db, "projects"), where("ownerId", "==", user.uid));
-            const qServers = query(collection(db, "servers"), where("ownerId", "==", user.uid));
-            const [projSnap, servSnap] = await Promise.all([getDocs(qProjects), getDocs(qServers)]);
+            const [projSnap, servSnap, svcSnap, credSnap] = await Promise.all([
+              getDocs(query(collection(db, "projects"), where("ownerId", "==", user.uid))),
+              getDocs(query(collection(db, "servers"), where("ownerId", "==", user.uid))),
+              getDocs(query(collection(db, "services"), where("ownerId", "==", user.uid))),
+              getDocs(query(collection(db, "credentials"), where("ownerId", "==", user.uid))),
+            ]);
             
-            const projects = projSnap.docs.map(d => ({ id: d.id, name: d.data().name, description: d.data().description, status: d.data().status }));
-            const servers = servSnap.docs.map(d => ({ id: d.id, name: d.data().name, ip: d.data().ipAddress, location: d.data().location }));
+            const projects = projSnap.docs.map(d => ({ name: d.data().name, description: d.data().description, status: d.data().status, stack: d.data().stack }));
+            const servers = servSnap.docs.map(d => ({ name: d.data().name, ip: d.data().ipAddress, location: d.data().location, os: d.data().os, provider: d.data().provider }));
+            const services = svcSnap.docs.map(d => ({ name: d.data().name, url: d.data().url, port: d.data().port, status: d.data().status }));
+            const creds = credSnap.docs.map(d => ({ name: d.data().name, type: d.data().type, host: d.data().host }));
             
-            setContextData(`Current User's Data:\nProjects: ${JSON.stringify(projects)}\nServers: ${JSON.stringify(servers)}`);
+            const ctx = [
+              `User Plan: ${userPlan}`,
+              `Projects (${projects.length}): ${JSON.stringify(projects)}`,
+              `Servers (${servers.length}): ${JSON.stringify(servers)}`,
+              `Services (${services.length}): ${JSON.stringify(services)}`,
+              `Credentials (${creds.length}, passwords hidden): ${JSON.stringify(creds)}`,
+            ].join('\n');
+            setContextData(ctx);
           } catch(e) {
             console.error("Error fetching context for AI", e);
           }
@@ -89,7 +86,7 @@ export function AIConsultant() {
         fetchContext();
       }
     }
-  }, [isOpen, messages.length, t, user]);
+  }, [isOpen, messages.length, t, user, userPlan]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,25 +98,70 @@ export function AIConsultant() {
     setIsLoading(true);
 
     try {
-      const contents = [
-        "System Instruction: You are an AI consultant and technical helper for an IT infrastructure management application called 'StackBox'. StackBox manages Projects, Servers, Services, and Credentials for IT teams. Use markdown for your responses (make them well formatted, use bold fonts, lists when needed). Write in the language of the user's prompt (mostly Russian or English). Be helpful and professional, keep your logic concise.\n\n" + (contextData ? contextData : ""),
-        ...messages.map(m => (m.role === 'user' ? 'User: ' : 'AI: ') + m.text),
-        "User: " + userMessage
-      ].join('\n\n');
+      const allMessages = [...messages, { role: 'user' as const, text: userMessage }];
 
-      const client = getAiClient();
-      if (!client) {
-        throw new Error("AI API is not configured");
-      }
-
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: contents,
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: allMessages,
+          context: contextData,
+          uid: user?.uid || 'guest',
+          plan: userPlan,
+        }),
       });
 
-      setMessages(prev => [...prev, { role: 'model', text: response.text || '...' }]);
+      if (res.status === 429) {
+        const data = await res.json();
+        setMessages(prev => [...prev, { role: 'model', text: data.message || t('ai_rate_limit', 'Лимит сообщений на сегодня исчерпан.') }]);
+        setRemaining(0);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+
+      // Streaming SSE
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('No stream');
+
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') break;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.error) throw new Error(parsed.error);
+              if (parsed.text) {
+                fullText += parsed.text;
+                setMessages(prev => {
+                  const updated = [...prev];
+                  updated[updated.length - 1] = { role: 'model', text: fullText };
+                  return updated;
+                });
+              }
+              if (parsed.remaining !== undefined) {
+                setRemaining(parsed.remaining);
+              }
+            } catch {}
+          }
+        }
+      }
     } catch (error) {
-      console.error('Gemini API Error:', error);
+      console.error('AI Chat Error:', error);
       setMessages(prev => [...prev, { role: 'model', text: t('ai_error', 'Произошла ошибка при обращении к ИИ. Пожалуйста, попробуйте позже.') }]);
     } finally {
       setIsLoading(false);
@@ -173,14 +215,32 @@ export function AIConsultant() {
             {/* Header */}
             <div className="flex flex-col items-center justify-center pt-5 pb-3 relative shrink-0">
               <h3 className="font-bold text-lg md:text-xl text-[var(--neu-text)] text-opacity-80 tracking-tight">StackBox AI</h3>
-              <button 
-                onClick={() => setIsOpen(false)} 
-                className="absolute right-5 top-4 p-1 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
-                title="Закрыть"
-                aria-label="Close AI chat"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              {remaining !== null && userPlan !== 'premium' && (
+                <span className="text-[10px] text-[var(--neu-text-muted)] mt-0.5">
+                  {remaining > 0 ? `${remaining} ${t('messages_left', 'сообщ. осталось')}` : t('limit_reached', 'Лимит исчерпан')}
+                </span>
+              )}
+              {userPlan === 'premium' && (
+                <span className="text-[10px] text-[var(--neu-accent)] mt-0.5">PRO model</span>
+              )}
+              <div className="absolute right-5 top-4 flex gap-1">
+                <button 
+                  onClick={() => { setMessages([]); localStorage.removeItem('ai-chat-history'); }}
+                  className="p-1 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
+                  title={t('clear_chat', 'Очистить чат')}
+                  aria-label="Clear chat"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+                <button 
+                  onClick={() => setIsOpen(false)} 
+                  className="p-1 rounded-full text-[var(--neu-text-muted)] hover:text-[var(--neu-text)] transition-colors"
+                  title="Закрыть"
+                  aria-label="Close AI chat"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Main Panel Container */}
