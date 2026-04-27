@@ -14,6 +14,7 @@ export interface PlanLimits {
   canIntegrations: boolean;
   canEnhancedEncryption: boolean;
   canChangeTheme: boolean;
+  canMonitoring: boolean;
 }
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
@@ -31,6 +32,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
     canIntegrations: false,
     canEnhancedEncryption: false,
     canChangeTheme: false,
+    canMonitoring: false,
   },
   standard: {
     maxProjects: 10,
@@ -46,6 +48,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
     canIntegrations: false,
     canEnhancedEncryption: false,
     canChangeTheme: true,
+    canMonitoring: true,
   },
   premium: {
     maxProjects: Infinity,
@@ -61,6 +64,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
     canIntegrations: true,
     canEnhancedEncryption: true,
     canChangeTheme: true,
+    canMonitoring: true,
   },
 };
 

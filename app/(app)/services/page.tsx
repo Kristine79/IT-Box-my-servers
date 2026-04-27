@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, deleteDoc } from "firebase/firestore";
 import { db, useAuth } from "@/lib/providers";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, ExternalLink, Share2, Network, Globe } from "lucide-react";
+import { Plus, Trash2, ExternalLink, Share2, Network, Globe, Activity, Shield, ShieldAlert, RefreshCw, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { UpgradeModal } from "@/components/UpgradeModal";
@@ -19,6 +19,9 @@ export default function ServicesPage() {
   const [servers, setServers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [checkResults, setCheckResults] = useState<Record<string, any>>({});
+  const [checking, setChecking] = useState(false);
+  const [uptimeHistory, setUptimeHistory] = useState<Record<string, any[]>>({});
 
   // Form
   const [name, setName] = useState("");
@@ -64,6 +67,60 @@ export default function ServicesPage() {
     }
   };
 
+  const runHealthCheck = async () => {
+    if (!planLimits.canMonitoring) {
+      setUpgradeOpen(true);
+      return;
+    }
+    if (checking || services.length === 0) return;
+    setChecking(true);
+    try {
+      const res = await fetch('/api/monitoring/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          services: services.map(s => ({ id: s.id, url: s.url, port: s.port })),
+        }),
+      });
+      const data = await res.json();
+      if (data.results) {
+        const map: Record<string, any> = {};
+        for (const r of data.results) {
+          map[r.serviceId] = r;
+        }
+        setCheckResults(map);
+        // Update uptime history in localStorage
+        const historyKey = `uptime-${user?.uid}`;
+        const saved = localStorage.getItem(historyKey);
+        const history: Record<string, any[]> = saved ? JSON.parse(saved) : {};
+        const now = new Date().toISOString().split('T')[0];
+        for (const r of data.results) {
+          if (!history[r.serviceId]) history[r.serviceId] = [];
+          history[r.serviceId].push({ date: now, status: r.status, responseTime: r.responseTime });
+          // Keep last 30 entries
+          if (history[r.serviceId].length > 30) history[r.serviceId] = history[r.serviceId].slice(-30);
+        }
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        setUptimeHistory(history);
+        toast.success(t('check_complete', 'Проверка завершена'));
+      }
+    } catch (e) {
+      toast.error('Health check failed');
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  // Load uptime history from localStorage
+  useEffect(() => {
+    if (user) {
+      const saved = localStorage.getItem(`uptime-${user.uid}`);
+      if (saved) {
+        try { setUptimeHistory(JSON.parse(saved)); } catch {}
+      }
+    }
+  }, [user]);
+
   const handleDelete = async (id: string) => {
     if(!confirm("Are you sure?")) return;
     try {
@@ -82,6 +139,26 @@ export default function ServicesPage() {
            <h1 className="text-3xl font-bold tracking-tight mb-2">{t('services')}</h1>
            <p className="text-[var(--neu-text-muted)]">{t('manage_services_desc')}</p>
         </div>
+        {planLimits.canMonitoring && (
+          <button
+            onClick={runHealthCheck}
+            disabled={checking || services.length === 0}
+            className="neu-button px-4 py-2.5 text-sm font-semibold flex items-center gap-2 shrink-0 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${checking ? 'animate-spin' : ''}`} />
+            {checking ? t('checking', 'Проверка...') : t('check_status', 'Check Status')}
+          </button>
+        )}
+        {!planLimits.canMonitoring && (
+          <button
+            onClick={() => setUpgradeOpen(true)}
+            className="neu-button px-4 py-2.5 text-sm font-semibold flex items-center gap-2 shrink-0 opacity-60"
+          >
+            <Activity className="w-4 h-4" />
+            <Lock className="w-3 h-3" />
+            {t('monitoring', 'Мониторинг')}
+          </button>
+        )}
         <UpgradeModal
           open={upgradeOpen}
           onClose={() => setUpgradeOpen(false)}
@@ -172,6 +249,64 @@ export default function ServicesPage() {
                  </div>
                  
                  <h3 className="text-xl font-bold mb-4 pr-8">{s.name}</h3>
+
+                 {/* Status Badge */}
+                 {checkResults[s.id] && (
+                    <div className="flex items-center gap-2 mb-3">
+                       <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                         checkResults[s.id].status === 'up' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' :
+                         checkResults[s.id].status === 'degraded' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' :
+                         'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+                       }`} />
+                       <span className={`text-xs font-semibold uppercase ${
+                         checkResults[s.id].status === 'up' ? 'text-emerald-500' :
+                         checkResults[s.id].status === 'degraded' ? 'text-amber-500' :
+                         'text-red-500'
+                       }`}>
+                         {checkResults[s.id].status === 'up' ? 'Online' : checkResults[s.id].status === 'degraded' ? 'Degraded' : 'Offline'}
+                       </span>
+                       {checkResults[s.id].responseTime && (
+                         <span className="text-[11px] text-[var(--neu-text-muted)] ml-auto font-mono">
+                           {checkResults[s.id].responseTime}ms
+                         </span>
+                       )}
+                    </div>
+                 )}
+
+                 {/* SSL Warning */}
+                 {checkResults[s.id]?.sslDaysLeft !== undefined && checkResults[s.id].sslDaysLeft <= 14 && (
+                    <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-lg mb-3 ${
+                      checkResults[s.id].sslDaysLeft <= 3 ? 'bg-red-500/10 text-red-500' :
+                      checkResults[s.id].sslDaysLeft <= 7 ? 'bg-amber-500/10 text-amber-500' :
+                      'bg-yellow-500/10 text-yellow-600'
+                    }`}>
+                       <ShieldAlert className="w-4 h-4 shrink-0" />
+                       SSL: {checkResults[s.id].sslDaysLeft} {t('days_left', 'дн. осталось')}
+                    </div>
+                 )}
+                 {checkResults[s.id]?.sslDaysLeft !== undefined && checkResults[s.id].sslDaysLeft > 14 && (
+                    <div className="flex items-center gap-2 text-xs text-emerald-500/70 mb-3">
+                       <Shield className="w-3.5 h-3.5" />
+                       SSL OK ({checkResults[s.id].sslDaysLeft}d)
+                    </div>
+                 )}
+
+                 {/* Uptime Sparkline */}
+                 {uptimeHistory[s.id] && uptimeHistory[s.id].length > 1 && (
+                    <div className="flex gap-[2px] items-end h-4 mb-3" title={t('uptime_history', 'История доступности (30 дней)')}>
+                       {uptimeHistory[s.id].slice(-30).map((entry: any, i: number) => (
+                         <div
+                           key={i}
+                           className={`flex-1 min-w-[3px] max-w-[6px] rounded-sm ${
+                             entry.status === 'up' ? 'bg-emerald-500/60' :
+                             entry.status === 'degraded' ? 'bg-amber-500/60' :
+                             'bg-red-500/60'
+                           }`}
+                           style={{ height: entry.status === 'up' ? '100%' : entry.status === 'degraded' ? '60%' : '30%' }}
+                         />
+                       ))}
+                    </div>
+                 )}
                  
                  {s.url && (
                     <div className="flex items-center gap-2 text-sm text-[var(--neu-accent)] mb-4 bg-[var(--neu-accent)]/10 px-3 py-2 rounded-lg truncate">
