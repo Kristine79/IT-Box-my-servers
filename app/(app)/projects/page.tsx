@@ -361,7 +361,7 @@ export default function ProjectsPage() {
           <DialogTrigger className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm">
              <Plus className="w-4 h-4 mr-2"/> {t('create_project')}
           </DialogTrigger>
-          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
             <DialogHeader><DialogTitle className="text-xl font-bold">{t('create_project')}</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4 pt-2">
@@ -407,7 +407,7 @@ export default function ProjectsPage() {
         </Dialog>
 
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)' }}>
+          <DialogContent className="border-0 sm:rounded-3xl p-8 max-w-lg max-h-[85vh] overflow-y-auto" style={{ background: 'var(--neu-bg)', boxShadow: 'var(--neu-shadow)', color: 'var(--neu-text)', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div tabIndex={0} className="opacity-0 w-0 h-0 absolute overflow-hidden pointer-events-none" autoFocus />
             <DialogHeader><DialogTitle className="text-xl font-bold">{t('edit_project')}</DialogTitle></DialogHeader>
             <form onSubmit={handleUpdate} className="space-y-4 pt-2">
