@@ -200,6 +200,14 @@ export default function PricingPage() {
                 <span className="text-4xl font-bold">{plan.price} ₽</span>
                 <span className="text-[var(--neu-text-muted)]">{plan.duration}</span>
               </div>
+              {plan.annualPrice && (
+                <div className="mt-2 text-sm text-[var(--neu-text-muted)]">
+                  <span className="line-through opacity-60">{plan.price} ₽</span>
+                  {' → '}
+                  <span className="font-semibold text-green-500">{plan.annualPrice} ₽</span>
+                  <span className="opacity-70"> {plan.duration} {c.annualLabel}</span>
+                </div>
+              )}
             </div>
 
             <div className="flex-1 space-y-4 mb-10">

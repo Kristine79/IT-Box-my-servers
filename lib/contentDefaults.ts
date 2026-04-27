@@ -67,22 +67,88 @@ export const defaultFAQ: { en: FAQItem[]; ru: FAQItem[] } = {
 export const defaultPricing = {
   en: {
     plans: [
-      { id: 'free', name: 'Free Trial', price: '0', duration: '14 days', features: ['Up to 5 projects', 'Basic tracking', '1 user'], current: true },
-      { id: 'basic', name: 'Basic', price: '10', duration: 'per month', features: ['Unlimited projects', 'Encrypted vault', 'Priority support'], current: false },
-      { id: 'pro', name: 'Pro', price: '700', duration: 'per month', features: ['Everything in Basic', 'Unlimited sharing', 'API access', 'Account manager'], current: false }
+      { id: 'free', name: 'Free', price: '0', annualPrice: '', duration: '/ mo', features: [
+        'Up to 2 projects',
+        'Up to 1 server',
+        'Up to 2 services',
+        'Up to 4 credentials (logins / passwords / API keys)',
+        'Basic data storage',
+        'No export',
+        'No notifications',
+        'No sharing',
+        'Standard theme'
+      ], current: true },
+      { id: 'standard', name: 'Standard', price: '300', annualPrice: '250', duration: '/ mo', features: [
+        'Up to 10 projects',
+        'Up to 5 servers',
+        'Up to 15 services',
+        'Up to 50 credentials',
+        'Data export (JSON / CSV)',
+        'Read-only config sharing via link',
+        'Notifications (Email + Telegram)',
+        'Color scheme selection',
+        'AES-256 encryption',
+        'Change history (7 days)'
+      ], current: false },
+      { id: 'premium', name: 'Premium', price: '900', annualPrice: '750', duration: '/ mo', features: [
+        'Unlimited projects / servers / services / credentials',
+        'Team access (roles: admin / editor / viewer)',
+        'Real-time collaboration',
+        'Advanced sharing (flexible permissions)',
+        'Integrations (Webhook, API, Git, Notion, Slack/Telegram bots)',
+        'Advanced notifications (triggers, custom rules)',
+        'Enhanced encryption (client-side / zero-knowledge)',
+        'Full change history & action audit',
+        'Backups',
+        'Priority support'
+      ], current: false }
     ],
-    enterpriseTitle: "Need more?",
-    enterpriseDesc: "Custom solutions for large teams with dedicated infrastructure requirements.",
+    annualLabel: 'annually',
+    enterpriseTitle: "Need a custom solution?",
+    enterpriseDesc: "Individual plans for large teams with dedicated infrastructure, SLA, and personal manager.",
     contactSales: "Contact Sales"
   },
   ru: {
     plans: [
-      { id: 'free', name: 'Бесплатный', price: '0', duration: '14 дней', features: ['До 5 проектов', 'Базовый трекинг', '1 пользователь'], current: true },
-      { id: 'basic', name: 'Базовый', price: '10', duration: 'в месяц', features: ['Безлимит проектов', 'Зашифрованное хранилище', 'Приоритетная поддержка'], current: false },
-      { id: 'pro', name: 'Про', price: '700', duration: 'в месяц', features: ['Всё из Базового', 'Безлимит шеринг', 'API доступ', 'Персональный менеджер'], current: false }
+      { id: 'free', name: 'Free', price: '0', annualPrice: '', duration: '/ мес', features: [
+        'До 2 проектов',
+        'До 1 сервера',
+        'До 2 сервисов',
+        'До 4 доступов (логины / пароли / API ключи)',
+        'Базовое хранение данных',
+        'Без экспорта',
+        'Без уведомлений',
+        'Без шаринга',
+        'Стандартная тема'
+      ], current: true },
+      { id: 'standard', name: 'Standard', price: '300', annualPrice: '250', duration: '/ мес', features: [
+        'До 10 проектов',
+        'До 5 серверов',
+        'До 15 сервисов',
+        'До 50 доступов',
+        'Экспорт данных (JSON / CSV)',
+        'Шаринг конфигурации по ссылке (read-only)',
+        'Уведомления (Email + Telegram)',
+        'Выбор цветовой схемы',
+        'Шифрование AES-256',
+        'История изменений (7 дней)'
+      ], current: false },
+      { id: 'premium', name: 'Premium', price: '900', annualPrice: '750', duration: '/ мес', features: [
+        'Неограниченное кол-во проектов / серверов / сервисов / доступов',
+        'Командный доступ (роли: admin / editor / viewer)',
+        'Совместная работа в реальном времени',
+        'Расширенный шаринг (гибкие права доступа)',
+        'Интеграции (Webhook, API, Git, Notion, Slack/Telegram боты)',
+        'Продвинутые уведомления (триггеры, кастомные правила)',
+        'Усиленное шифрование (client-side / zero-knowledge)',
+        'Полная история изменений и аудит действий',
+        'Резервные копии',
+        'Приоритетная поддержка'
+      ], current: false }
     ],
-    enterpriseTitle: "Нужно больше?",
-    enterpriseDesc: "Индивидуальные решения для крупных команд со специфическими требованиями к инфраструктуре.",
+    annualLabel: 'при оплате за год',
+    enterpriseTitle: "Нужно индивидуальное решение?",
+    enterpriseDesc: "Персональные тарифы для крупных команд с выделенной инфраструктурой, SLA и личным менеджером.",
     contactSales: "Связаться с отделом продаж"
   }
 };
