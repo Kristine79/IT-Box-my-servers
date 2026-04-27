@@ -72,10 +72,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    document.body.classList.remove('glassmorphism-theme', 'defi-theme');
     if (theme === 'glassmorphism') {
       document.body.classList.add('glassmorphism-theme');
-    } else {
-      document.body.classList.remove('glassmorphism-theme');
+    } else if (theme === 'defi') {
+      document.body.classList.add('defi-theme');
     }
   }, [theme]);
 
@@ -197,12 +198,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}</span>}
             </button>
             <button 
-              title={!desktopSidebarOpen ? (theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism Premium') : undefined}
+              title={!desktopSidebarOpen ? (theme === 'neumorphic' ? 'Glassmorphism' : theme === 'glassmorphism' ? 'DeFi Yield' : 'Neumorphic') : undefined}
               className={cn(
                 "flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden relative",
                 desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10",
                 canUsePremiumTheme ? "cursor-pointer" : "cursor-not-allowed opacity-50",
-                theme === 'glassmorphism' && canUsePremiumTheme && "text-[var(--neu-accent)]",
+                (theme === 'glassmorphism' || theme === 'defi') && canUsePremiumTheme && "text-[var(--neu-accent)]",
                 "text-[var(--neu-text)] opacity-60 hover:opacity-100"
               )}
               onClick={() => {
@@ -211,7 +212,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   return;
                 }
                 if (!canUsePremiumTheme) return;
-                setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
+                const cycle: ('neumorphic' | 'glassmorphism' | 'defi')[] = ['neumorphic', 'glassmorphism', 'defi'];
+                const next = cycle[(cycle.indexOf(theme) + 1) % cycle.length];
+                setTheme(next);
               }}
               disabled={false}
             >
@@ -219,7 +222,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {!planLimits.canChangeTheme && !desktopSidebarOpen && <Lock className="h-2 w-2 absolute bottom-2 right-2 text-[var(--neu-text-muted)]" />}
               {desktopSidebarOpen && (
                 <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">
-                  {theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism'}
+                  {theme === 'neumorphic' ? 'Glassmorphism' : theme === 'glassmorphism' ? 'DeFi Yield' : 'Neumorphic'}
                   {!planLimits.canChangeTheme && <Lock className="inline h-3 w-3 text-[var(--neu-text-muted)] ml-1" />}
                 </span>
               )}
@@ -353,18 +356,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                           return;
                         }
                         if (!canUsePremiumTheme) return;
-                        setTheme(theme === 'glassmorphism' ? 'neumorphic' : 'glassmorphism');
+                        const cycle: ('neumorphic' | 'glassmorphism' | 'defi')[] = ['neumorphic', 'glassmorphism', 'defi'];
+                        setTheme(cycle[(cycle.indexOf(theme) + 1) % cycle.length]);
                         setSidebarOpen(false); 
                       }} 
                       className={cn(
                         "flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-left w-full",
                         planLimits.canChangeTheme && canUsePremiumTheme ? "" : "opacity-50",
-                        theme === 'glassmorphism' && canUsePremiumTheme ? "text-[var(--neu-accent)]" : "text-[var(--neu-text)]",
+                        (theme === 'glassmorphism' || theme === 'defi') && canUsePremiumTheme ? "text-[var(--neu-accent)]" : "text-[var(--neu-text)]",
                         "opacity-60 hover:opacity-100"
                       )}
                     >
                        <Sparkles className="h-4 w-4 shrink-0" />
-                       {theme === 'glassmorphism' ? 'Neumorphic' : 'Glassmorphism'}
+                       {theme === 'neumorphic' ? 'Glassmorphism' : theme === 'glassmorphism' ? 'DeFi Yield' : 'Neumorphic'}
                        {!planLimits.canChangeTheme && <Lock className="inline h-3 w-3 text-[var(--neu-text-muted)] ml-1" />}
                     </button>
                     <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">

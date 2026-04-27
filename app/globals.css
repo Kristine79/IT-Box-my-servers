@@ -199,6 +199,101 @@ body.glassmorphism-theme header {
     backdrop-filter: var(--glass-blur);
 }
 
+/* ── DeFi Yield Theme ── */
+body.defi-theme {
+    background: #080c15;
+    color: #e2e8f0;
+}
+
+body.defi-theme * {
+    --neu-bg: #080c15;
+    --neu-light: #111827;
+    --neu-dark: rgba(0, 0, 0, 0.5);
+    --neu-accent: #22c55e;
+    --neu-text: #e2e8f0;
+    --neu-text-muted: #64748b;
+}
+
+body.defi-theme .neu-panel,
+body.defi-theme .neu-card,
+body.defi-theme .neu-button {
+    background: rgba(16, 24, 48, 0.75);
+    border: 1px solid rgba(34, 197, 94, 0.12);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    border-radius: 1.5rem;
+}
+
+body.defi-theme .neu-panel:hover,
+body.defi-theme .neu-card:hover {
+    background: rgba(22, 33, 62, 0.85);
+    border-color: rgba(34, 197, 94, 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(34, 197, 94, 0.1);
+}
+
+body.defi-theme .neu-panel-inset {
+    background: rgba(8, 12, 21, 0.8);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(34, 197, 94, 0.08);
+}
+
+body.defi-theme .neu-button-accent {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.35);
+    color: #020617;
+    font-weight: 600;
+    border-radius: 1.5rem;
+}
+
+body.defi-theme .neu-button-accent:hover {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    box-shadow: 0 6px 30px rgba(34, 197, 94, 0.5);
+}
+
+body.defi-theme .neu-button-accent:active {
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+}
+
+body.defi-theme .neu-input {
+    background: rgba(8, 12, 21, 0.7);
+    border: 1px solid rgba(34, 197, 94, 0.12);
+    backdrop-filter: blur(8px);
+    color: #e2e8f0;
+    border-radius: 1.5rem;
+}
+
+body.defi-theme .neu-input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+body.defi-theme .neu-sidebar {
+    background: rgba(8, 12, 21, 0.9);
+    box-shadow: 1px 0 0 0 rgba(34, 197, 94, 0.1);
+    backdrop-filter: blur(16px);
+}
+
+body.defi-theme .neu-sidebar-item:hover {
+    background: rgba(22, 33, 62, 0.8);
+}
+
+body.defi-theme .neu-sidebar-item.active {
+    background: rgba(34, 197, 94, 0.15);
+    box-shadow: inset 0 0 0 1px #22c55e;
+}
+
+body.defi-theme .neu-divider {
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.2), transparent);
+}
+
+body.defi-theme header {
+    background: rgba(8, 12, 21, 0.85);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+    backdrop-filter: blur(16px);
+}
+
 .dark {
     --background: oklch(0.22 0.03 260);
     --foreground: oklch(0.95 0 0);
