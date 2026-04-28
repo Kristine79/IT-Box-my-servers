@@ -12,6 +12,7 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { SkeletonGrid } from "@/components/SkeletonCard";
 import { SearchFilter, useFilteredItems, usePagination } from "@/components/SearchFilter";
+import { useKeyboardShortcuts } from "@/components/useKeyboardShortcuts";
 
 export default function ServicesPage() {
   const { t } = useTranslation();
@@ -39,6 +40,26 @@ export default function ServicesPage() {
     (s) => `${s.name} ${s.url || ''} ${s.port || ''}`
   );
   const { paginatedItems, hasMore, loadMore, reset } = usePagination(filteredServices, 12);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onSearch: () => {
+      const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
+      searchInput?.focus();
+    },
+    onEscape: () => {
+      if (open) setOpen(false);
+      if (deleteDialogOpen) setDeleteDialogOpen(false);
+      if (upgradeOpen) setUpgradeOpen(false);
+    },
+    onNew: () => {
+      if (services.length < planLimits.maxServices) {
+        setOpen(true);
+      } else {
+        setUpgradeOpen(true);
+      }
+    },
+  });
 
   // Form
   const [name, setName] = useState("");

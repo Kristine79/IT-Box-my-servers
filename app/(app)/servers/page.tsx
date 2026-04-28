@@ -13,6 +13,7 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { SkeletonList } from "@/components/SkeletonCard";
 import { SearchFilter, useFilteredItems, usePagination } from "@/components/SearchFilter";
+import { useKeyboardShortcuts } from "@/components/useKeyboardShortcuts";
 
 export default function ServersPage() {
   const { t } = useTranslation();
@@ -49,6 +50,27 @@ export default function ServersPage() {
     (s) => `${s.name} ${s.ipAddress || ''} ${s.provider || ''} ${s.os || ''}`
   );
   const { paginatedItems, hasMore, loadMore, reset } = usePagination(filteredServers, 10);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onSearch: () => {
+      const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
+      searchInput?.focus();
+    },
+    onEscape: () => {
+      if (open) setOpen(false);
+      if (deleteDialogOpen) setDeleteDialogOpen(false);
+      if (upgradeOpen) setUpgradeOpen(false);
+      if (shareModalOpen) setShareModalOpen(false);
+    },
+    onNew: () => {
+      if (servers.length < planLimits.maxServers) {
+        setOpen(true);
+      } else {
+        setUpgradeOpen(true);
+      }
+    },
+  });
 
   const loadData = useCallback(async () => {
     if(!user) return;

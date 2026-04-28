@@ -14,6 +14,7 @@ import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { useUndoableDelete } from "@/components/UndoToast";
 import { SkeletonGrid } from "@/components/SkeletonCard";
 import { SearchFilter, useFilteredItems, usePagination } from "@/components/SearchFilter";
+import { useKeyboardShortcuts } from "@/components/useKeyboardShortcuts";
 
 export default function CredentialsPage() {
   const { t } = useTranslation();
@@ -57,6 +58,30 @@ export default function CredentialsPage() {
     (c) => `${c.name} ${c.username || ''} ${c.type || ''}`
   );
   const { paginatedItems, hasMore, loadMore, reset } = usePagination(filteredCredentials, 12);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onSearch: () => {
+      const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
+      searchInput?.focus();
+    },
+    onEscape: () => {
+      if (open) setOpen(false);
+      if (deleteDialogOpen) setDeleteDialogOpen(false);
+      if (upgradeOpen) setUpgradeOpen(false);
+      if (shareModalOpen) setShareModalOpen(false);
+    },
+    onNew: () => {
+      if (credentials.length < planLimits.maxCredentials) {
+        setOpen(true);
+      } else {
+        setUpgradeTitle(t('limit_credentials_title'));
+        setUpgradeDesc(t('limit_credentials_desc', { max: planLimits.maxCredentials }));
+        setUpgradeTarget('standard');
+        setUpgradeOpen(true);
+      }
+    },
+  });
 
   const loadData = useCallback(async () => {
     if(!user) return;
