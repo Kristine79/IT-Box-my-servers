@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/providers';
 import { Button } from './ui/button';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, FolderKanban, Server, Network, KeyRound, Share2, LogOut, Menu, HelpCircle, CreditCard, Moon, Sun, X, LogIn, Settings, Sparkles, Lock, User } from 'lucide-react';
+import { Share2, LogOut, Menu, Moon, Sun, X, LogIn, Sparkles, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,7 @@ import { NotificationBell } from './NotificationBell';
 import { AIConsultant } from './AIConsultant';
 import { CommandPalette } from './CommandPalette';
 import { UpgradeModal } from './UpgradeModal';
+import { NavItems } from './NavItems';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isPaywall, isAdmin, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme, planLimits } = useAuth();
@@ -106,14 +107,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return <Paywall />;
   }
 
-  const navItems = [
-    { href: '/', icon: LayoutDashboard, label: t('dashboard') },
-    { href: '/projects', icon: FolderKanban, label: t('projects') },
-    { href: '/servers', icon: Server, label: t('servers') },
-    { href: '/services', icon: Network, label: t('services') },
-    { href: '/credentials', icon: KeyRound, label: t('credentials') },
-  ];
-
   const motionProps = prefersReducedMotion ? { initial: false, animate: false, exit: undefined } : {};
 
   return (
@@ -144,53 +137,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className={cn("hidden flex-col neu-panel-sidebar m-4 mr-0 rounded-2xl md:flex shrink-0 transition-all duration-300 overflow-hidden", desktopSidebarOpen ? "w-44" : "w-[68px]")}>
         <div className="flex-1 overflow-y-auto px-2 py-6 scrollbar-hide">
           <nav className={cn("flex flex-col gap-0.5 font-normal text-[13px]", desktopSidebarOpen ? "items-stretch" : "items-center")}>
-
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={!desktopSidebarOpen ? item.label : undefined}
-                className={cn(
-                  "flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden",
-                  desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10",
-                  isActive ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "hover:text-[var(--neu-accent)] text-[var(--neu-text)] opacity-80 hover:opacity-100"
-                )}
-              >
-                <item.icon className="h-4 w-4 shrink-0" />
-                {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{item.label}</span>}
-              </Link>
-            )})}
-            
-            <div className={cn("my-1.5 h-px neu-panel-inset opacity-50", desktopSidebarOpen ? "w-full" : "w-10")} />
-            
-            <Link href="/about" title={!desktopSidebarOpen ? t('about') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <HelpCircle className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('about')}</span>}
-            </Link>
-            <Link href="/faq" title={!desktopSidebarOpen ? t('faq') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <HelpCircle className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('faq')}</span>}
-            </Link>
-            <Link href="/pricing" title={!desktopSidebarOpen ? t('pricing') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <CreditCard className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('pricing')}</span>}
-            </Link>
-            <div className={cn("my-1.5 h-px neu-panel-inset opacity-50", desktopSidebarOpen ? "w-full" : "w-10")} />
-            {user && !user.isAnonymous && isAdmin && (
-            <Link href="/admin" title={!desktopSidebarOpen ? t('admin') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/admin" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <Settings className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('admin')}</span>}
-            </Link>
-            )}
-            {user && !user.isAnonymous && (
-            <Link href="/profile" title={!desktopSidebarOpen ? t('profile') : undefined} className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", pathname === "/profile" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-               <User className="h-4 w-4 shrink-0" />
-               {desktopSidebarOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{t('profile')}</span>}
-            </Link>
-            )}
-            <div className={cn("my-1.5 h-px neu-panel-inset opacity-50", desktopSidebarOpen ? "w-full" : "w-10")} />
+            <NavItems mode="desktop" isOpen={desktopSidebarOpen} />
             <button 
               title={!desktopSidebarOpen ? (isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')) : undefined}
               className={cn("flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden", desktopSidebarOpen ? "px-3" : "px-0 justify-center w-10", "text-[var(--neu-text)] opacity-60 hover:opacity-100")}
@@ -304,48 +251,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </button>
                  </div>
                  <nav className="flex-1 p-4 text-sm font-normal gap-0.5 overflow-y-auto flex flex-col items-start w-full">
-                   {navItems.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className={cn(
-                          "flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full",
-                          pathname === item.href ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "hover:text-[var(--neu-accent)] opacity-80"
-                        )}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {item.label}
-                      </Link>
-                    ))}
-                    <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
-                    
-                    <Link href="/about" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/about" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <HelpCircle className="h-4 w-4" />
-                       {t('about')}
-                    </Link>
-                    <Link href="/faq" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/faq" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <HelpCircle className="h-4 w-4" />
-                       {t('faq')}
-                    </Link>
-                    <Link href="/pricing" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/pricing" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <CreditCard className="h-4 w-4" />
-                       {t('pricing')}
-                    </Link>
-                    <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
-                    {user && !user.isAnonymous && isAdmin && (
-                    <Link href="/admin" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/admin" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <Settings className="h-4 w-4" />
-                       {t('admin')}
-                    </Link>
-                    )}
-                    {user && !user.isAnonymous && (
-                    <Link href="/profile" onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full", pathname === "/profile" ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset" : "text-[var(--neu-text)] opacity-60 hover:opacity-100")}>
-                       <User className="h-4 w-4" />
-                       {t('profile')}
-                    </Link>
-                    )}
-                    <div className="my-1.5 h-px neu-panel-inset opacity-50 w-full" />
+                   <NavItems mode="mobile" onNavigate={() => setSidebarOpen(false)} />
                     <button onClick={() => { toggleTheme(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
                        {isDark ? t('light_mode', 'Светлая тема') : t('dark_mode', 'Тёмная тема')}

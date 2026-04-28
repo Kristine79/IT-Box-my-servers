@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { SkeletonGrid } from "@/components/SkeletonCard";
 
 export default function ServicesPage() {
   const { t } = useTranslation();
@@ -237,7 +238,7 @@ export default function ServicesPage() {
         </Dialog>
       </div>
 
-      {loading ? <p className="opacity-50">{t('loading')}</p> : (
+      {loading ? <SkeletonGrid count={6} /> : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
            {services.length === 0 && (
               <div className="neu-panel p-12 text-center text-[var(--neu-text-muted)] col-span-full">

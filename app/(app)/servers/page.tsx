@@ -11,6 +11,7 @@ import { useNotifications } from "@/lib/notifications";
 import { ShareModal } from "@/components/ShareModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { SkeletonList } from "@/components/SkeletonCard";
 
 export default function ServersPage() {
   const { t } = useTranslation();
@@ -169,7 +170,7 @@ export default function ServersPage() {
         </Dialog>
       </div>
 
-      {loading ? <p className="opacity-50">{t('loading')}</p> : (
+      {loading ? <SkeletonList count={4} /> : (
         <div className="space-y-4">
            {servers.length === 0 && (
               <div className="neu-panel p-12 text-center text-[var(--neu-text-muted)]">
