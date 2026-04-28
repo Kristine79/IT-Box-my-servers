@@ -9,6 +9,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-YD1230Y7R5';
 import { SchemaMarkup } from '@/components/SchemaMarkup';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -90,12 +91,14 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       </head>
       <body suppressHydrationWarning>
         <SchemaMarkup />
-        <Providers>
-          <NotificationProvider>
-            {children}
-            <Toaster />
-          </NotificationProvider>
-        </Providers>
+        <ErrorBoundary>
+          <Providers>
+            <NotificationProvider>
+              {children}
+              <Toaster />
+            </NotificationProvider>
+          </Providers>
+        </ErrorBoundary>
         <GoogleAnalytics gaId={GA_ID} />
       </body>
     </html>

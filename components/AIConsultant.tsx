@@ -246,7 +246,7 @@ export function AIConsultant() {
             {/* Main Panel Container */}
             <div className="flex-1 flex flex-col overflow-hidden min-h-0">
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin scrollbar-thumb-[var(--neu-text-muted)]/30 scrollbar-track-transparent">
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin scrollbar-thumb-[var(--neu-text-muted)]/30 scrollbar-track-transparent" aria-live="polite" aria-atomic="false">
                 {messages.map((msg, idx) => (
                   <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[90%] px-4 py-3 text-[14px] leading-relaxed ${
@@ -257,7 +257,7 @@ export function AIConsultant() {
                       {msg.role === 'user' ? (
                         <div>{msg.text}</div>
                       ) : (
-                        <div className="prose prose-lg dark:prose-invert max-w-none prose-p:my-1 prose-headings:mb-2 prose-headings:mt-3 prose-ul:my-1">
+                        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:mb-2 prose-headings:mt-3 prose-ul:my-1">
                           <ReactMarkdown>{msg.text}</ReactMarkdown>
                         </div>
                       )}
@@ -292,7 +292,7 @@ export function AIConsultant() {
                   <button 
                     type="submit" 
                     disabled={!input.trim() || isLoading}
-                    className="w-[44px] h-[44px] shrink-0 flex items-center justify-center rounded-full neu-panel text-[#2563ea] disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_8px_var(--neu-dark),-4px_-4px_8px_var(--neu-light)] active:shadow-inner"
+                    className="w-[44px] h-[44px] shrink-0 flex items-center justify-center rounded-full neu-panel text-[var(--neu-accent)] disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_8px_var(--neu-dark),-4px_-4px_8px_var(--neu-light)] active:shadow-inner"
                     aria-label="Send message"
                   >
                     <Send className="w-5 h-5 ml-0.5" />

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { ShareModal } from "@/components/ShareModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 export default function ServersPage() {
   const { t } = useTranslation();
@@ -32,6 +33,11 @@ export default function ServersPage() {
   // Share modal state
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareServer, setShareServer] = useState<any>(null);
+
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteTargetName, setDeleteTargetName] = useState<string>('');
 
   const loadData = useCallback(async () => {
     if(!user) return;
@@ -70,14 +76,23 @@ export default function ServersPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if(!confirm(t('confirm_delete'))) return;
+  const handleDelete = async (id: string, name?: string) => {
+    setDeleteTargetId(id);
+    setDeleteTargetName(name || '');
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      await deleteDoc(doc(db, "servers", id));
-      toast.success(t('server_deleted'));
+      await deleteDoc(doc(db, "servers", deleteTargetId));
+      toast.success(t('server_deleted', 'Сервер удалён'));
       loadData();
     } catch (error) {
-      toast.error(t('server_delete_failed'));
+      toast.error(t('server_delete_failed', 'Не удалось удалить сервер'));
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -225,7 +240,7 @@ export default function ServersPage() {
                         >
                           <Share2 className="w-4 h-4" />
                        </button>
-                       <button className="neu-button h-10 w-10 text-red-500" onClick={() => handleDelete(s.id)}>
+                       <button className="neu-button h-10 w-10 text-red-500" onClick={() => handleDelete(s.id, s.name)}>
                           <Trash2 className="w-4 h-4" />
                        </button>
                     </div>
@@ -244,6 +259,13 @@ export default function ServersPage() {
         resourceType="server"
         resourceData={shareServer || {}}
         resourceId={shareServer?.id || ''}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        itemName={deleteTargetName}
       />
     </div>
   );

@@ -9,6 +9,7 @@ import { Plus, Trash2, ExternalLink, Share2, Network, Globe, Activity, Shield, S
 import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 export default function ServicesPage() {
   const { t } = useTranslation();
@@ -22,6 +23,11 @@ export default function ServicesPage() {
   const [checkResults, setCheckResults] = useState<Record<string, any>>({});
   const [checking, setChecking] = useState(false);
   const [uptimeHistory, setUptimeHistory] = useState<Record<string, any[]>>({});
+
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteTargetName, setDeleteTargetName] = useState<string>('');
 
   // Form
   const [name, setName] = useState("");
@@ -121,14 +127,23 @@ export default function ServicesPage() {
     }
   }, [user]);
 
-  const handleDelete = async (id: string) => {
-    if(!confirm("Are you sure?")) return;
+  const handleDelete = async (id: string, name?: string) => {
+    setDeleteTargetId(id);
+    setDeleteTargetName(name || '');
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      await deleteDoc(doc(db, "services", id));
-      toast.success("Service deleted");
+      await deleteDoc(doc(db, "services", deleteTargetId));
+      toast.success(t('service_deleted', 'Сервис удалён'));
       loadData();
     } catch (error) {
-      toast.error("Failed to delete service");
+      toast.error(t('delete_failed', 'Не удалось удалить'));
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -184,23 +199,24 @@ export default function ServicesPage() {
             <form onSubmit={handleCreate} className="space-y-4 pt-4 pb-12 sm:pb-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
-                   <input required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="API Gateway" />
+                   <label htmlFor="svc-name" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_name')}</label>
+                   <input id="svc-name" required value={name} onChange={e=>setName(e.target.value)} className="neu-input w-full" placeholder="API Gateway" />
                  </div>
                  <div className="space-y-1">
-                   <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_port')}</label>
-                   <input value={port} onChange={e=>setPort(e.target.value)} className="neu-input w-full font-mono text-sm" placeholder="443" />
+                   <label htmlFor="svc-port" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_port')}</label>
+                   <input id="svc-port" value={port} onChange={e=>setPort(e.target.value)} className="neu-input w-full font-mono text-sm" placeholder="443" />
                  </div>
                </div>
 
                <div className="space-y-1">
-                 <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
-                 <input value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full" placeholder="https://api.example.com" />
+                 <label htmlFor="svc-url" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_url')}</label>
+                 <input id="svc-url" value={url} onChange={e=>setUrl(e.target.value)} className="neu-input w-full" placeholder="https://api.example.com" />
                </div>
                
                <div className="space-y-1">
-                 <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_server')}</label>
+                 <label htmlFor="svc-server" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_server')}</label>
                  <select 
+                    id="svc-server"
                     value={serverId} 
                     onChange={(e) => setServerId(e.target.value)}
                     className="neu-input w-full appearance-none cursor-pointer"
@@ -211,8 +227,8 @@ export default function ServicesPage() {
                </div>
                
                <div className="space-y-1">
-                  <label className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
-                  <textarea value={notes} onChange={e=>setNotes(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_notes')} />
+                  <label htmlFor="svc-notes" className="text-sm font-semibold tracking-wide ml-2 uppercase text-[var(--neu-text-muted)]">{t('field_notes')}</label>
+                  <textarea id="svc-notes" value={notes} onChange={e=>setNotes(e.target.value)} className="neu-input w-full min-h-[100px] resize-none" placeholder={t('placeholder_notes')} />
                </div>
 
               <div className="flex justify-end pt-2"><button type="submit" className="neu-button neu-button-accent px-8 py-3">{t('btn_save')}</button></div>
@@ -242,7 +258,7 @@ export default function ServicesPage() {
                        <button className="neu-button h-8 w-8 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" title={t('share')}>
                           <Share2 className="w-4 h-4" />
                        </button>
-                       <button className="neu-button h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(s.id)}>
+                       <button className="neu-button h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(s.id, s.name)}>
                           <Trash2 className="w-4 h-4" />
                        </button>
                     </div>
@@ -336,6 +352,13 @@ export default function ServicesPage() {
            )})}
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        itemName={deleteTargetName}
+      />
     </div>
   );
 }

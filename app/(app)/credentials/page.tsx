@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useNotifications } from "@/lib/notifications";
 import { ShareModal } from "@/components/ShareModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 export default function CredentialsPage() {
   const { t } = useTranslation();
@@ -39,6 +40,11 @@ export default function CredentialsPage() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareCredential, setShareCredential] = useState<any>(null);
   const [notes, setNotes] = useState("");
+
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteTargetName, setDeleteTargetName] = useState<string>('');
 
   const loadData = useCallback(async () => {
     if(!user) return;
@@ -126,14 +132,23 @@ export default function CredentialsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if(!confirm(t('confirm_delete'))) return;
+  const handleDelete = async (id: string, name?: string) => {
+    setDeleteTargetId(id);
+    setDeleteTargetName(name || '');
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      await deleteDoc(doc(db, "credentials", id));
-      toast.success("Credential deleted");
+      await deleteDoc(doc(db, "credentials", deleteTargetId));
+      toast.success(t('credential_deleted', 'Доступ удалён'));
       loadData();
     } catch (error) {
-      toast.error("Failed to delete credential");
+      toast.error(t('delete_failed', 'Не удалось удалить'));
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -273,7 +288,7 @@ export default function CredentialsPage() {
                         >
                           <Share2 className="w-4 h-4" />
                        </button>
-                       <button className="neu-button h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(c.id)} aria-label={t('delete_credential')}>
+                       <button className="neu-button h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(c.id, c.name)} aria-label={t('delete_credential')}>
                           <Trash2 className="w-4 h-4" />
                        </button>
                     </div>
@@ -307,6 +322,13 @@ export default function CredentialsPage() {
            ))}
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        itemName={deleteTargetName}
+      />
     </div>
   );
 }
