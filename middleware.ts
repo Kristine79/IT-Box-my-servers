@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { logAuthFailure } from '@/lib/security';
 
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
@@ -17,7 +18,6 @@ const PUBLIC_PATHS = [
 // Static assets and API routes
 const PUBLIC_PREFIXES = [
   '/_next/',
-  '/api/',
   '/static/',
   '/favicon.ico',
   '/manifest.json',
@@ -25,11 +25,35 @@ const PUBLIC_PREFIXES = [
   '/sitemap',
 ];
 
+// Admin-only paths
+const ADMIN_PATHS = ['/admin', '/api/admin'];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public prefixes
+  // Allow public prefixes (static assets)
   if (PUBLIC_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
+    return NextResponse.next();
+  }
+
+  // Allow API routes to handle their own auth (they use Firebase verify)
+  if (pathname.startsWith('/api/')) {
+    // Special handling for sensitive API endpoints
+    if (pathname.startsWith('/api/crypto/') || pathname.startsWith('/api/billing/')) {
+      const authCookie = request.cookies.get('__session')?.value;
+      if (!authCookie) {
+        logAuthFailure(request, 'API access without valid session');
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { 
+            status: 401,
+            headers: {
+              'WWW-Authenticate': 'Bearer',
+            }
+          }
+        );
+      }
+    }
     return NextResponse.next();
   }
 
@@ -44,11 +68,8 @@ export function middleware(request: NextRequest) {
 
   // If no auth cookie, redirect to login
   if (!authCookie) {
-    // For API routes, return 401
-    if (pathname.startsWith('/api/')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+    logAuthFailure(request, 'Access to protected route without authentication');
+    
     // For app routes, redirect to home with login modal
     const url = request.nextUrl.clone();
     url.pathname = '/';
@@ -56,7 +77,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  // Add security headers to all responses
+  const response = NextResponse.next();
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '0'); // Disabled in favor of CSP
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  return response;
 }
 
 export const config = {

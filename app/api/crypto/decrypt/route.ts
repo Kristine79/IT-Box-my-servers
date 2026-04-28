@@ -1,27 +1,26 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { withApiProtection, RATE_LIMITS, secureJsonResponse, secureErrorResponse } from '@/lib/security';
+import { z } from 'zod';
 
 const ALGORITHM = 'aes-256-gcm';
-
 const MAX_ENCRYPTED_LENGTH = 10000;
 
-export async function POST(req: Request) {
+// Validation schema
+const decryptSchema = z.object({
+  encrypted: z.string().min(1).max(MAX_ENCRYPTED_LENGTH),
+  iv: z.string().regex(/^[A-Za-z0-9+/=]+$/, 'Invalid base64'),
+  authTag: z.string().regex(/^[A-Za-z0-9+/=]+$/, 'Invalid base64'),
+});
+
+async function decryptHandler(req: Request): Promise<NextResponse> {
   try {
     const { encrypted, iv, authTag } = await req.json();
-    if (!encrypted || !iv || !authTag) {
-      return NextResponse.json({ error: 'Missing encryption parameters' }, { status: 400 });
-    }
-    if (typeof encrypted !== 'string' || typeof iv !== 'string' || typeof authTag !== 'string') {
-      return NextResponse.json({ error: 'Invalid parameter types' }, { status: 400 });
-    }
-    if (encrypted.length > MAX_ENCRYPTED_LENGTH || iv.length > 200 || authTag.length > 200) {
-      return NextResponse.json({ error: 'Parameter length exceeds maximum' }, { status: 400 });
-    }
-
+    
     const secretKey = process.env.AES_SECRET_KEY;
     if (!secretKey || secretKey.length !== 64) {
       console.error("AES_SECRET_KEY is improperly configured.");
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      return secureErrorResponse('Server configuration error', 500);
     }
 
     const key = Buffer.from(secretKey, 'hex');
@@ -34,11 +33,16 @@ export async function POST(req: Request) {
     let decrypted = decipher.update(encrypted, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
 
-    return NextResponse.json({
-      decrypted,
-    });
+    return secureJsonResponse({ decrypted });
   } catch (error) {
     console.error('Decryption error:', error);
-    return NextResponse.json({ error: 'Decryption failed' }, { status: 500 });
+    return secureErrorResponse('Decryption failed', 500);
   }
 }
+
+// Apply rate limiting and security headers
+export const POST = withApiProtection(
+  async (req) => decryptHandler(req),
+  decryptSchema,
+  RATE_LIMITS.CRYPTO.decrypt
+);
