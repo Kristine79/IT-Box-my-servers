@@ -11,6 +11,7 @@ import { useNotifications } from "@/lib/notifications";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { SkeletonGrid } from "@/components/SkeletonCard";
+import { SearchFilter, useFilteredItems, usePagination } from "@/components/SearchFilter";
 
 export default function ServicesPage() {
   const { t } = useTranslation();
@@ -29,6 +30,15 @@ export default function ServicesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+
+  // Search and pagination
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredServices = useFilteredItems(
+    services,
+    searchQuery,
+    (s) => `${s.name} ${s.url || ''} ${s.port || ''}`
+  );
+  const { paginatedItems, hasMore, loadMore, reset } = usePagination(filteredServices, 12);
 
   // Form
   const [name, setName] = useState("");
@@ -155,6 +165,13 @@ export default function ServicesPage() {
            <h1 className="text-3xl font-bold tracking-tight mb-2">{t('services')}</h1>
            <p className="text-[var(--neu-text-muted)]">{t('manage_services_desc')}</p>
         </div>
+        <div className="flex gap-3 items-center">
+          <SearchFilter
+            value={searchQuery}
+            onChange={(val) => { setSearchQuery(val); reset(); }}
+            placeholder={t('search_services', 'Поиск сервисов...')}
+            className="w-full sm:w-64"
+          />
         {planLimits.canMonitoring && (
           <button
             onClick={runHealthCheck}
@@ -183,6 +200,7 @@ export default function ServicesPage() {
           targetPlan="standard"
           buttonText={t('view_plans', 'Смотреть тарифы')}
         />
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger
             className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center font-semibold text-sm"
@@ -246,7 +264,7 @@ export default function ServicesPage() {
                  <p>{t('no_services')}</p>
               </div>
            )}
-           {services.map((s) => {
+           {paginatedItems.map((s) => {
               const server = servers.find(srv => srv.id === s.serverId);
               return (
               <div key={s.id} className="neu-panel p-6 flex flex-col h-full group relative transition-all duration-300 hover:scale-[1.02]">
@@ -351,6 +369,14 @@ export default function ServicesPage() {
                  </div>
               </div>
            )})}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <button onClick={loadMore} className="neu-button px-6 py-3 font-semibold">
+            {t('load_more', 'Загрузить ещё')}
+          </button>
         </div>
       )}
 

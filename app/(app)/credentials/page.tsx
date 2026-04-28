@@ -11,7 +11,9 @@ import { useNotifications } from "@/lib/notifications";
 import { ShareModal } from "@/components/ShareModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { useUndoableDelete } from "@/components/UndoToast";
 import { SkeletonGrid } from "@/components/SkeletonCard";
+import { SearchFilter, useFilteredItems, usePagination } from "@/components/SearchFilter";
 
 export default function CredentialsPage() {
   const { t } = useTranslation();
@@ -46,6 +48,15 @@ export default function CredentialsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+
+  // Search and pagination
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredCredentials = useFilteredItems(
+    credentials,
+    searchQuery,
+    (c) => `${c.name} ${c.username || ''} ${c.type || ''}`
+  );
+  const { paginatedItems, hasMore, loadMore, reset } = usePagination(filteredCredentials, 12);
 
   const loadData = useCallback(async () => {
     if(!user) return;
@@ -139,18 +150,36 @@ export default function CredentialsPage() {
     setDeleteDialogOpen(true);
   };
 
+  const { showUndoToast } = useUndoableDelete();
+
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
-    try {
-      await deleteDoc(doc(db, "credentials", deleteTargetId));
-      toast.success(t('credential_deleted', 'Доступ удалён'));
-      loadData();
-    } catch (error) {
-      toast.error(t('delete_failed', 'Не удалось удалить'));
-    } finally {
-      setDeleteDialogOpen(false);
-      setDeleteTargetId(null);
-    }
+    const idToDelete = deleteTargetId;
+    const nameToDelete = deleteTargetName;
+    const itemToRestore = credentials.find(c => c.id === idToDelete);
+    
+    // Close dialog and remove from UI immediately
+    setDeleteDialogOpen(false);
+    setDeleteTargetId(null);
+    setCredentials(prev => prev.filter(c => c.id !== idToDelete));
+    
+    // Show undo toast
+    showUndoToast({
+      itemName: nameToDelete,
+      onDelete: async () => {
+        // Actually delete from Firestore after delay
+        await deleteDoc(doc(db, "credentials", idToDelete));
+        toast.success(t('credential_deleted', 'Доступ удалён'));
+      },
+      onUndo: async () => {
+        // Restore to UI (no Firestore action needed since we didn't delete yet)
+        if (itemToRestore) {
+          setCredentials(prev => [...prev, itemToRestore].sort((a, b) => 
+            new Date(b.createdAt?.seconds || 0).getTime() - new Date(a.createdAt?.seconds || 0).getTime()
+          ));
+        }
+      },
+    });
   };
 
   const copyToClipboard = (text: string) => {
@@ -180,6 +209,13 @@ export default function CredentialsPage() {
              {t('secure_storage')}
            </p>
         </div>
+        <div className="flex gap-3 items-center">
+          <SearchFilter
+            value={searchQuery}
+            onChange={(val) => { setSearchQuery(val); reset(); }}
+            placeholder={t('search_credentials', 'Поиск доступов...')}
+            className="w-full sm:w-64"
+          />
         <UpgradeModal
           open={upgradeOpen}
           onClose={() => setUpgradeOpen(false)}
@@ -187,6 +223,7 @@ export default function CredentialsPage() {
           description={upgradeDesc}
           targetPlan={upgradeTarget}
         />
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger
             className="neu-button neu-button-accent px-6 py-3 shrink-0 shadow-rose-500/30 flex items-center font-semibold"
@@ -261,7 +298,7 @@ export default function CredentialsPage() {
                  <p>{t('no_credentials')}</p>
               </div>
            )}
-           {credentials.map((c) => (
+           {paginatedItems.map((c) => (
               <div key={c.id} className="neu-panel p-6 flex flex-col h-full group relative transition-all duration-300">
                  <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
@@ -321,6 +358,14 @@ export default function CredentialsPage() {
                  </div>
               </div>
            ))}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <button onClick={loadMore} className="neu-button px-6 py-3 font-semibold">
+            {t('load_more', 'Загрузить ещё')}
+          </button>
         </div>
       )}
 

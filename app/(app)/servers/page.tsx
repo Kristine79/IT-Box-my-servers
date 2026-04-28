@@ -12,6 +12,7 @@ import { ShareModal } from "@/components/ShareModal";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { SkeletonList } from "@/components/SkeletonCard";
+import { SearchFilter, useFilteredItems, usePagination } from "@/components/SearchFilter";
 
 export default function ServersPage() {
   const { t } = useTranslation();
@@ -39,6 +40,15 @@ export default function ServersPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+
+  // Search and pagination
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredServers = useFilteredItems(
+    servers,
+    searchQuery,
+    (s) => `${s.name} ${s.ipAddress || ''} ${s.provider || ''} ${s.os || ''}`
+  );
+  const { paginatedItems, hasMore, loadMore, reset } = usePagination(filteredServers, 10);
 
   const loadData = useCallback(async () => {
     if(!user) return;
@@ -104,6 +114,13 @@ export default function ServersPage() {
            <h1 className="text-3xl font-bold tracking-tight mb-2">{t('servers')}</h1>
            <p className="text-[var(--neu-text-muted)]">{t('manage_servers_desc')}</p>
         </div>
+        <div className="flex gap-3 items-center">
+          <SearchFilter
+            value={searchQuery}
+            onChange={(val) => { setSearchQuery(val); reset(); }}
+            placeholder={t('search_servers', 'Поиск серверов...')}
+            className="w-full sm:w-64"
+          />
         <UpgradeModal
           open={upgradeOpen}
           onClose={() => setUpgradeOpen(false)}
@@ -112,6 +129,7 @@ export default function ServersPage() {
           targetPlan="standard"
           buttonText={t('view_plans', 'Смотреть тарифы')}
         />
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger
             className="neu-button neu-button-accent px-6 py-3 shrink-0 flex items-center justify-center font-semibold text-sm"
@@ -178,7 +196,7 @@ export default function ServersPage() {
                  <p>{t('no_servers')}</p>
               </div>
            )}
-           {servers.map((s) => {
+           {paginatedItems.map((s) => {
               const project = projects.find(p => p.id === s.projectId);
               return (
               <div key={s.id} className="neu-panel p-6 px-8 flex flex-col lg:flex-row items-center justify-between gap-6 transition-all duration-300 hover:scale-[1.01] group">
@@ -248,6 +266,14 @@ export default function ServersPage() {
                  </div>
               </div>
            )})}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <button onClick={loadMore} className="neu-button px-6 py-3 font-semibold">
+            {t('load_more', 'Загрузить ещё')}
+          </button>
         </div>
       )}
 
