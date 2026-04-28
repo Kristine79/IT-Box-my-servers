@@ -1,0 +1,56 @@
+# Windsurf Configuration
+# Cybersecurity Skills Library Integration
+
+skills:
+  # Path to local skills directory
+  local_path: .windsurf/skills
+  
+  # Auto-load these skill categories for relevant prompts
+  auto_load:
+    - pattern: "(security|vulnerability|threat|malware|forensics|pentest|audit)"
+      categories:
+        - analyzing-*
+        - detecting-*
+        - hunting-*
+        - performing-*
+        - implementing-security-*
+    
+    - pattern: "(cloud|aws|azure|gcp|kubernetes|docker|container)"
+      categories:
+        - securing-*-on-cloud
+        - implementing-*-for-cloud
+        - detecting-cloud-*
+        - auditing-*
+    
+    - pattern: "(incident|response|ir|forensics|investigation|breach)"
+      categories:
+        - conducting-*-incident-response
+        - performing-*-forensics
+        - building-incident*
+        - triaging-*
+    
+    - pattern: "(api|authentication|jwt|oauth|sso)"
+      categories:
+        - implementing-api-*
+        - testing-api-*
+        - securing-api-*
+        - detecting-api-*
+        - exploiting-api-*
+
+# Default skills always available
+default_skills:
+  - implementing-secrets-management-with-vault
+  - detecting-credential-dumping-techniques
+  - securing-aws-iam-permissions
+  - hardening-docker-containers-for-production
+
+# Skill behavior
+behavior:
+  # Suggest relevant skills when context matches
+  suggest_on_match: true
+  
+  # Show skill usage in responses
+  show_attribution: true
+  
+  # Cache skill metadata
+  cache_enabled: true
