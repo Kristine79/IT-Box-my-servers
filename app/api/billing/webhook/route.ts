@@ -93,6 +93,7 @@ export async function POST(req: Request) {
       }
 
       const uid = verified.metadata?.uid;
+      const planId = verified.metadata?.planId || 'standard';
       if (!uid) {
         console.error('No UID in payment metadata');
         return NextResponse.json({ error: 'No UID in payment metadata' }, { status: 400 });
@@ -124,9 +125,9 @@ export async function POST(req: Request) {
         }
 
         if (userDoc.exists) {
-          tx.update(userRef, { subscriptionEndsAt: newEnd.toISOString() });
+          tx.update(userRef, { subscriptionEndsAt: newEnd.toISOString(), plan: planId });
         } else {
-          tx.set(userRef, { subscriptionEndsAt: newEnd.toISOString() }, { merge: true });
+          tx.set(userRef, { subscriptionEndsAt: newEnd.toISOString(), plan: planId }, { merge: true });
         }
 
         tx.set(processedRef, {

@@ -17,7 +17,7 @@ export const auth = getAuth(app);
 
 
 
-type ThemeMode = 'neumorphic' | 'glassmorphism' | 'defi';
+type ThemeMode = 'neumorphic' | 'glassmorphism' | 'defi' | 'eco';
 
 type AuthContextType = {
   user: User | null;
@@ -143,7 +143,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
           setTrialEndsAt(tEnd);
           setSubscriptionEndsAt(sEnd);
           setNotificationsEnabled(data.notificationsEnabled !== false);
-          const plan = (data.plan as PlanId) || 'free';
+          // Determine plan: use saved plan field, or auto-detect from active subscription
+          let plan = (data.plan as PlanId) || 'free';
+          if (plan === 'free' && sEnd && new Date() <= sEnd) {
+            plan = 'standard'; // Active subscription but plan not set — assume standard
+          }
           setUserPlan(plan);
 
           const now = new Date();
@@ -155,14 +159,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
           
           // Theme: load saved or default to neumorphic
           const savedTheme = data.theme as ThemeMode;
-          if (savedTheme === 'glassmorphism' || savedTheme === 'neumorphic' || savedTheme === 'defi') {
+          if (savedTheme === 'glassmorphism' || savedTheme === 'neumorphic' || savedTheme === 'defi' || savedTheme === 'eco') {
             setThemeState(savedTheme);
           }
           
           // Can use premium theme if has active subscription or trial
           const canUsePremium = !trialExpired || !subExpired;
           // If they selected premium but can't use it, revert to neumorphic
-          if ((savedTheme === 'glassmorphism' || savedTheme === 'defi') && !canUsePremium) {
+          if ((savedTheme === 'glassmorphism' || savedTheme === 'defi' || savedTheme === 'eco') && !canUsePremium) {
             setThemeState('neumorphic');
           }
         }

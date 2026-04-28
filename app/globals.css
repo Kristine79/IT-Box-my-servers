@@ -294,6 +294,87 @@ body.defi-theme header {
     backdrop-filter: blur(16px);
 }
 
+/* ── Eco/Sustainability Theme ── */
+body.eco-theme {
+    --neu-bg: #f6f3ef;
+    --neu-light: #ffffff;
+    --neu-dark: #e2ddd6;
+    --neu-accent: #2d7d46;
+    --neu-text: #1f2937;
+    --neu-text-muted: #6b7280;
+    --neu-shadow: 8px 8px 20px #e2ddd6, -8px -8px 20px #ffffff;
+    --neu-shadow-inset: inset 4px 4px 10px #e2ddd6, inset -4px -4px 10px #ffffff;
+    --neu-shadow-hover: 10px 10px 24px #d8d3cc, -10px -10px 24px #ffffff;
+    --neu-shadow-active: inset 4px 4px 10px #d8d3cc, inset -4px -4px 10px #ffffff;
+    --neu-border: rgba(45, 125, 70, 0.15);
+
+    background-color: var(--neu-bg);
+    background-image: radial-gradient(ellipse at top right, rgba(45, 125, 70, 0.06), transparent 50%),
+                      radial-gradient(ellipse at bottom left, rgba(34, 197, 94, 0.04), transparent 40%);
+    color: var(--neu-text);
+}
+
+body.eco-theme .neu-panel {
+    border: 1px solid rgba(45, 125, 70, 0.08);
+}
+
+body.eco-theme .neu-panel:hover {
+    border-color: rgba(45, 125, 70, 0.18);
+    box-shadow: 10px 10px 24px #d8d3cc, -10px -10px 24px #ffffff;
+}
+
+body.eco-theme .neu-panel-sidebar {
+    background: rgba(246, 243, 239, 0.92);
+    border-right: 1px solid rgba(45, 125, 70, 0.12);
+}
+
+body.eco-theme .neu-panel-inset {
+    background: var(--neu-bg);
+    box-shadow: inset 4px 4px 10px #e2ddd6, inset -4px -4px 10px #ffffff;
+}
+
+body.eco-theme .neu-button {
+    background: var(--neu-bg);
+    box-shadow: 6px 6px 14px #e2ddd6, -6px -6px 14px #ffffff;
+    color: var(--neu-text);
+    border: 1px solid rgba(45, 125, 70, 0.1);
+}
+
+body.eco-theme .neu-button:hover {
+    box-shadow: 8px 8px 18px #d8d3cc, -8px -8px 18px #ffffff;
+    border-color: rgba(45, 125, 70, 0.2);
+}
+
+body.eco-theme .neu-button-accent {
+    background: linear-gradient(135deg, #2d7d46 0%, #3a9b5a 100%);
+    color: #ffffff;
+    box-shadow: 6px 6px 14px rgba(45, 125, 70, 0.25), -6px -6px 14px #ffffff;
+    border: none;
+}
+
+body.eco-theme .neu-button-accent:hover {
+    box-shadow: 8px 8px 20px rgba(45, 125, 70, 0.35), -8px -8px 20px #ffffff;
+}
+
+body.eco-theme .neu-sidebar-item.active {
+    background: rgba(45, 125, 70, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(45, 125, 70, 0.3);
+}
+
+body.eco-theme .neu-sidebar-item:hover {
+    background: rgba(45, 125, 70, 0.06);
+}
+
+body.eco-theme .neu-divider {
+    background: linear-gradient(90deg, transparent, rgba(45, 125, 70, 0.2), transparent);
+}
+
+body.eco-theme header {
+    background: rgba(246, 243, 239, 0.88);
+    border-bottom: 1px solid rgba(45, 125, 70, 0.1);
+    backdrop-filter: blur(16px);
+}
+
 .dark {
     --background: oklch(0.22 0.03 260);
     --foreground: oklch(0.95 0 0);
