@@ -43,14 +43,15 @@ export const RATE_LIMITS = {
   DEFAULT: { windowMs: 60 * 1000, maxRequests: 100, keyPrefix: 'api:default' },
   // AI endpoints
   AI: { windowMs: 60 * 1000, maxRequests: 20, keyPrefix: 'ai:chat' },
-} as const;
+};
 
 /**
  * Generate rate limit key from request
  * Combines user ID (if authenticated) + IP address
  */
 function getRateLimitKey(req: NextRequest, config: RateLimitConfig): string {
-  const ip = req.ip || req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  const forwarded = req.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0].trim() : req.headers.get('x-real-ip') || 'unknown';
   const userId = req.headers.get('x-user-id') || 'anonymous';
   return `${config.keyPrefix}:${userId}:${ip}`;
 }

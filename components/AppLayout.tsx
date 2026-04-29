@@ -21,6 +21,7 @@ import { AIConsultant } from './AIConsultant';
 import { CommandPalette } from './CommandPalette';
 import { UpgradeModal } from './UpgradeModal';
 import { NavItems } from './NavItems';
+import { SecurityOnboarding } from './SecurityOnboarding';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isPaywall, isAdmin, login, loginWithEmail, logout, theme, setTheme, canUsePremiumTheme, planLimits } = useAuth();
@@ -336,6 +337,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex flex-col gap-1.5">
                   <Link href="/consent" className="hover:text-[var(--neu-accent)] transition-colors">{t('personal_data_consent')}</Link>
                   <Link href="/privacy" className="hover:text-[var(--neu-accent)] transition-colors">{t('privacy_policy')}</Link>
+                  <a href="https://github.com/Kristine79/IT-Box-my-servers/blob/main/SECURITY_GUIDE.md" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--neu-accent)] transition-colors">{t('security', 'Безопасность')}</a>
                 </div>
               </footer>
             </motion.div>
@@ -343,6 +345,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
       <AIConsultant />
+      <SecurityOnboarding />
     </div>
   );
 }

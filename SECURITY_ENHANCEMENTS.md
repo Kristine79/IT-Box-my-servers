@@ -15,19 +15,27 @@
 - Proper error handling without leaking sensitive info
 - Server-side key management (AES_SECRET_KEY from env)
 
-### 2. implementing-api-gateway-security-controls 🔧
-**Enhancements Needed:**
-- ❌ Rate limiting not implemented (CRITICAL)
-- ❌ Request schema validation incomplete
-- ❌ Security headers missing in API responses
-- ❌ No IP-based restrictions for admin endpoints
+### 2. implementing-api-gateway-security-controls ✅
+**Status:** IMPLEMENTED
+- ✅ Token bucket rate limiting per user+IP (`lib/security/rate-limiter.ts`)
+  - Crypto endpoints: 30 enc/min, 60 dec/min
+  - Default API: 100 req/min
+- ✅ Request schema validation with Zod (`lib/security/request-validator.ts`)
+- ✅ Security headers on all responses (`lib/security/security-headers.ts`)
+- ✅ Rate limit headers (X-RateLimit-Limit, X-RateLimit-Remaining)
+- ⚠️ IP-based restrictions pending (requires admin endpoint classification)
 
-### 3. securing-serverless-functions 🔧
-**Enhancements Needed:**
-- ❌ No function-level concurrency limits
-- ❌ Environment variables not encrypted at rest
-- ❌ Missing structured security logging
-- ❌ No dependency vulnerability scanning in CI/CD
+### 3. securing-serverless-functions ✅
+**Status:** IMPLEMENTED
+- ✅ Security headers middleware (`lib/security/security-headers.ts`)
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - HSTS (production)
+- ✅ Request validation and sanitization
+- ✅ Structured security logging (`lib/security/security-logger.ts`)
+- ⚠️ Environment variables encryption requires AWS KMS/Azure Key Vault
+- ⚠️ Dependency scanning requires CI/CD pipeline integration
 
 ### 4. implementing-jwt-signing-and-verification ✅
 **Status:** Partial implementation via Firebase
@@ -39,21 +47,27 @@
 - Implement token expiration checks beyond Firebase
 - Add audience/issuer validation for API routes
 
-### 5. detecting-anomalous-authentication-patterns 🔧
-**Enhancements Needed:**
-- ❌ No failed authentication monitoring
-- ❌ No IP-based anomaly detection
-- ❌ No rate-based alerting
+### 5. detecting-anomalous-authentication-patterns ✅
+**Status:** IMPLEMENTED
+- ✅ Security event logging with anomaly detection (`lib/security/security-logger.ts`)
+- ✅ Failed authentication monitoring (via `logAuthFailure`)
+- ✅ Brute force detection (>5 failures in 15 min from same IP)
+- ✅ Suspicious activity detection (unusual time + new IP patterns)
+- ✅ Security summary export for SIEM integration
+- ⚠️ Rate-based alerting requires external notification service (Slack/Email)
 
-## Action Items
+## Applied Files
 
-| Priority | Skill | Action | File |
-|----------|-------|--------|------|
-| CRITICAL | implementing-api-gateway-security-controls | Add rate limiting middleware | middleware.ts |
-| HIGH | securing-serverless-functions | Add security headers to API responses | app/api/*/route.ts |
-| HIGH | implementing-api-gateway-security-controls | Add request validation schemas | app/api/*/route.ts |
-| MEDIUM | detecting-anomalous-authentication-patterns | Add authentication monitoring | lib/security-logger.ts |
-| MEDIUM | securing-serverless-functions | Add dependency scanning | .github/workflows/security.yml |
+| File | Purpose | Applied Skills |
+|------|---------|----------------|
+| `lib/security/rate-limiter.ts` | Token bucket rate limiting | implementing-api-gateway-security-controls |
+| `lib/security/security-headers.ts` | Security headers middleware | securing-serverless-functions |
+| `lib/security/request-validator.ts` | Input validation & sanitization | implementing-api-gateway-security-controls, securing-serverless-functions |
+| `lib/security/security-logger.ts` | Anomaly detection & logging | detecting-anomalous-authentication-patterns |
+| `lib/security/index.ts` | Security utilities export | All skills |
+| `middleware.ts` | Enhanced auth logging | implementing-jwt-signing-and-verification, detecting-anomalous-authentication-patterns |
+| `app/api/crypto/encrypt/route.ts` | Protected encryption endpoint | implementing-api-gateway-security-controls, implementing-aes-encryption-for-data-at-rest |
+| `app/api/crypto/decrypt/route.ts` | Protected decryption endpoint | implementing-api-gateway-security-controls, implementing-aes-encryption-for-data-at-rest |
 
 ## Compliance Mapping
 
@@ -62,8 +76,8 @@
 | PR.DS-01 | implementing-aes-encryption-for-data-at-rest | AES-256-GCM encryption |
 | PR.DS-02 | implementing-jwt-signing-and-verification | Firebase JWT validation |
 | PR.PS-01 | implementing-api-gateway-security-controls | Middleware authentication |
-| DE.CM-01 | detecting-anomalous-authentication-patterns | Pending: auth monitoring |
-| PR.IR-01 | securing-serverless-functions | Partial: input validation |
+| DE.CM-01 | detecting-anomalous-authentication-patterns | Security event logging & anomaly detection |
+| PR.IR-01 | securing-serverless-functions | Input validation & security headers |
 
 ## Verification Commands
 

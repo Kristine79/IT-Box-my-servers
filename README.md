@@ -49,6 +49,8 @@ StackBox takes security seriously. We implement the "Eight Pillars of Hardened R
 3. **IAM (Identity & Access Management):** Granular Firestore security rules ensure users can only access data they own.
 4. **Audit Logs:** (Planned) Tracking of who accessed which secret and when.
 
+📖 **[Подробнее о безопасности](SECURITY_GUIDE.md)** — Узнайте, как мы защищаем ваши данные (AES-256-GCM, rate limiting, anomaly detection)
+
 ---
 
 ## ⚙️ Getting Started

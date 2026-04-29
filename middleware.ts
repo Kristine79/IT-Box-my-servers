@@ -12,8 +12,15 @@ const PUBLIC_PATHS = [
   '/consent', // Data consent
   '/login',   // Login page
   '/auth',    // Auth page
-  '/',        // Dashboard (will handle auth check client-side)
+  '/',        // Landing page (will handle auth redirect)
 ];
+
+// Landing paths that authenticated users should be redirected from
+const LANDING_REDIRECT_PATHS = ['/', '/about', '/faq'];
+const LANDING_EXACT_PATHS = ['/', ''];
+const LANDING_PREFIX_PATHS = ['/about', '/faq', '/pricing', '/privacy', '/consent'];
+
+const APP_PATH = '/app';
 
 // Static assets and API routes
 const PUBLIC_PREFIXES = [
@@ -57,14 +64,25 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Check for Firebase auth token in cookies
+  const authCookie = request.cookies.get('__session')?.value || 
+                     request.cookies.get('firebaseUser')?.value;
+
+  // If authenticated and on landing page, redirect to app
+  if (authCookie) {
+    const isLandingPath = LANDING_EXACT_PATHS.includes(pathname) ||
+                          LANDING_PREFIX_PATHS.some(path => pathname.startsWith(path));
+    if (isLandingPath) {
+      const url = request.nextUrl.clone();
+      url.pathname = APP_PATH;
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Allow public paths
   if (PUBLIC_PATHS.some(path => pathname.startsWith(path))) {
     return NextResponse.next();
   }
-
-  // Check for Firebase auth token in cookies
-  const authCookie = request.cookies.get('__session')?.value || 
-                     request.cookies.get('firebaseUser')?.value;
 
   // If no auth cookie, redirect to login
   if (!authCookie) {

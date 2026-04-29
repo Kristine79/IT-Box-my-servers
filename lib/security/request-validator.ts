@@ -40,7 +40,6 @@ export const ValidationSchemas = {
   
   // IP address validation
   ipAddress: z.union([
-    z.string().ip(),
     z.string().regex(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/),
   ]),
   
