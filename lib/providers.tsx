@@ -44,7 +44,7 @@ type AuthContextType = {
   trialEndsAt: Date | null;
   subscriptionEndsAt: Date | null;
   notificationsEnabled: boolean;
-  currentTheme: ThemeMode;
+  theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
   canUsePremiumTheme: boolean;
   userPlan: PlanId;
@@ -66,7 +66,7 @@ const AuthContext = createContext<AuthContextType>({
   trialEndsAt: null,
   subscriptionEndsAt: null,
   notificationsEnabled: true,
-  currentTheme: 'neumorphic',
+  theme: 'neumorphic',
   setTheme: () => {},
   canUsePremiumTheme: false,
   userPlan: 'free',
@@ -260,7 +260,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, currentTheme, setTheme, canUsePremiumTheme, userPlan, planLimits: getPlanLimits(userPlan), login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
+<AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme: currentTheme, setTheme, canUsePremiumTheme, userPlan, planLimits: getPlanLimits(userPlan), login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>
