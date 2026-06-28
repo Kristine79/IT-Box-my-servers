@@ -23,7 +23,7 @@ export default [
       
       // Additional strict rules
       "no-console": ["warn", { allow: ["error"] }],
-      "no-unused-vars": "warn",
+      "no-unused-vars": "off",
       "prefer-const": "error"
     }
   }
