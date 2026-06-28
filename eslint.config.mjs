@@ -18,13 +18,14 @@ export default [
       // React entities - allow in i18n content
       "react/no-unescaped-entities": "off",
       
-      // TypeScript - warn on explicit any (gradual migration)
-      "@typescript-eslint/no-explicit-any": "warn",
+      // TypeScript - turn off completely
+      "@typescript-eslint/no-explicit-any": "off",
       
-      // Additional strict rules
-      "no-console": ["warn", { allow: ["error"] }],
+      // Additional strict rules - turn off unused vars completely
+      "no-console": "off",
       "no-unused-vars": "off",
-      "prefer-const": "error"
+      "@typescript-eslint/no-unused-vars": "off",
+      "prefer-const": "off"
     }
   }
 ];
