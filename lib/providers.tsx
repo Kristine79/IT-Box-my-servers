@@ -162,8 +162,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           const trialExpired = tEnd ? now > tEnd : false;
           const subExpired = sEnd ? now > sEnd : true;
 
-          // If trial is over and no active subscription (or it's expired) -> Paywall
-          setIsPaywall(trialExpired && subExpired);
+// Paywall disabled - always allow access
+          // setIsPaywall(trialExpired && subExpired);
+          setIsPaywall(false);
           
           // Theme: load saved or default to neumorphic
           const savedTheme = data.theme as ThemeMode;
