@@ -2,7 +2,6 @@
 
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 export function CTASection() {
@@ -18,47 +17,43 @@ export function CTASection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.6 }}
-        className="max-w-4xl mx-auto relative z-10"
+        className="max-w-3xl mx-auto"
       >
-        <div className="neu-card rounded-3xl p-12 md:p-16 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm font-medium mb-8 border border-[var(--primary)]/20">
-            <Sparkles size={14} />
-            <span>Бесплатный старт: 14 дней полного доступа</span>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-10 md:p-12 text-center border border-slate-200 dark:border-slate-700">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-medium mb-6">
+            <span>Стартовый пакет: 2 проекта, 1 сервер</span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Готовы управлять
-            <br />
-            инфраструктурой умнее?
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Готовы управлять инфраструктурой?
           </h2>
 
-          <p className="text-lg text-[var(--muted-foreground)] max-w-2xl mx-auto mb-10">
-            Присоединяйтесь к тысячам IT-специалистов, которые уже используют IT Box для управления серверами, проектами и доступами.
+          <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto mb-8">
+            Начните бесплатно и обновитесь, когда понадобится больше ресурсов.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/app">
               <Button
                 size="lg"
-                className="neu-button-accent text-lg px-8 py-6 rounded-3xl group"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-xl font-medium"
               >
-                Начать бесплатно
-                <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                Создать аккаунт
               </Button>
             </Link>
             <Link href="/app/pricing">
               <Button
                 variant="outline"
                 size="lg"
-                className="neu-button text-lg px-8 py-6 rounded-3xl"
+                className="border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-8 py-6 rounded-xl font-medium"
               >
-                Сравнить тарифы
+                Смотреть тарифы
               </Button>
             </Link>
           </div>
 
-          <p className="text-sm text-[var(--muted-foreground)] mt-6">
-            Не требуется кредитная карта • Отмена в любое время
+          <p className="text-xs text-slate-500 dark:text-slate-500 mt-6">
+            Без кредитной карты • Отмена в любой момент
           </p>
         </div>
       </motion.div>

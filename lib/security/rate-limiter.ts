@@ -172,7 +172,9 @@ export function withRateLimit(
 
     // Call handler and add headers to response
     const response = await handler(req);
-    result.remaining >= 0 && headers.set('X-RateLimit-Remaining', String(result.remaining));
+    if (result.remaining >= 0) {
+      headers.set('X-RateLimit-Remaining', String(result.remaining));
+    }
     
     // Merge headers into response
     headers.forEach((value, key) => {

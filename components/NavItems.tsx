@@ -15,6 +15,8 @@ import {
   CreditCard,
   Settings,
   User,
+  Home,
+  ExternalLink,
   LucideIcon,
 } from 'lucide-react';
 
@@ -39,11 +41,15 @@ export function NavItems({ mode, isOpen = true, onNavigate, showLabels = true }:
   const pathname = usePathname();
 
   const mainNavItems: NavItemConfig[] = [
-    { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
+    { href: '/app', icon: LayoutDashboard, labelKey: 'dashboard' },
     { href: '/projects', icon: FolderKanban, labelKey: 'projects' },
     { href: '/servers', icon: Server, labelKey: 'servers' },
     { href: '/services', icon: Network, labelKey: 'services' },
     { href: '/credentials', icon: KeyRound, labelKey: 'credentials' },
+  ];
+
+  const externalNavItems: NavItemConfig[] = [
+    { href: '/', icon: Home, labelKey: 'home' },
   ];
 
   const secondaryNavItems: NavItemConfig[] = [
@@ -57,9 +63,11 @@ export function NavItems({ mode, isOpen = true, onNavigate, showLabels = true }:
     { href: '/profile', icon: User, labelKey: 'profile', requiresAuth: true },
   ];
 
+  const isExternal = (href: string) => href === '/';
+
   const isActive = (href: string) => pathname === href;
 
-  const renderNavItem = (item: NavItemConfig, index: number, isSecondary = false) => {
+  const renderNavItem = (item: NavItemConfig, index: number, isSecondary = false, isExternalLink = false) => {
     if (item.adminOnly && (!user || !isAdmin)) return null;
     if (item.requiresAuth && (!user || user.isAnonymous)) return null;
 
@@ -75,15 +83,18 @@ export function NavItems({ mode, isOpen = true, onNavigate, showLabels = true }:
           className={cn(
             "flex items-center gap-2 rounded-md py-1.5 transition-all duration-200 overflow-hidden",
             isOpen ? "px-3" : "px-0 justify-center w-10",
-            isActive(item.href)
-              ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset"
-              : isSecondary
-                ? "text-[var(--neu-text)] opacity-60 hover:opacity-100"
-                : "hover:text-[var(--neu-accent)] text-[var(--neu-text)] opacity-80 hover:opacity-100"
+            isExternalLink
+              ? "text-[var(--neu-text)] opacity-60 hover:opacity-100 hover:text-blue-500"
+              : isActive(item.href)
+                ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset"
+                : isSecondary
+                  ? "text-[var(--neu-text)] opacity-60 hover:opacity-100"
+                  : "hover:text-[var(--neu-accent)] text-[var(--neu-text)] opacity-80 hover:opacity-100"
           )}
         >
           <Icon className="h-4 w-4 shrink-0" />
           {isOpen && <span className="transition-opacity duration-300 whitespace-nowrap overflow-hidden text-ellipsis">{label}</span>}
+          {isExternalLink && isOpen && <ExternalLink className="h-3 w-3 ml-auto opacity-40" />}
         </Link>
       );
     }
@@ -96,15 +107,18 @@ export function NavItems({ mode, isOpen = true, onNavigate, showLabels = true }:
         onClick={onNavigate}
         className={cn(
           "flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all w-full",
-          isActive(item.href)
-            ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset"
-            : isSecondary
-              ? "text-[var(--neu-text)] opacity-60 hover:opacity-100"
-              : "hover:text-[var(--neu-accent)] opacity-80"
+          isExternalLink
+            ? "text-[var(--neu-text)] opacity-60 hover:opacity-100 hover:text-blue-500"
+            : isActive(item.href)
+              ? "neu-panel text-[var(--neu-accent)] ring-2 ring-[var(--neu-accent)]/40 ring-inset"
+              : isSecondary
+                ? "text-[var(--neu-text)] opacity-60 hover:opacity-100"
+                : "hover:text-[var(--neu-accent)] opacity-80"
         )}
       >
         <Icon className="h-4 w-4" />
         {showLabels && label}
+        {isExternalLink && <ExternalLink className="h-3 w-3 ml-auto opacity-40" />}
       </Link>
     );
   };
@@ -125,6 +139,8 @@ export function NavItems({ mode, isOpen = true, onNavigate, showLabels = true }:
       {secondaryNavItems.map((item, idx) => renderNavItem(item, idx, true))}
       {renderDivider()}
       {userNavItems.map((item, idx) => renderNavItem(item, idx, true))}
+      {renderDivider()}
+      {externalNavItems.map((item, idx) => renderNavItem(item, idx, true, true))}
     </>
   );
 }

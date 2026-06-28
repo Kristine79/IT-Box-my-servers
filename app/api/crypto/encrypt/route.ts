@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { withApiProtection, RATE_LIMITS, secureJsonResponse, secureErrorResponse } from '@/lib/security';
+import { withFirebaseAuth } from '@/lib/security/firebase-auth';
+import type { AuthenticatedRequest } from '@/lib/security/firebase-auth';
 import { z } from 'zod';
 
 const ALGORITHM = 'aes-256-gcm';
@@ -11,13 +13,20 @@ const encryptSchema = z.object({
   text: z.string().min(1).max(MAX_TEXT_LENGTH),
 });
 
-async function encryptHandler(req: Request): Promise<NextResponse> {
+async function encryptHandler(req: AuthenticatedRequest, user: { uid: string }): Promise<NextResponse> {
   try {
     const { text } = await req.json();
     
     const secretKey = process.env.AES_SECRET_KEY;
     if (!secretKey || secretKey.length !== 64) {
-      console.error("AES_SECRET_KEY is improperly configured.");
+      // Log security event instead of console.error
+      const { logSecurityEvent } = await import('@/lib/security');
+      logSecurityEvent(
+        req,
+        'encryption_failure',
+        'critical',
+        { reason: 'AES_SECRET_KEY not configured', userId: user.uid }
+      );
       return secureErrorResponse('Server configuration error', 500);
     }
 
@@ -35,14 +44,23 @@ async function encryptHandler(req: Request): Promise<NextResponse> {
       authTag,
     });
   } catch (error) {
-    console.error('Encryption error:', error);
+    const { logSecurityEvent } = await import('@/lib/security');
+    logSecurityEvent(
+      req,
+      'encryption_failure',
+      'high',
+      { error: error instanceof Error ? error.message : 'Unknown error', userId: user.uid }
+    );
     return secureErrorResponse('Encryption failed', 500);
   }
 }
 
-// Apply rate limiting and security headers
-export const POST = withApiProtection(
-  async (req) => encryptHandler(req),
-  encryptSchema,
-  RATE_LIMITS.CRYPTO.encrypt
+// Apply Firebase auth + rate limiting + security headers
+export const POST = withFirebaseAuth(
+  (req, user) => withApiProtection(
+    async (request) => encryptHandler(request as AuthenticatedRequest, user),
+    encryptSchema,
+    RATE_LIMITS.CRYPTO.encrypt
+  )(req),
+  { required: true }
 );

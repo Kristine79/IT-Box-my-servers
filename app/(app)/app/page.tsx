@@ -101,26 +101,42 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
            .map(d => {
              const pathParts = d.ref.path.split('/');
              const projectId = pathParts.length > 2 ? pathParts[1] : null;
-             return { id: d.id, projectId, ...d.data() } as any;
+             return { id: d.id, projectId, ...d.data() } as Task & { projectId: string | null };
            })
            .filter(t => t.status === "todo" && (t.priority === "urgent" || t.priority === "critical"));
         
-        // Enhance tasks with project names
-        const enrichedTasks = await Promise.all(tasks.map(async (t) => {
-           if (!t.projectId) return t;
-           try {
-             // Cache check theoretically, we can just getDoc
-             const pDoc = await getDoc(doc(db, "projects", t.projectId));
-             if (pDoc.exists()) {
-               return { ...t, projectName: pDoc.data().name };
-             }
-           } catch (e) {
-             console.log(e);
-           }
-           return t;
+        // Batch fetch project names to avoid N+1 queries
+        const projectIds = [...new Set(tasks.map(t => t.projectId).filter(Boolean))];
+        const projectNames: Record<string, string> = {};
+        
+        if (projectIds.length > 0) {
+          try {
+            // Fetch projects in batches of 10 (Firestore 'in' limit)
+            const batchSize = 10;
+            for (let i = 0; i < projectIds.length; i += batchSize) {
+              const batch = projectIds.slice(i, i + batchSize);
+              const projectsQuery = query(
+                collection(db, "projects"),
+                where("__name__", "in", batch)
+              );
+              const projectsSnap = await getDocs(projectsQuery);
+              projectsSnap.docs.forEach(doc => {
+                projectNames[doc.id] = doc.data().name || 'Unknown';
+              });
+            }
+          } catch (e) {
+            // Silent fail - tasks will show without project names
+            console.error('Failed to fetch project names:', e);
+          }
+        }
+        
+        // Enrich tasks with project names
+        const enrichedTasks = tasks.map(t => ({
+          ...t,
+          projectName: t.projectId ? projectNames[t.projectId] : undefined
         }));
 
-        enrichedTasks.sort((a,b) => {
+        enrichedTasks.sort((a, b) => {
            const timeA = a.createdAt?.toMillis?.() || 0;
            const timeB = b.createdAt?.toMillis?.() || 0;
            return timeB - timeA; // desc
@@ -363,7 +379,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
               {t('upsell_desc', 'Вы активно пользуетесь сервисом. Оформите Standard за 300 \u20bd/мес — всего 10 \u20bd в день. Экспорт, уведомления, до 10 проектов.')}
             </p>
           </div>
-          <Link href="/pricing" className="neu-button neu-button-accent px-5 py-2 text-sm font-bold shrink-0">
+          <Link href="/app/pricing" className="neu-button neu-button-accent px-5 py-2 text-sm font-bold shrink-0">
             {t('upgrade_to_standard', 'Перейти на Standard')}
           </Link>
           <button

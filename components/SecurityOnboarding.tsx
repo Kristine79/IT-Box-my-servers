@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Shield, Lock, Eye, Server, CheckCircle, ChevronRight, ChevronLeft, X } from 'lucide-react';
 import { useAuth } from '@/lib/providers';
+import { User } from 'firebase/auth';
 
 interface SecuritySlide {
   icon: React.ReactNode;
@@ -21,9 +22,9 @@ export function SecurityOnboarding() {
 
   // Check if user is new (first login)
   useEffect(() => {
-    if (user) {
+    if (user && !('isGuest' in user)) {
       const hasSeenSecurityGuide = localStorage.getItem(`security-guide-${user.uid}`);
-      const userCreatedAt = user.metadata?.creationTime;
+      const userCreatedAt = (user as User).metadata?.creationTime;
       const isNewUser = userCreatedAt && 
         (Date.now() - new Date(userCreatedAt).getTime()) < 24 * 60 * 60 * 1000; // 24 hours
       

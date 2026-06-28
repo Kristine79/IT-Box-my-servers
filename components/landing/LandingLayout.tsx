@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, Server, Menu, X } from 'lucide-react';
+import { Moon, Sun, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { LOGO_BASE64 } from '@/lib/logoBase64';
 
 export function LandingLayout({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
@@ -57,11 +58,11 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
         `}
       >
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-[var(--primary-foreground)]">
-              <Server size={18} />
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg overflow-hidden">
+              <img src={LOGO_BASE64} alt="StackBox" className="w-full h-full object-contain" />
             </div>
-            <span className="font-semibold text-lg tracking-tight">IT Box</span>
+            <span className="font-bold text-2xl tracking-tight">StackBox</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -80,13 +81,13 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="neu-button w-10 h-10 rounded-xl flex items-center justify-center"
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
               aria-label="Toggle theme"
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <Link href="/app">
-              <Button className="neu-button-accent rounded-xl px-5">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5 font-medium transition-colors">
                 Начать бесплатно
               </Button>
             </Link>
@@ -94,7 +95,7 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden neu-button w-10 h-10 rounded-xl flex items-center justify-center"
+            className="md:hidden w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -142,13 +143,13 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-[var(--primary-foreground)]">
-                  <Server size={18} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div>
+              <Link href="/" className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-lg overflow-hidden">
+                  <img src={LOGO_BASE64} alt="StackBox" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-semibold text-lg">IT Box</span>
+                <span className="font-bold text-xl tracking-tight">StackBox</span>
               </Link>
               <p className="text-sm text-[var(--muted-foreground)]">
                 Умное управление серверами с AI и максимальной безопасностью.
@@ -156,48 +157,18 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-              <h4 className="font-medium text-sm mb-4">Продукт</h4>
-              <ul className="space-y-2">
-                {['Возможности', 'Тарифы', 'Безопасность', 'Обновления'].map((item) => (
-                  <li key={item}>
-                    <a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-sm mb-4">Компания</h4>
-              <ul className="space-y-2">
-                {['О нас', 'Блог', 'Карьера', 'Контакты'].map((item) => (
-                  <li key={item}>
-                    <a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
               <h4 className="font-medium text-sm mb-4">Правовая информация</h4>
               <ul className="space-y-2">
-                {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
-                  <li key={item}>
-                    <a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
-                      {item}
-                    </a>
-                  </li>
-                ))}
+                <li><Link href="/privacy" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">Политика конфиденциальности</Link></li>
+                <li><Link href="/terms" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">Условия использования</Link></li>
+                <li><Link href="/cookies" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">Политика cookies</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-[var(--border)] flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-[var(--muted-foreground)]">
-              © 2026 IT Box. Все права защищены.
+              © 2026 StackBox. Все права защищены.
             </p>
             <div className="flex items-center gap-4">
               <span className="text-xs text-[var(--muted-foreground)]">

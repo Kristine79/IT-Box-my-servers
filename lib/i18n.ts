@@ -10,6 +10,7 @@ i18n
       en: {
         translation: {
           "dashboard": "Dashboard",
+          "home": "Site Home",
           "projects": "Projects",
           "servers": "Servers",
           "services": "Services",
@@ -203,6 +204,7 @@ i18n
       ru: {
         translation: {
           "dashboard": "Дашборд",
+          "home": "На сайт",
           "projects": "Проекты",
           "servers": "Серверы",
           "services": "Сервисы",

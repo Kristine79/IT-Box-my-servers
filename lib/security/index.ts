@@ -62,7 +62,8 @@ import { logSecurityEvent } from './security-logger';
  * Combines rate limiting + security headers + validation
  */
 export function withApiProtection<T>(
-  handler: (req: NextRequest, data: T) => Promise<NextResponse>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handler: (_req: NextRequest, _data: T) => Promise<NextResponse>,
   schema: import('zod').ZodSchema<T>,
   rateLimitConfig = RATE_LIMITS.DEFAULT
 ) {

@@ -16,8 +16,7 @@ const PUBLIC_PATHS = [
 ];
 
 // Landing paths that authenticated users should be redirected from
-const LANDING_REDIRECT_PATHS = ['/', '/about', '/faq'];
-const LANDING_EXACT_PATHS = ['/', ''];
+const LANDING_EXACT_PATHS: string[] = [];
 const LANDING_PREFIX_PATHS = ['/about', '/faq', '/pricing', '/privacy', '/consent'];
 
 const APP_PATH = '/app';
@@ -32,9 +31,14 @@ const PUBLIC_PREFIXES = [
   '/sitemap',
 ];
 
-// Admin-only paths
-const ADMIN_PATHS = ['/admin', '/api/admin'];
+// Admin-only paths (reserved for future use)
+// const ADMIN_PATHS = ['/admin', '/api/admin'];
 
+/**
+ * Middleware handles routing and cookie presence checks only.
+ * Actual Firebase token verification happens in API routes.
+ * This is intentional - Edge runtime cannot use Firebase Admin SDK.
+ */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -43,32 +47,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow API routes to handle their own auth (they use Firebase verify)
+  // API routes handle their own auth verification
+  // Each API route must use withFirebaseAuth() HOC
   if (pathname.startsWith('/api/')) {
-    // Special handling for sensitive API endpoints
-    if (pathname.startsWith('/api/crypto/') || pathname.startsWith('/api/billing/')) {
-      const authCookie = request.cookies.get('__session')?.value;
-      if (!authCookie) {
-        logAuthFailure(request, 'API access without valid session');
-        return NextResponse.json(
-          { error: 'Unauthorized' },
-          { 
-            status: 401,
-            headers: {
-              'WWW-Authenticate': 'Bearer',
-            }
-          }
-        );
-      }
-    }
     return NextResponse.next();
   }
 
-  // Check for Firebase auth token in cookies
+  // Check for Firebase auth token in cookies (presence only, not validity)
   const authCookie = request.cookies.get('__session')?.value || 
                      request.cookies.get('firebaseUser')?.value;
 
-  // If authenticated and on landing page, redirect to app
+  // If cookie present and on landing page, redirect to app
   if (authCookie) {
     const isLandingPath = LANDING_EXACT_PATHS.includes(pathname) ||
                           LANDING_PREFIX_PATHS.some(path => pathname.startsWith(path));

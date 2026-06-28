@@ -1,4 +1,21 @@
 import type {NextConfig} from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
+
+// Content Security Policy
+const cspHeader = `
+  default-src 'self';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google.com https://www.gstatic.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' blob: data: https://www.googletagmanager.com https://firebasestorage.googleapis.com https://picsum.photos;
+  font-src 'self';
+  connect-src 'self' https://*.googleapis.com https://www.googletagmanager.com https://vitals.vercel-insights.com;
+  frame-src 'self' https://www.google.com;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+  upgrade-insecure-requests;
+`.replace(/\s+/g, ' ').trim();
 
 const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
@@ -7,6 +24,7 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Content-Security-Policy', value: cspHeader },
 ];
 
 const nextConfig: NextConfig = {
@@ -54,4 +72,32 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry configuration
+const sentryConfig = {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#configure-source-maps
+  widenClientFileUpload: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+
+  // Enables automatic instrumentation of Vercel Cron Monitors
+  automaticVercelMonitors: true,
+
+  // Source maps configuration
+  sourcemaps: {
+    // Delete source maps after upload to prevent exposing them to users
+    deleteSourcemapsAfterUpload: true,
+  },
+};
+
+export default withSentryConfig(nextConfig, sentryConfig);

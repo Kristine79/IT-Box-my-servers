@@ -2,6 +2,7 @@ import { Hero } from '@/components/landing/Hero';
 import { FeaturesBento } from '@/components/landing/FeaturesBento';
 import { SecurityTrust } from '@/components/landing/SecurityTrust';
 import { PricingPreview } from '@/components/landing/PricingPreview';
+import { Testimonials } from '@/components/landing/Testimonials';
 import { CTASection } from '@/components/landing/CTASection';
 import { LandingLayout } from '@/components/landing/LandingLayout';
 
@@ -12,6 +13,7 @@ export default function LandingPage() {
       <FeaturesBento />
       <SecurityTrust />
       <PricingPreview />
+      <Testimonials />
       <CTASection />
     </LandingLayout>
   );

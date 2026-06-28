@@ -90,7 +90,7 @@ export default function AdminPage() {
         <Lock className="w-12 h-12 mx-auto mb-4 text-[var(--neu-accent)] opacity-60" />
         <h2 className="text-xl font-bold mb-2">Доступ запрещён</h2>
         <p className="text-[var(--neu-text-muted)] mb-6">Эта страница доступна только администратору.</p>
-        <Link href="/" className="neu-button neu-button-accent px-6 py-3 font-bold inline-block">
+        <Link href="/app" className="neu-button neu-button-accent px-6 py-3 font-bold inline-block">
           На главную
         </Link>
       </div>

@@ -199,7 +199,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Menu className="h-5 w-5" />
             </Button>
             
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity ml-1">
+            <Link href="/app" className="flex items-center gap-2 hover:opacity-80 transition-opacity ml-1">
                <div className="neu-panel-inset p-0.5 rounded-xl text-[var(--neu-accent)] overflow-hidden w-9 h-9 flex items-center justify-center shrink-0">
                   <img src={LOGO_BASE64} alt="StackBox Logo" className="w-[450%] h-[450%] object-contain scale-[1.5]" />
                </div>
@@ -305,9 +305,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <nav aria-label="Breadcrumb" className="mb-4">
             <ol className="flex items-center gap-2 text-xs text-[var(--neu-text-muted)]">
               <li>
-                <Link href="/" className="hover:text-[var(--neu-accent)] transition-colors">{t('dashboard', 'Dashboard')}</Link>
+                <Link href="/app" className="hover:text-[var(--neu-accent)] transition-colors">{t('dashboard', 'Dashboard')}</Link>
               </li>
-              {pathname !== '/' && (
+              {pathname !== '/app' && (
                 <>
                   <li>/</li>
                   <li className="text-[var(--neu-text)] font-medium">{breadcrumbMap[pathname.split('/')[1]] || pathname.split('/')[1] || ''}</li>

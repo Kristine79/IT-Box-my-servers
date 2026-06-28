@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, OAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendSignInLinkToEmail } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 import { I18nextProvider } from 'react-i18next';
@@ -19,26 +19,43 @@ export const auth = getAuth(app);
 
 type ThemeMode = 'neumorphic' | 'glassmorphism' | 'defi' | 'eco';
 
+// Guest user type for unauthenticated state
+type GuestUser = {
+  uid: 'guest_user';
+  email: 'guest@stackbox.pro';
+  displayName: 'Guest';
+  isAnonymous: true;
+  isGuest: true;
+};
+
+// Union type for authenticated or guest user
+type AppUser = User | GuestUser;
+
+// Type guard to check if user is a guest (exported for use in other components)
+export function isGuestUser(user: AppUser): user is GuestUser {
+  return 'isGuest' in user && user.isGuest === true;
+}
+
 type AuthContextType = {
-  user: User | null;
+  user: AppUser | null;
   loading: boolean;
   isPaywall: boolean;
   isAdmin: boolean;
   trialEndsAt: Date | null;
   subscriptionEndsAt: Date | null;
   notificationsEnabled: boolean;
-  theme: ThemeMode;
+  currentTheme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
   canUsePremiumTheme: boolean;
   userPlan: PlanId;
   planLimits: PlanLimits;
   login: () => Promise<void>;
   loginWithGitHub: () => Promise<void>;
-  loginWithEmail: (e: string, p: string, isRegister?: boolean) => Promise<void>;
+  loginWithEmail: (_email: string, _password: string, _isRegister?: boolean) => Promise<void>;
   loginWithApple: () => Promise<void>;
-  loginWithMagicLink: (email: string) => Promise<void>;
+  loginWithMagicLink: (_email: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (data: Partial<{ notificationsEnabled: boolean; theme?: ThemeMode }>) => Promise<void>;
+  updateProfile: (_data: Partial<{ notificationsEnabled: boolean; theme?: ThemeMode }>) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -49,7 +66,7 @@ const AuthContext = createContext<AuthContextType>({
   trialEndsAt: null,
   subscriptionEndsAt: null,
   notificationsEnabled: true,
-  theme: 'neumorphic',
+  currentTheme: 'neumorphic',
   setTheme: () => {},
   canUsePremiumTheme: false,
   userPlan: 'free',
@@ -68,13 +85,13 @@ export function useAuth() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPaywall, setIsPaywall] = useState(false);
   const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
   const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<Date | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [theme, setThemeState] = useState<ThemeMode>('neumorphic');
+  const [currentTheme, setThemeState] = useState<ThemeMode>('neumorphic');
   const [userPlan, setUserPlan] = useState<PlanId>('free');
 
   useEffect(() => {
@@ -84,32 +101,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
       if (u) {
         setUser(u);
       } else {
-        // Force a guest user if not signed in
-        setUser({ 
-          uid: 'guest_user', 
-          email: 'guest@stackbox.pro', 
+        // Create guest user for unauthenticated state
+        const guestUser: GuestUser = {
+          uid: 'guest_user',
+          email: 'guest@stackbox.pro',
           displayName: 'Guest',
           isAnonymous: true,
-          providerId: '',
-          metadata: {},
-          photoURL: null,
-          phoneNumber: null,
-          emailVerified: false,
-          tenantId: null,
-          refreshToken: '',
-          toJSON: () => ({}),
-          delete: async () => {},
-          getIdToken: async () => '',
-          getIdTokenResult: async () => ({} as unknown as import('firebase/auth').IdTokenResult),
-          reload: async () => {},
-          providerData: [],
-        } as unknown as User);
+          isGuest: true,
+        };
+        setUser(guestUser);
       }
       
-      const currentUser = u || { uid: 'guest_user', email: 'guest@stackbox.pro' };
+      // Determine current user for Firestore operations
+      const currentUserId = u?.uid ?? 'guest_user';
+      const currentUserEmail = u?.email ?? 'guest@stackbox.pro';
       
       // Check user document for subscription logic
-      const userRef = doc(db, 'users', currentUser.uid);
+      const userRef = doc(db, 'users', currentUserId);
       
       const checkDoc = async () => {
         try {
@@ -118,7 +126,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             // New User: 14 days free trial
             const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
             await setDoc(userRef, {
-              email: currentUser.email || 'guest@stackbox.pro',
+              email: currentUserEmail,
               trialEndsAt: trialEnd,
               subscriptionEndsAt: null,
               notificationsEnabled: true,
@@ -251,7 +259,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, theme, setTheme, canUsePremiumTheme, userPlan, planLimits: getPlanLimits(userPlan), login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
+      <AuthContext.Provider value={{ user, loading, isPaywall, isAdmin, trialEndsAt, subscriptionEndsAt, notificationsEnabled, currentTheme, setTheme, canUsePremiumTheme, userPlan, planLimits: getPlanLimits(userPlan), login, loginWithGitHub, loginWithEmail, loginWithApple, loginWithMagicLink, logout, updateProfile }}>
         {children}
       </AuthContext.Provider>
     </I18nextProvider>
