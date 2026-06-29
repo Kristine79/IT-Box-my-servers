@@ -58,36 +58,36 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
         `}
       >
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
+<Link href="/" className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg overflow-hidden">
-              <img src={LOGO_BASE64} alt="StackBox" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="StackBox Logo" className="w-full h-full object-contain" />
             </div>
             <span className="font-bold text-2xl tracking-tight">StackBox</span>
           </Link>
 
-          {/* Desktop Nav */}
+{/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.slice(0, 2).map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50 transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-medium uppercase tracking-wide text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50 transition-colors"
               >
                 {link.label}
               </a>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+<div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               aria-label="Toggle theme"
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <Link href="/app">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5 font-medium transition-colors">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5">
                 Начать бесплатно
               </Button>
             </Link>
@@ -102,7 +102,7 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+{/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -116,7 +116,7 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
                   <a
                     key={link.href}
                     href={link.href}
-                    className="block px-4 py-3 rounded-xl text-sm font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50 transition-colors"
+                    className="block px-4 py-3 rounded-xl text-sm font-medium uppercase tracking-wide text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50 transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}
@@ -145,9 +145,9 @@ export function LandingLayout({ children }: { children: React.ReactNode }) {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <div>
-              <Link href="/" className="flex items-center gap-3 mb-4">
+<Link href="/" className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-lg overflow-hidden">
-                  <img src={LOGO_BASE64} alt="StackBox" className="w-full h-full object-contain" />
+                  <img src="/logo.png" alt="StackBox Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-bold text-xl tracking-tight">StackBox</span>
               </Link>

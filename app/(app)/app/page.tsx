@@ -232,7 +232,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
               prefetch={true}
               className="flex items-center gap-3 px-4 py-4 md:px-5 md:py-5 group hover:bg-[var(--neu-text-muted)]/5 transition-colors"
             >
-              <div className={cn("p-2 rounded-lg shrink-0", s.bg, s.color, "group-hover:scale-110 transition-transform")}>
+<div className={cn("p-2 rounded-2xl shrink-0", s.bg, s.color, "group-hover:scale-110 transition-transform")}>
                 <s.icon className="w-4 h-4" />
               </div>
               <div className="min-w-0">
@@ -248,8 +248,8 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
       <motion.div variants={item} className="neu-panel overflow-hidden !rounded-xl">
          <div className="p-5 lg:p-6 bg-[var(--neu-bg)]/50">
             <div className="flex items-center justify-between gap-2 md:gap-3 mb-5">
-              <div className="flex items-center gap-2 md:gap-3 shrink min-w-0">
-                 <div className="p-1.5 md:p-2 rounded-md bg-orange-500/10 text-orange-500 shrink-0">
+<div className="flex items-center gap-2 md:gap-3 shrink min-w-0">
+                 <div className="p-1.5 md:p-2 rounded-2xl bg-orange-500/10 text-orange-500 shrink-0">
                    <AlertTriangle className="w-4 h-4 md:w-5 md:h-5" />
                  </div>
                  <h3 className="text-[13px] sm:text-base md:text-lg font-bold truncate tracking-tight">{t('urgent_tasks')}</h3>
@@ -313,10 +313,10 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
                  </div>
                ) : (
                  displayedTasks.map((task: Task) => (
-                   <Link 
+<Link 
                      key={task.id} 
                      href={`/projects?project=${task.projectId}`} 
-                     className="block p-4 rounded-md border border-[var(--neu-border)]/10 hover:border-orange-500/30 bg-[var(--neu-bg)] hover:bg-orange-500/5 transition-all group"
+                     className="block p-4 rounded-2xl border border-[var(--neu-border)]/10 hover:border-orange-500/30 bg-[var(--neu-bg)] hover:bg-orange-500/5 transition-all group"
                    >
                      <div className="flex justify-between items-start gap-4 overflow-hidden">
                        <div className="flex-1 min-w-0">
@@ -343,7 +343,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
           <div className="space-y-1">
              {recentProjects.length === 0 ? <p className="text-sm opacity-50 px-1">{t('no_data')}</p> : null}
              {recentProjects.map((p) => (
-               <Link href="/projects" prefetch={true} key={p.id} className="block group p-2 mx-0 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden min-w-0">
+<Link href="/projects" prefetch={true} key={p.id} className="block group p-2 mx-0 rounded-2xl hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden min-w-0">
                   <div className="w-full overflow-hidden">
                     <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate">{p.name}</h4>
                   </div>
@@ -358,7 +358,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
           <div className="space-y-1">
              {recentServers.length === 0 ? <p className="text-sm opacity-50 px-1">{t('no_data')}</p> : null}
              {recentServers.map((s) => (
-               <Link href="/servers" prefetch={true} key={s.id} className="block group p-2 mx-0 rounded-lg hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden min-w-0">
+<Link href="/servers" prefetch={true} key={s.id} className="block group p-2 mx-0 rounded-2xl hover:bg-[var(--neu-accent)]/5 transition-all overflow-hidden min-w-0">
                   <div className="w-full overflow-hidden">
                     <h4 className="text-[15px] font-bold group-hover:text-[var(--neu-accent)] transition-colors truncate">{s.name}</h4>
                   </div>
@@ -369,7 +369,7 @@ interface Task { id: string; projectId?: string | null; projectName?: string; co
         </motion.div>
       </div>
       {showUpsell && userPlan === 'free' && (
-        <motion.div variants={item} className="neu-panel p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative">
+<motion.div variants={item} className="neu-panel p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative">
           <div className="neu-panel-inset p-3 rounded-2xl text-purple-500 shrink-0">
             <Zap className="w-6 h-6" />
           </div>

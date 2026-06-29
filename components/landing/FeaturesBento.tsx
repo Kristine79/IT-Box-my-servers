@@ -72,7 +72,7 @@ export function FeaturesBento() {
             {coreFeatures.map((feature, i) => {
               const Icon = feature.icon;
               return (
-                <motion.div
+<motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ export function FeaturesBento() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4">
                     <Icon size={24} strokeWidth={1.5} />
                   </div>
                   <h4 className="text-lg font-semibold mb-2">{feature.title}</h4>
@@ -102,15 +102,15 @@ export function FeaturesBento() {
             {advancedFeatures.map((feature, i) => {
               const Icon = feature.icon;
               return (
-                <motion.div
+<motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-50px' }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700"
+                  className="p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center mb-3">
                     <Icon size={20} strokeWidth={1.5} />
                   </div>
                   <h4 className="font-medium mb-1">{feature.title}</h4>

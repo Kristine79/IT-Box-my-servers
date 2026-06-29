@@ -43,20 +43,20 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Link href="/app">
+<Link href="/app">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-2xl group shadow-lg shadow-blue-500/25 transition-all"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-2xl shadow-lg shadow-blue-500/25 [&_svg]:size-5"
             >
               Начать бесплатно
-              <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
           <Link href="#features">
-            <Button
+<Button
               variant="outline"
               size="lg"
-              className="border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-lg px-8 py-6 rounded-2xl transition-all"
+              className="border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-8 py-6 rounded-2xl"
             >
               Возможности
             </Button>

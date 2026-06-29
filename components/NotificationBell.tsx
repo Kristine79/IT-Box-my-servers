@@ -63,7 +63,7 @@ export function NotificationBell() {
           !notificationsEnabled && "opacity-50 grayscale-[0.5]"
         )}
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? 'Close notifications' : `Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+aria-label={isOpen ? t('close_notifications') : `${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} ${t('unread')})` : ''}`}
         role="button"
         tabIndex={0}
       >
@@ -101,7 +101,7 @@ animate={{ opacity: 1, scale: 1, y: 0 }}
                      "p-2 rounded-full transition-all",
                      showSettings ? "bg-[var(--neu-accent)] text-white shadow-lg" : "hover:bg-white/10 opacity-60 hover:opacity-100"
                    )}
-                   aria-label="Notification settings"
+aria-label={t('notification_settings')}
                 >
                   <Settings className="w-4 h-4" />
                 </button>
@@ -129,7 +129,7 @@ animate={{ opacity: 1, scale: 1, y: 0 }}
                     <div className="flex items-center justify-between p-6 rounded-2xl neu-panel-inset">
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-bold">{t('enable_notifications')}</span>
-                        <span className="text-[10px] opacity-40 uppercase tracking-widest">{notificationsEnabled ? "Active" : "Disabled"}</span>
+<span className="text-[10px] opacity-40 uppercase tracking-widest">{notificationsEnabled ? t('active') : t('disabled')}</span>
                       </div>
                       <button 
                         onClick={handleToggleNotifications}
@@ -158,15 +158,15 @@ animate={{ opacity: 1, scale: 1, y: 0 }}
                          <div className="neu-panel-inset p-6 rounded-full opacity-20">
                             <BellOff className="w-10 h-10" />
                          </div>
-                         <div className="space-y-1">
-                           <p className="font-bold text-sm opacity-60">Notifications Disabled</p>
-                           <p className="text-[11px] opacity-40 leading-relaxed max-w-[200px]">Turn them on in settings to see real-time updates.</p>
+<div className="space-y-1">
+                           <p className="font-bold text-sm opacity-60">{t('notifications_disabled')}</p>
+                           <p className="text-[11px] opacity-40 leading-relaxed max-w-[200px]">{t('notifications_disabled_desc')}</p>
                          </div>
                          <button 
                            onClick={() => setShowSettings(true)}
                            className="mt-2 neu-button px-6 py-2 text-xs font-bold text-[var(--neu-accent)]"
                          >
-                           Open Settings
+                           {t('open_settings')}
                          </button>
                       </div>
                     ) : loading ? (

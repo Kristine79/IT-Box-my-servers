@@ -32,11 +32,11 @@ export function CTASection() {
             Начните бесплатно и обновитесь, когда понадобится больше ресурсов.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+<div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/app">
               <Button
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-xl font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-2xl shadow-lg shadow-blue-500/25 [&_svg]:size-5"
               >
                 Создать аккаунт
               </Button>
@@ -45,7 +45,7 @@ export function CTASection() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-8 py-6 rounded-xl font-medium"
+                className="border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-8 py-6 rounded-2xl [&_svg]:size-5"
               >
                 Смотреть тарифы
               </Button>

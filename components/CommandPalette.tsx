@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, FolderKanban, Server, Network, KeyRound, FileText, HelpCircle, CreditCard, Settings, LayoutDashboard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface SearchItem {
@@ -33,6 +34,7 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const filteredItems = query.trim() === '' 
     ? navItems 
@@ -87,11 +89,11 @@ export function CommandPalette() {
 
   return (
     <>
-      <button
+<button
         onClick={() => setIsOpen(true)}
         className="neu-button h-9 w-9 md:h-10 md:w-10 flex items-center justify-center cursor-pointer shrink-0"
-        aria-label="Open search (Ctrl+K)"
-        title="Search (Ctrl+K)"
+        aria-label={t('open_search')}
+        title={t('search_ctrl_k')}
       >
         <Search className="h-4 w-4" />
       </button>
@@ -117,12 +119,12 @@ export function CommandPalette() {
             >
               <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--neu-border)]/20">
                 <Search className="h-5 w-5 text-[var(--neu-text-muted)] shrink-0" />
-                <input
+<input
                   ref={inputRef}
                   type="text"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="Search pages..."
+                  placeholder={t('search_pages')}
                   className="flex-1 bg-transparent border-none outline-none text-[var(--neu-text)] placeholder:text-[var(--neu-text-muted)] text-base"
                   aria-label="Search input"
                 />
@@ -135,11 +137,11 @@ export function CommandPalette() {
                 </button>
               </div>
 
-              <div className="max-h-[300px] overflow-y-auto py-2">
+<div className="max-h-[300px] overflow-y-auto py-2">
                 {filteredItems.length === 0 ? (
                   <div className="px-4 py-8 text-center text-[var(--neu-text-muted)]">
                     <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No results found</p>
+                    <p className="text-sm">{t('no_results')}</p>
                   </div>
                 ) : (
                   filteredItems.map((item, index) => (
@@ -170,18 +172,18 @@ export function CommandPalette() {
                 )}
               </div>
 
-              <div className="px-4 py-2 border-t border-[var(--neu-border)]/20 text-xs text-[var(--neu-text-muted)] flex items-center gap-4">
+<div className="px-4 py-2 border-t border-[var(--neu-border)]/20 text-xs text-[var(--neu-text-muted)] flex items-center gap-4">
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--neu-bg)] text-[10px] font-mono border border-[var(--neu-border)]/30">↑↓</kbd>
-                  <span>Navigate</span>
+                  <span>{t('navigate')}</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--neu-bg)] text-[10px] font-mono border border-[var(--neu-border)]/30">Enter</kbd>
-                  <span>Select</span>
+                  <span>{t('select')}</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--neu-bg)] text-[10px] font-mono border border-[var(--neu-border)]/30">Esc</kbd>
-                  <span>Close</span>
+                  <span>{t('close_popup')}</span>
                 </span>
               </div>
             </motion.div>

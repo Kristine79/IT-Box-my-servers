@@ -116,10 +116,11 @@ export function PricingPreview() {
                 ))}
               </ul>
 
-              <Link href="/pricing" className="block">
+<Link href="/pricing" className="block">
                 <Button
+                  size="lg"
                   className={`
-                    w-full rounded-xl py-4 font-medium transition-colors
+                    w-full rounded-2xl py-4 px-8 shadow-lg shadow-blue-500/25 [&_svg]:size-5
                     ${plan.popular
                       ? 'bg-blue-600 hover:bg-blue-700 text-white'
                       : 'border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
