@@ -4,12 +4,12 @@ import { withSentryConfig } from '@sentry/nextjs';
 // Content Security Policy
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google.com https://www.gstatic.com;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google.com https://www.gstatic.com https://apis.google.com https://*.firebase.googleapis.com;
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data: https://www.googletagmanager.com https://firebasestorage.googleapis.com https://picsum.photos;
   font-src 'self';
-  connect-src 'self' https://*.googleapis.com https://www.googletagmanager.com https://vitals.vercel-insights.com;
-  frame-src 'self' https://www.google.com;
+  connect-src 'self' https://*.googleapis.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://www.google-analytics.com https://www.google.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com firebase.googleapis.com firebaseapp.com;
+  frame-src 'self' https://www.google.com https://accounts.google.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self';
