@@ -196,9 +196,12 @@ i18n
           "redirecting": "Redirecting...",
           "technical_support": "Technical support",
           "useful_bots": "Useful Telegram bots",
-          "personal_data_consent": "Personal data processing consent",
-          "confirm_delete": "Are you sure?",
-          "skip_to_content": "Skip to content"
+"personal_data_consent": "Personal data processing consent",
+          "skip_to_content": "Skip to content",
+          "search_pages": "Search pages...",
+          "no_results": "No results found",
+          "navigate": "Navigate",
+          "select": "Select"
         }
       },
       ru: {
@@ -390,9 +393,12 @@ i18n
           "redirecting": "Переход...",
           "technical_support": "Техническая поддержка",
           "useful_bots": "Полезные Telegram боты",
-          "personal_data_consent": "Согласие на обработку персональных данных",
-          "confirm_delete": "Вы уверены?",
-          "skip_to_content": "Перейти к контенту"
+"personal_data_consent": "Согласие на обработку персональных данных",
+          "skip_to_content": "Перейти к контенту",
+          "search_pages": "Поиск страниц...",
+          "no_results": "Ничего не найдено",
+          "navigate": "Навигация",
+          "select": "Выбрать"
         }
       }
     },

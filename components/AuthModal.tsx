@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 const firebaseErrorRu: Record<string, string> = {
+  // Popular Auth Errors
   'auth/account-exists-with-different-credential':
     'Этот email уже привязан к другому способу входа. Войдите через Google или GitHub, которым регистрировались.',
   'auth/popup-closed-by-user': 'Окно входа закрыто. Попробуйте ещё раз.',
@@ -23,11 +24,83 @@ const firebaseErrorRu: Record<string, string> = {
   'auth/weak-password': 'Пароль слишком простой. Минимум 6 символов.',
   'auth/invalid-credential': 'Неверный email или пароль.',
   'auth/operation-not-allowed': 'Этот способ входа отключён. Обратитесь к администратору.',
+  
+  // Additional Auth Error Codes
+  'auth/invalid-api-key': 'Ошибка конфигурации. Обратитесь к администратору.',
+  'auth/app-not-authorized': 'Приложение не авторизовано. Обратитесь к администратору.',
+  'auth/app-deleted': 'Приложение было удалено. Обратитесь к администратору.',
+  'auth/client-deprecated': 'Клиент устарел. Обновите приложение.',
+  'auth/ credential-already-in-use': 'Этот аккаунт уже используется.',
+  'auth/email-change-needs-verification': 'Для смены email требуется верификация.',
+  'auth/email-not-found': 'Email не найден. Проверьте правильность ввода.',
+  'auth/expired-action-code': 'Срок действия кода истёк. Запросите новый.',
+  'auth/invalid-action-code': 'Неверный или истёкший код. Запросите новый.',
+  'auth/invalid-continue-uri': 'Неверная ссылка продолжения. Обратитесь к администратору.',
+  'auth/invalid-captcha': 'Неверная капча. Обновите страницу и попробуйте снова.',
+  'auth/invalid-phone-number': 'Неверный номер телефона.',
+  'auth/invalid-provider-id': 'Неверный провайдер. Обратитесь к администратору.',
+  'auth/invalid-recipient-email': 'Неверный email получателя. Обратитесь к администратору.',
+  'auth/invalid-sender': 'Неверный отправитель email. Обратитесь к администраторu.',
+  'auth/invalid-verification-code': 'Неверный код верификации.',
+  'auth/invalid-tenant-id': 'Ошибка конфигурации. Обратитесь к администратору.',
+  'auth/missing-android-pkg-name': 'Отсутствует название Android пакета. Обратитесь к администратору.',
+  'auth/missing-continue-uri': 'Отсутствует ссылка продолжения. Обратитесь к администратору.',
+  'auth/missing-ios-bundle-id': 'Отсутствует ID iOS пакета. Обратитесь к администратору.',
+  'auth/missing-phone-number': 'Введите номер телефона.',
+  'auth/missing-recipient-email': 'Отсутствует email получателя. Обратитесь к администратору.',
+  'auth/missing-verification-code': 'Введите код верификации.',
+  'auth/needConfirmation': 'Требуется подтверждение. Проверьте email для подтверждения.',
+  'auth/network-timeout': 'Время ожидания сети истекло. Проверьте подключение.',
+  'auth/no-auth-event': 'Ошибка события аутентификации. Обновите страницу.',
+  'auth/no-such-provider': 'Этот способ входа недоступен.',
+  'auth/null-user': 'Ошибка пользователя. Обновите страницу.',
+  'auth-provider-already-linked': 'Этот провайдер уже привязан к аккаунту.',
+  'auth/quota-exceeded': 'Превышен лимит. Попробуйте позже.',
+  'auth/requires-recent-login': 'Требуется повторный вход. Выйдите и войдите снова.',
+  'auth/tenants-id-not-found': 'Ошибка конфигурации. Обратитесь к администратору.',
+  'auth/too-many-credential-attempts': 'Слишком много попыток. Попробуйте позже или через другой способ.',
+  'auth/unsupported-first-party': 'Этот способ входа не поддерживается.',
+  'auth/user-disabled': 'Аккаунт заблокирован. Обратитесь к администратору.',
+  'auth/user-token-expired': 'Сессия истекла. Войдите заново.',
+  'auth/verified-email-needed': 'Требуется верифицированный email.',
+  'auth/tenant-not-found': 'Ошибка конфигурации. Обратитесь к администратору.',
+  'auth/user-mismatch': 'Аккаунт не совпадает.',
+  'auth/game-circle-update': 'Ошибка Google Game Services. Обновите страницу.',
+  'auth/game-circle-auth-access': 'Ошибка доступа Game Services. Обновите страницу.',
+  'auth/game-circle-auth-library': 'Ошибка библиотеки Game Services. Обновите страницу.',
+  'auth/game-circle-api-key': 'Ошибка API Key Game Services. Обновите страницу.',
+  'auth/game-circle-auth-sdk': 'Ошибка SDK Game Services. Обновите страницу.',
+  'auth/internal-error': 'Внутренняя ошибка. Обновите страницу и попробуйте снова.',
+  'auth/popup-closed': 'Окно входа закрыто. Попробуйте ещё раз.',
+  'auth/signin-failed': 'Ошибка входа. Попробуйте ещё раз.',
+  'auth/signin-cookies-required': 'Требуются cookies. Разрешите cookies для этого сайта.',
+  'auth/signup-closed': 'Регистрация закрыта. Обратитесь к администратору.',
+'auth/signup-failed': 'Ошибка регистрации. Попробуйте ещё раз.',
+  
+  // Legacy/missing verifications
+  'auth/invalid-idp-response': 'Ошибка провайдера. Попробуйте другой способ входа.',
+  'auth/pending': 'Запрос ожидает подтверждения. Проверьте ваш email.',
+  'auth/timeout': 'Время ожидания истекло. Попробуйте снова.',
+  'auth/tenant-limit-exceeded': 'Превышен лимит арендаторов. Обратитесь к администратору.',
+  'auth/unauthorized-domain': 'Домен не авторизован. Обратитесь к администратору.',
 };
 
-function getAuthError(e: any): string {
+function getAuthError(e: any): { message: string; canRetry?: boolean } {
   const code = e?.code as string;
-  return firebaseErrorRu[code] || e?.message || 'Произошла ошибка. Попробуйте ещё раз.';
+  const message = firebaseErrorRu[code] || e?.message || 'Произошла ошибка. Попробуйте ещё раз.';
+  
+  // Determine if error is retry-able
+  const canRetry = [
+    'auth/popup-closed-by-user',
+    'auth/popup-closed',
+    'auth/cancelled-popup-request',
+    'auth/network-request-failed',
+    'auth/network-timeout',
+    'auth/too-many-requests',
+    'auth/too-many-credential-attempts',
+  ].includes(code);
+  
+  return { message, canRetry };
 }
 
 interface AuthModalProps {
@@ -48,14 +121,19 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
 
-  const handleGoogle = async () => {
+const handleGoogle = async () => {
     setLoadingProvider('google');
     try {
       await login();
       onSuccess?.();
       onClose();
     } catch (e: any) {
-      toast.error(getAuthError(e));
+      const { message, canRetry } = getAuthError(e);
+      if (canRetry) {
+        toast.error(message, { action: { label: 'Повторить', onClick: handleGoogle } });
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoadingProvider(null);
     }
@@ -68,13 +146,18 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
       onSuccess?.();
       onClose();
     } catch (e: any) {
-      toast.error(getAuthError(e));
+      const { message, canRetry } = getAuthError(e);
+      if (canRetry) {
+        toast.error(message, { action: { label: 'Повторить', onClick: handleGitHub } });
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoadingProvider(null);
     }
   };
 
-  const handleEmailSubmit = async () => {
+const handleEmailSubmit = async () => {
     if (!email.trim() || !password.trim()) {
       toast.error(t('fill_email_password'));
       return;
@@ -89,7 +172,12 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, description }: Au
         setIsRegister(false);
         toast.error(t('email_already_registered'));
       } else {
-        toast.error(getAuthError(e));
+        const { message, canRetry } = getAuthError(e);
+        if (canRetry) {
+          toast.error(message, { action: { label: 'Повторить', onClick: handleEmailSubmit } });
+        } else {
+          toast.error(message);
+        }
       }
     } finally {
       setLoadingProvider(null);

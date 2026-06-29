@@ -9,11 +9,33 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { LOGO_BASE64 } from '@/lib/logoBase64';
+import { toast } from 'sonner';
 
 import { Paywall } from './Paywall';
 import { LoadingScreen } from './ui/LoadingScreen';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { NotificationBell } from './NotificationBell';
+
+// Error message helper
+const firebaseErrorRu: Record<string, string> = {
+  'auth/popup-closed-by-user': 'Окно входа закрыто. Попробуйте ещё раз.',
+  'auth/popup-blocked': 'Браузер заблокировал всплывающее окно. Разрешите попапы для этого сайта.',
+  'auth/cancelled-popup-request': 'Запрос отменён. Попробуйте ещё раз.',
+  'auth/network-request-failed': 'Ошибка сети. Проверьте подключение к интернету.',
+  'auth/too-many-requests': 'Слишком много попыток. Подождите немного и попробуйте снова.',
+  'auth/account-exists-with-different-credential': 'Этот email уже привязан к другому способу входа.',
+  'auth/invalid-credential': 'Неверный email или пароль.',
+  'auth/user-not-found': 'Пользователь с таким email не найден.',
+  'auth/wrong-password': 'Неверный пароль.',
+  'auth/email-already-in-use': 'Этот email уже зарегистрирован.',
+};
+
+function getAuthError(e: any): { message: string; canRetry?: boolean } {
+  const code = e?.code as string;
+  const message = firebaseErrorRu[code] || e?.message || 'Произошла ошибка входа. Попробуйте ещё раз.';
+  const canRetry = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/network-request-failed', 'auth/too-many-requests'].includes(code);
+  return { message, canRetry };
+}
 
 // import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
@@ -82,7 +104,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     } else if (theme === 'eco') {
       document.body.classList.add('eco-theme');
     }
-  }, [theme]);
+}, [theme]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -93,6 +115,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
+    }
+  };
+
+  // Login handler with error handling
+  const handleLogin = async () => {
+    try {
+      await login();
+    } catch (e: any) {
+      const { message, canRetry } = getAuthError(e);
+      console.error('Login error:', e);
+      if (canRetry) {
+        toast.error(message, { action: { label: 'Повторить', onClick: handleLogin } });
+      } else {
+        toast.error(message);
+      }
     }
   };
 
@@ -207,11 +244,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           
-          <div className="flex gap-1.5 md:gap-2 ml-auto items-center">
+<div className="flex gap-1.5 md:gap-2 ml-auto items-center">
              <NotificationBell />
              <CommandPalette />
-              {user && user.isAnonymous ? (
-                <button className="neu-button h-9 px-3 md:h-10 hidden md:flex items-center justify-center cursor-pointer gap-2 shrink-0" onClick={login}>
+             {user && user.isAnonymous ? (
+                <button className="neu-button h-9 px-3 md:h-10 hidden md:flex items-center justify-center cursor-pointer gap-2 shrink-0" onClick={handleLogin}>
                   <LogIn className="h-4 w-4" />
                   <span className="text-xs font-bold">{t('sign_in')}</span>
                 </button>
@@ -280,12 +317,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        {theme === 'neumorphic' ? 'Glassmorphism' : theme === 'glassmorphism' ? 'DeFi Yield' : theme === 'defi' ? 'Eco' : 'Neumorphic'}
                        {!planLimits.canChangeTheme && <Lock className="inline h-3 w-3 text-[var(--neu-text-muted)] ml-1" />}
                     </button>
-                    <button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
+<button onClick={() => { i18n.changeLanguage(i18n.language === 'ru' ? 'en' : 'ru'); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-text)] opacity-60 hover:opacity-100 text-left w-full">
                        <div className="w-4 h-4 flex items-center justify-center font-bold text-[10px] shrink-0">{i18n.language === 'ru' ? 'RU' : 'EN'}</div>
                        {t('change_language', 'Сменить язык')}
                     </button>
                     {user && user.isAnonymous ? (
-                      <button onClick={() => { login(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-accent)] opacity-80 hover:opacity-100 text-left w-full">
+                      <button onClick={() => { handleLogin(); setSidebarOpen(false); }} className="flex items-center gap-3 rounded-xl px-3 py-1.5 transition-all text-[var(--neu-accent)] opacity-80 hover:opacity-100 text-left w-full">
                         <LogIn className="h-4 w-4 shrink-0" />
                         {t('sign_in', 'Войти')}
                       </button>

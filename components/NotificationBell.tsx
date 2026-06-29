@@ -85,10 +85,10 @@ export function NotificationBell() {
         {isOpen && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
-            className="fixed md:absolute top-16 md:top-auto inset-x-4 md:inset-auto md:right-0 mt-4 md:w-[400px] neu-panel rounded-xl overflow-hidden z-[100] shadow-2xl border border-black/5 dark:border-white/5"
+            className="fixed md:absolute top-16 md:top-auto inset-x-4 md:inset-auto md:right-0 mt-4 md:w-[400px] neu-panel rounded-2xl overflow-hidden z-[100] shadow-2xl border border-black/5 dark:border-white/5"
           >
             <div className="p-4 md:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[var(--neu-bg)] relative z-10">
               <div className="flex items-center gap-3">

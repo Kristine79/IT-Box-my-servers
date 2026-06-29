@@ -187,20 +187,35 @@ export function Providers({ children }: { children: React.ReactNode }) {
       });
     });
 
-    return () => {
+return () => {
       unsubscribeAuth();
       unsubscribeDoc();
     };
   }, []);
 
   const login = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      // Add additional scopes for profile access
+      provider.addScope('profile');
+      provider.addScope('email');
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      // Re-throw with better context
+      throw error;
+    }
   };
 
   const loginWithGitHub = async () => {
-    const provider = new GithubAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GithubAuthProvider();
+      provider.addScope('user:email');
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error('GitHub login error:', error);
+      throw error;
+    }
   };
 
   const loginWithApple = async () => {
