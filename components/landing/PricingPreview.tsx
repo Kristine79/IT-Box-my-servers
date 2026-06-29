@@ -116,7 +116,7 @@ export function PricingPreview() {
                 ))}
               </ul>
 
-              <Link href="/app/pricing" className="block">
+              <Link href="/pricing" className="block">
                 <Button
                   className={`
                     w-full rounded-xl py-4 font-medium transition-colors

@@ -41,7 +41,7 @@ export function CTASection() {
                 Создать аккаунт
               </Button>
             </Link>
-            <Link href="/app/pricing">
+            <Link href="/pricing">
               <Button
                 variant="outline"
                 size="lg"
